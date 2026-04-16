@@ -1,16 +1,13 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import Balancer from "react-wrap-balancer";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import * as Icons from "@/components/ui/icons";
+import { toast } from "sonner";
 
 import { creem } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import * as Icons from "@/components/ui/icons";
-
 import { useSigninModal } from "@/hooks/use-signin-modal";
 import {
   getLocalizedOnetimePackages,
@@ -38,16 +35,13 @@ function formatPrice(cents: number): string {
   return `$${value}`;
 }
 
-// 定义标准功能列表（所有产品功能的并集）
 function getStandardFeatures(products: LocalizedPackage[]): FeatureItem[] {
-  // 收集所有产品的功能
-  const allFeatures = products.flatMap(p => p.localizedFeatures);
-  // 去重
+  const allFeatures = products.flatMap((product) => product.localizedFeatures);
   const uniqueFeatures = Array.from(new Set(allFeatures));
 
-  return uniqueFeatures.map(feature => ({
+  return uniqueFeatures.map((feature) => ({
     text: feature,
-    included: false, // 默认为 false，每个产品会自己设置
+    included: false,
   }));
 }
 
@@ -57,16 +51,15 @@ export function DarkPricing({
   dictCredits,
 }: DarkPricingProps) {
   const t = useTranslations("PricingCards");
+  const locale = useLocale();
+  const isZh = locale === "zh";
   const [activeTab, setActiveTab] = useState<PricingTab>("monthly");
-  const [hasAccess, setHasAccess] = useState(false);
-  const [activeProductId, setActiveProductId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const signInModal = useSigninModal();
   const { balance } = useCredits();
   const userPlan = balance?.plan || "FREE";
   const isFreeUser = !userPlan || userPlan === "FREE";
 
-  // 组织产品数据
   const allSubscriptionProducts = useMemo(
     () =>
       getLocalizedSubscriptionPackages(dictCredits).sort(
@@ -101,9 +94,6 @@ export function DarkPricing({
 
     startTransition(async () => {
       const origin = window.location.origin;
-      // 支付成功后跳转到 credits 页面
-      // 如果当前不在 pricing 页面（例如嵌入在其他页面的弹窗），则设置 returnTo 以便跳回
-      // 如果本来就在 pricing 页面，则不设置 returnTo，让用户停留在 credits 页面查看余额
       const currentPath = window.location.pathname;
       const isPricingPage = currentPath.includes("/pricing");
       const returnTo = isPricingPage ? "" : encodeURIComponent(currentPath);
@@ -138,27 +128,7 @@ export function DarkPricing({
     });
   };
 
-  const handlePortal = async () => {
-    const { data, error } = await creem.createPortal();
-    if (error) {
-      toast.error("Portal error", {
-        description: error.message ?? "Failed to open customer portal.",
-      });
-      return;
-    }
-
-    if (!data || !("url" in data) || !data.url) {
-      toast.error("Portal error", {
-        description: "Missing portal URL from Creem.",
-      });
-      return;
-    }
-
-    window.location.href = data.url;
-  };
-
-  // 获取当前 tab 的产品
-  const getCurrentProducts = () => {
+  const currentProducts = useMemo(() => {
     switch (activeTab) {
       case "onetime":
         return onetimeProducts;
@@ -169,60 +139,42 @@ export function DarkPricing({
       default:
         return [];
     }
-  };
+  }, [activeTab, monthlyProducts, onetimeProducts, yearlyProducts]);
 
-  const currentProducts = getCurrentProducts();
+  const standardFeatures = useMemo(
+    () => getStandardFeatures(currentProducts),
+    [currentProducts]
+  );
+
   const buyCreditsLabel = dictCredits.buy_credits ?? "Buy Credits";
 
-  // 计算标准功能列表（所有产品的功能并集）
-  const standardFeatures = useMemo(() => {
-    return getStandardFeatures(currentProducts);
-  }, [currentProducts]);
-
   return (
-    <section className="flex flex-col items-center text-center py-6 md:py-6">
-      {/* Tab 切换 */}
-      <div className="mb-6 mx-auto flex justify-center">
-        <div className="inline-flex rounded-lg bg-muted p-1">
-          <TabButton
-            active={activeTab === "onetime"}
-            onClick={() => setActiveTab("onetime")}
-          >
+    <section className="pb-4">
+      <div className="mx-auto mb-8 flex justify-center">
+        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-1.5">
+          <TabButton active={activeTab === "onetime"} onClick={() => setActiveTab("onetime")}>
             {t("onetime")}
           </TabButton>
-          <TabButton
-            active={activeTab === "monthly"}
-            onClick={() => setActiveTab("monthly")}
-          >
+          <TabButton active={activeTab === "monthly"} onClick={() => setActiveTab("monthly")}>
             {t("monthly")}
           </TabButton>
-          <TabButton
-            active={activeTab === "yearly"}
-            onClick={() => setActiveTab("yearly")}
-            showBadge
-          >
+          <TabButton active={activeTab === "yearly"} onClick={() => setActiveTab("yearly")}>
             {t("yearly")}
-            <span className="ml-1.5 rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
-              20% OFF
+            <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+              {isZh ? "省 20%" : "Save 20%"}
             </span>
           </TabButton>
         </div>
       </div>
 
-      {/* 价格卡片 */}
       {currentProducts.length > 0 ? (
-        <div className="mx-auto grid gap-5 bg-inherit py-5 md:grid-cols-[repeat(3,minmax(0,360px))] justify-center">
-          {currentProducts.map((product, index) => {
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {currentProducts.map((product) => {
             const isRecommended = product.popular === true;
-            const isCurrent = activeProductId === product.id && hasAccess;
-
-            // 为每个产品生成对齐后的功能列表
-            const alignedFeatures = standardFeatures.map(feature => ({
+            const alignedFeatures = standardFeatures.map((feature) => ({
               ...feature,
-              included: product.localizedFeatures.some(f => f === feature.text),
+              included: product.localizedFeatures.some((item) => item === feature.text),
             }));
-
-            // 检查是否允许免费用户购买
             const isRestricted = isFreeUser && product.allowFreeUser === false;
 
             return (
@@ -231,15 +183,16 @@ export function DarkPricing({
                 product={product}
                 features={alignedFeatures}
                 isRecommended={isRecommended}
-                isCurrent={isCurrent}
                 userId={userId}
                 isPending={isPending}
-                isRestricted={isRestricted} // Pass restriction status
+                isRestricted={isRestricted}
                 buyCreditsLabel={buyCreditsLabel}
                 dictPrice={dictPrice}
-                dictCredits={dictCredits}
+                creditsLabel={dictCredits.title ?? (isZh ? "积分" : "Credits")}
+                popularLabel={isZh ? "推荐" : "Popular"}
+                perMonthLabel={t("per_month")}
+                perYearLabel={t("per_year")}
                 onCheckout={handleCheckout}
-                onPortal={handlePortal}
                 signInModal={signInModal}
               />
             );
@@ -254,27 +207,22 @@ export function DarkPricing({
   );
 }
 
-// ============================================
-// Tab Button Component
-// ============================================
-
 interface TabButtonProps {
   active: boolean;
   children: React.ReactNode;
   onClick: () => void;
-  showBadge?: boolean;
 }
 
-function TabButton({ active, children, onClick, showBadge }: TabButtonProps) {
+function TabButton({ active, children, onClick }: TabButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
-        "relative rounded-md px-6 py-2.5 text-sm font-semibold transition-all duration-200",
-        !showBadge && "pr-6",
+        "rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200",
         active
-          ? "bg-primary text-primary-foreground shadow-md scale-105"
-          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          ? "bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.12)]"
+          : "text-white/68 hover:bg-white/6 hover:text-white"
       )}
     >
       {children}
@@ -282,22 +230,19 @@ function TabButton({ active, children, onClick, showBadge }: TabButtonProps) {
   );
 }
 
-// ============================================
-// Pricing Card Component
-// ============================================
-
 interface PricingCardProps {
   product: LocalizedPackage;
   features: FeatureItem[];
   isRecommended: boolean;
-  isCurrent: boolean;
   userId?: string;
   isPending: boolean;
   buyCreditsLabel: string;
   dictPrice: Record<string, string>;
-  dictCredits: CreditsDictionary;
+  creditsLabel: string;
+  popularLabel: string;
+  perMonthLabel: string;
+  perYearLabel: string;
   onCheckout: (product: LocalizedPackage) => void;
-  onPortal: () => void;
   signInModal: { onOpen: () => void };
   isRestricted?: boolean;
 }
@@ -306,109 +251,89 @@ function PricingCard({
   product,
   features,
   isRecommended,
-  isCurrent,
   userId,
   isPending,
   buyCreditsLabel,
   dictPrice,
-  dictCredits,
+  creditsLabel,
+  popularLabel,
+  perMonthLabel,
+  perYearLabel,
   onCheckout,
-  onPortal,
   signInModal,
   isRestricted = false,
 }: PricingCardProps) {
-  const t = useTranslations("PricingCards");
-
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-xl border transition-all duration-200",
-        isRecommended
-          ? "border-primary shadow-lg z-10 bg-secondary/5"
-          : "border-border bg-card hover:bg-muted/10"
+        "relative flex h-full flex-col overflow-hidden rounded-[28px] border bg-[linear-gradient(180deg,rgba(23,23,31,0.97),rgba(12,12,18,0.96))] shadow-[0_24px_80px_rgba(0,0,0,0.34)] transition-all",
+        isRecommended ? "border-primary/45" : "border-white/10"
       )}
     >
       {isRecommended && (
-        <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
+        <div className="absolute right-5 top-5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+          {popularLabel}
+        </div>
       )}
-      <div className={cn(
-        "min-h-[150px] items-start space-y-4 p-6",
-        isRecommended ? "bg-secondary/40" : "bg-secondary/20"
-      )}>
-        <p className="font-urban flex text-sm font-bold uppercase tracking-wider text-muted-foreground">
+
+      <div className="border-b border-white/10 p-7">
+        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-white/45">
           {product.displayName}
         </p>
-
-        <div className="flex flex-row">
-          <div className="flex items-end gap-2">
-            <div className="flex text-left text-3xl font-semibold leading-6">
-              {formatPrice(product.price.amount)}
-            </div>
-            <div className="-mb-1 ml-2 text-left text-sm font-medium text-muted-foreground">
-              {product.billingPeriod ? (product.billingPeriod === "year" ? t("per_year") : t("per_month")) : ""}
-            </div>
-          </div>
+        <div className="mt-5 flex items-end gap-2">
+          <span className="text-4xl font-semibold tracking-[-0.04em] text-white">
+            {formatPrice(product.price.amount)}
+          </span>
+          {product.billingPeriod ? (
+            <span className="pb-1 text-sm text-muted-foreground">
+              {product.billingPeriod === "year" ? perYearLabel : perMonthLabel}
+            </span>
+          ) : null}
         </div>
-
-        {/* 显示积分数 */}
-        {product.credits && (
-          <div className="text-left text-sm text-muted-foreground">
-            {dictCredits.title || "Credits"}: {product.credits.toLocaleString()}
-          </div>
-        )}
-
+        {product.credits ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {creditsLabel}: {product.credits.toLocaleString()}
+          </p>
+        ) : null}
         {product.displayDescription ? (
-          <div className="text-left text-sm text-muted-foreground">
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">
             {product.displayDescription}
-          </div>
+          </p>
         ) : null}
       </div>
 
-      <div className="flex h-full flex-col justify-between gap-10 p-6">
-        <ul className="space-y-2 text-left text-sm font-medium leading-normal">
-          {features.map((feature, idx) => (
-            <li className="flex items-start" key={idx}>
+      <div className="flex flex-1 flex-col justify-between p-7">
+        <ul className="space-y-3">
+          {features.map((feature) => (
+            <li key={feature.text} className="flex items-start gap-3 text-sm leading-7">
               {feature.included ? (
-                <Icons.Check className="mr-3 h-5 w-5 shrink-0 text-primary" />
+                <Icons.Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               ) : (
-                <Icons.Close className="mr-3 h-5 w-5 shrink-0 text-destructive" />
+                <Icons.Close className="mt-0.5 h-5 w-5 shrink-0 text-white/30" />
               )}
-              <p className={cn(feature.included ? "text-foreground" : "text-muted-foreground")}>
+              <span className={feature.included ? "text-white/88" : "text-muted-foreground"}>
                 {feature.text}
-              </p>
+              </span>
             </li>
           ))}
         </ul>
 
-        {userId ? (
-          isCurrent ? (
-            <button
-              onClick={onPortal}
-              className={cn(
-                "w-full rounded-lg py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2",
-                "hover:opacity-90",
-                isRecommended
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground"
-              )}
-            >
-              {dictPrice.manage_subscription}
-            </button>
-          ) : (
+        <div className="mt-8">
+          {userId ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="w-full">
+                  <span className="block w-full">
                     <button
+                      type="button"
                       disabled={isPending || isRestricted}
                       onClick={() => onCheckout(product)}
                       className={cn(
-                        "w-full rounded-lg py-2.5 text-sm font-semibold transition-colors flex items-center justify-center gap-2",
-                        "disabled:opacity-50 disabled:cursor-not-allowed",
-                        "hover:opacity-90",
+                        "flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition-all",
+                        "disabled:cursor-not-allowed disabled:opacity-55",
                         isRecommended
-                          ? "bg-primary text-primary-foreground"
-                          : "border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(139,92,246,0.34)] hover:bg-primary/90"
+                          : "border border-white/12 bg-white/[0.04] text-white hover:bg-white/[0.08]"
                       )}
                     >
                       {isPending ? (
@@ -417,7 +342,7 @@ function PricingCard({
                           Processing...
                         </>
                       ) : isRestricted ? (
-                        "Subscribers Only"
+                        isRestricted && "Subscribers Only"
                       ) : product.billingPeriod ? (
                         dictPrice.upgrade
                       ) : (
@@ -433,21 +358,22 @@ function PricingCard({
                 )}
               </Tooltip>
             </TooltipProvider>
-          )
-        ) : (
-          <button
-            onClick={signInModal.onOpen}
-            className={cn(
-              "w-full rounded-lg py-2.5 text-sm font-semibold transition-colors",
-              "hover:opacity-90",
-              isRecommended
-                ? "bg-primary text-primary-foreground"
-                : "border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground"
-            )}
-          >
-            {dictPrice.signup}
-          </button>
-        )}
+          ) : (
+            <button
+              type="button"
+              onClick={signInModal.onOpen}
+              className={cn(
+                "w-full rounded-2xl px-5 py-3 text-sm font-semibold transition-all",
+                isRecommended
+                  ? "bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(139,92,246,0.34)] hover:bg-primary/90"
+                  : "border border-white/12 bg-white/[0.04] text-white hover:bg-white/[0.08]"
+              )}
+            >
+              {dictPrice.signup}
+            </button>
+          )}
+
+        </div>
       </div>
     </div>
   );

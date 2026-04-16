@@ -1,33 +1,25 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Sparkles, Zap, Play } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Play, Sparkles, Zap } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import type { ProviderType } from "@/ai";
+import {
+  isModelModeSupported,
+  type GenerationMode,
+} from "@/ai/model-mapping";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { cn } from "@/components/ui";
 import {
   VideoGeneratorInput,
   type SubmitData,
   DEFAULT_CONFIG,
   DEFAULT_DEFAULTS,
 } from "@/components/video-generator";
-import { BlurFade } from "@/components/magicui/blur-fade";
-import { Meteors } from "@/components/magicui/meteors";
-import { cn } from "@/components/ui";
-import { authClient } from "@/lib/auth/client";
-import { calculateModelCredits, getAvailableModels } from "@/config/credits";
-import { NEW_USER_GIFT } from "@/config/pricing-user";
-import { uploadImage } from "@/lib/video-api";
-import { useSigninModal } from "@/hooks/use-signin-modal";
-import { videoTaskStorage } from "@/lib/video-task-storage";
-import type { ProviderType } from "@/ai";
-import {
-  isModelModeSupported,
-  type GenerationMode,
-} from "@/ai/model-mapping";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +30,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { calculateModelCredits, getAvailableModels } from "@/config/credits";
+import { NEW_USER_GIFT } from "@/config/pricing-user";
+import { useSigninModal } from "@/hooks/use-signin-modal";
+import { authClient } from "@/lib/auth/client";
+import { uploadImage } from "@/lib/video-api";
+import { videoTaskStorage } from "@/lib/video-task-storage";
 
 const PENDING_PROMPT_KEY = "videofly_pending_prompt";
 const PENDING_IMAGE_KEY = "videofly_pending_image";
@@ -61,18 +59,11 @@ interface HeroSectionProps {
   currentProvider?: ProviderType;
 }
 
-/**
- * Hero Section - 视频生成器优先设计
- *
- * 设计模式: Video-First Hero with Glassmorphism
- * - Hero 区域直接集成视频生成组件
- * - Glassmorphism 风格: 背景模糊、透明层、微妙边框
- * - Magic UI 动画组件增强交互体验
- */
 export function HeroSection({ currentProvider }: HeroSectionProps) {
   const t = useTranslations("Hero");
   const tNotify = useTranslations("Notifications");
   const locale = useLocale();
+  const isZh = locale === "zh";
   const router = useRouter();
   const signInModal = useSigninModal();
   const { data: session } = authClient.useSession();
@@ -237,7 +228,6 @@ export function HeroSection({ currentProvider }: HeroSectionProps) {
     } catch (error) {
       console.error("Generation error:", error);
       const message = error instanceof Error ? error.message : "Failed to generate video. Please try again.";
-      // Check for common errors and provide helpful messages
       if (message.includes("credits") || message.includes("Credit")) {
         toast.error("Insufficient credits. Please top up and try again.");
       } else if (message.includes("database") || message.includes("DATABASE_URL")) {
@@ -297,7 +287,6 @@ export function HeroSection({ currentProvider }: HeroSectionProps) {
       return;
     }
 
-    // Check for notification permission
     if (typeof window !== "undefined" && "Notification" in window) {
       const asked = localStorage.getItem(NOTIFICATION_ASKED_KEY);
       if (!asked && Notification.permission === "default") {
@@ -310,106 +299,145 @@ export function HeroSection({ currentProvider }: HeroSectionProps) {
     processSubmission(data);
   };
 
+  const heroStats = [
+    {
+      value: "Text + Image",
+      label: isZh ? "双输入工作流" : "Input workflow",
+    },
+    {
+      value: "16:9 / 9:16",
+      label: isZh ? "常用比例" : "Aspect ratios",
+    },
+    {
+      value: "Multi-model",
+      label: isZh ? "统一模型入口" : "Model routing",
+    },
+    {
+      value: "Async Tasks",
+      label: isZh ? "生成与回看" : "Task lifecycle",
+    },
+  ];
+
   return (
-    <section id="generator" className="relative min-h-screen overflow-hidden pb-20">
-      {/* 动画流星效果 */}
+    <section id="generator" className="relative overflow-hidden pb-24 pt-6 sm:pb-28">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <Meteors number={15} minDelay={0.5} maxDelay={2} minDuration={3} maxDuration={8} />
+        <div className="absolute left-1/2 top-[-22rem] h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-primary/14 blur-[150px]" />
+        <div className="absolute left-[12%] top-[28%] h-40 w-40 rounded-full bg-sky-500/8 blur-[120px]" />
+        <div className="absolute right-[10%] top-[22%] h-44 w-44 rounded-full bg-fuchsia-500/10 blur-[125px]" />
+        <div
+          className="absolute inset-0 opacity-[0.14] mix-blend-soft-light"
+          style={{
+            backgroundImage: "url('/images/noise.webp')",
+            backgroundSize: "180px 180px",
+          }}
+        />
       </div>
 
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="flex flex-col items-center gap-10">
-          {/* 标题与说明区域 */}
+      <div className="container mx-auto flex min-h-[calc(100vh-7rem)] max-w-7xl flex-col justify-center px-4 pb-8 pt-8 md:pt-12">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 text-center md:gap-12">
           <motion.div
-            initial={{ opacity: 0, y: -30 }}
+            initial={{ opacity: 0, y: -24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center space-y-6 max-w-3xl mx-auto"
+            className="max-w-4xl space-y-7"
           >
-            {/* Badge */}
             <BlurFade delay={0.05} inView>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/78 backdrop-blur-xl">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">
-                  {t("badge")}
-                </span>
+                <span>{t("badge")}</span>
               </div>
             </BlurFade>
 
-            {/* 主标题 */}
             <BlurFade delay={0.1} inView>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              <h1 className="text-balance font-heading text-5xl font-semibold tracking-[-0.04em] text-white md:text-6xl lg:text-7xl">
                 {t("title")}
               </h1>
             </BlurFade>
 
-            {/* 描述 */}
             <BlurFade delay={0.2} inView>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              <p className="mx-auto max-w-3xl text-balance text-lg leading-8 text-muted-foreground md:text-xl">
                 {t("description")}
               </p>
             </BlurFade>
 
-            {/* 特性标签 */}
             <BlurFade delay={0.3} inView className="flex flex-wrap justify-center gap-3">
               {[
-                { icon: Zap, label: t("features.fast"), color: "text-yellow-500" },
-                { icon: Play, label: t("features.easy"), color: "text-primary" },
+                { icon: Zap, label: t("features.fast"), color: "text-amber-400" },
+                { icon: Play, label: t("features.easy"), color: "text-sky-400" },
                 { icon: Sparkles, label: t("features.ai"), color: "text-primary" },
               ].map((feature, idx) => {
                 const Icon = feature.icon;
                 return (
                   <motion.div
                     key={feature.label}
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 + idx * 0.1 }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/60 dark:bg-white/10 backdrop-blur-sm border border-border/50"
+                    transition={{ delay: 0.36 + idx * 0.08 }}
+                    className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-sm font-medium text-white/82 backdrop-blur-xl"
                   >
                     <Icon className={cn("h-4 w-4", feature.color)} />
-                    <span className="text-sm font-medium">{feature.label}</span>
+                    <span>{feature.label}</span>
                   </motion.div>
                 );
               })}
             </BlurFade>
           </motion.div>
 
-          {/* 视频生成器 - 核心组件 */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            className="w-full max-w-4xl mx-auto relative"
+            transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
+            className="relative w-full"
           >
-            {/* 装饰性光晕效果 */}
-            <div className="absolute -inset-4 rounded-3xl blur-3xl -z-10 opacity-30 dark:opacity-10" style={{ backgroundImage: "linear-gradient(to right, oklch(from var(--primary) l c h), oklch(from var(--primary) l c calc(h + 30)))" }} />
+            <div className="absolute inset-x-10 -top-10 h-28 rounded-full bg-primary/14 blur-[100px]" />
+            <div className="absolute inset-x-0 bottom-6 h-16 rounded-full bg-fuchsia-500/8 blur-[90px]" />
+            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-black/35 p-4 shadow-[0_30px_100px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:p-5">
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0))]" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
-            {/* 视频生成器 - 不需要外层容器，直接使用组件 */}
-            {generatorConfig.videoModels.length > 0 ? (
-              <VideoGeneratorInput
-                config={generatorConfig}
-                defaults={generatorDefaults}
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-                calculateCredits={calculateCredits}
-                onSubmit={handleSubmit}
-              />
-            ) : (
-              <div className="rounded-3xl border border-border bg-card/80 p-8 text-center text-sm text-muted-foreground">
-                No enabled models are available for the current AI provider configuration.
-              </div>
-            )}
+              {generatorConfig.videoModels.length > 0 ? (
+                <VideoGeneratorInput
+                  className="max-w-none"
+                  config={generatorConfig}
+                  defaults={generatorDefaults}
+                  isLoading={isSubmitting}
+                  disabled={isSubmitting}
+                  calculateCredits={calculateCredits}
+                  onSubmit={handleSubmit}
+                />
+              ) : (
+                <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-8 text-center text-sm text-muted-foreground">
+                  No enabled models are available for the current AI provider configuration.
+                </div>
+              )}
+            </div>
 
             {NEW_USER_GIFT.enabled && NEW_USER_GIFT.credits > 0 && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="text-center text-xs text-muted-foreground mt-4"
+                className="mt-4 text-center text-xs text-muted-foreground"
               >
                 {t("creditsHint", { credits: NEW_USER_GIFT.credits })}
               </motion.p>
             )}
+
+            <div className="mt-8 grid gap-3 border-t border-white/10 pt-6 sm:grid-cols-2 xl:grid-cols-4">
+              {heroStats.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 text-left"
+                >
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-white/92">
+                    {item.value}
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {item.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
-// import { ShowcaseSection } from "@/components/landing/showcase-section";
+import { ShowcaseSection } from "@/components/landing/showcase-section";
 import { HowItWorks } from "@/components/landing/how-it-works-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FAQSection } from "@/components/landing/faq-section";
@@ -70,7 +70,7 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <>
       <HeroSection currentProvider={getConfiguredAIProvider()} />
-      {/* <ShowcaseSection /> */}
+      <ShowcaseSection />
       <FeaturesSection />
       <HowItWorks />
       <PricingSection />

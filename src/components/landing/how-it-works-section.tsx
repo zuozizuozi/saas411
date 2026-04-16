@@ -1,217 +1,105 @@
 "use client";
 
-import { Type, Upload, Video, Download, Clock, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { Download, ImagePlus, SlidersHorizontal, Type } from "lucide-react";
 
-import { BlurFade } from "@/components/magicui/blur-fade";
-import { MagicCard } from "@/components/magicui/magic-card";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
-import { NumberTicker } from "@/components/magicui/number-ticker";
-import { cn } from "@/components/ui";
-import { LocaleLink } from "@/i18n/navigation";
-
-/**
- * How It Works Section - 工作流程展示
- *
- * 设计模式: Step-by-Step with MagicCard + Connected Timeline
- * - MagicCard 鼠标跟随光效
- * - 渐变连接线 + 箭头
- * - 动画数字计数器
- */
-
-// 步骤数据
-const steps = [
-  {
-    step: "01",
-    icon: Type,
-    titleKey: "steps.prompt.title",
-    descKey: "steps.prompt.description",
-    gradient: { from: "#9E7AFF", to: "#C084FC" },
-    stat: { value: 30, suffix: "s", labelKey: "steps.prompt.stat" },
-  },
-  {
-    step: "02",
-    icon: Upload,
-    titleKey: "steps.upload.title",
-    descKey: "steps.upload.description",
-    gradient: { from: "#6366F1", to: "#818CF8" },
-    stat: { value: 20, suffix: "+", labelKey: "steps.upload.stat" },
-  },
-  {
-    step: "03",
-    icon: Video,
-    titleKey: "steps.generate.title",
-    descKey: "steps.generate.description",
-    gradient: { from: "#EC4899", to: "#F472B6" },
-    stat: { value: 2, suffix: "min", labelKey: "steps.generate.stat" },
-  },
-  {
-    step: "04",
-    icon: Download,
-    titleKey: "steps.download.title",
-    descKey: "steps.download.description",
-    gradient: { from: "#F59E0B", to: "#FBBF24" },
-    stat: { value: 1080, suffix: "p", labelKey: "steps.download.stat" },
-  },
-];
+const icons = [Type, ImagePlus, SlidersHorizontal, Download];
 
 export function HowItWorks() {
-  const t = useTranslations("HowItWorks");
+  const locale = useLocale();
+  const isZh = locale === "zh";
+
+  const steps = [
+    {
+      step: "01",
+      title: isZh ? "输入视频想法" : "Describe the scene",
+      description: isZh
+        ? "写下主体、动作、镜头、光线和氛围，让首页工作台直接成为真实生成入口。"
+        : "Start with the subject, action, camera, and lighting so the homepage doubles as a real generation workspace.",
+    },
+    {
+      step: "02",
+      title: isZh ? "添加参考素材" : "Add reference media",
+      description: isZh
+        ? "需要时上传图片或关键视觉，帮助模型锁定风格、主体和运动方向。"
+        : "Upload an image when you need tighter control over style, subject identity, or movement direction.",
+    },
+    {
+      step: "03",
+      title: isZh ? "选择模型与参数" : "Pick model and settings",
+      description: isZh
+        ? "在一个面板里处理模型、比例、时长与分辨率，减少跳转和理解成本。"
+        : "Keep model, ratio, duration, and quality in one clear panel so users can decide fast and confidently.",
+    },
+    {
+      step: "04",
+      title: isZh ? "生成、查看与下载" : "Generate, review, download",
+      description: isZh
+        ? "任务发起后继续走你现有的鉴权、积分、任务状态和回调链路，结果页也保持闭环。"
+        : "Generation continues through your existing auth, credits, task tracking, and callback flow until the result is ready.",
+    },
+  ];
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-background" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
-      </div>
-
+    <section className="relative py-24 md:py-28">
       <div className="container mx-auto px-4">
-        {/* 区域标题 */}
-        <BlurFade inView>
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            {/* 徽章 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6"
-            >
-              <Clock className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
-                {t("badge")}
-              </span>
-            </motion.div>
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/65">
+            {isZh ? "工作流程" : "Workflow"}
+          </span>
+          <h2 className="mt-6 text-balance text-4xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
+            {isZh ? "从第一句提示词，到最终视频交付" : "From first prompt to finished video"}
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-muted-foreground">
+            {isZh
+              ? "对标站点最有说服力的地方，在于流程清楚、入口直接、付费路径自然，而不是把功能藏得很深。"
+              : "The best competitor flows feel direct: users understand the product fast, start fast, and see where pricing fits."}
+          </p>
+        </div>
 
-            {/* 主标题 */}
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
-            >
-              {t("title")}
-              <span className="block bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent mt-2">
-                {t("subtitle")}
-              </span>
-            </motion.h2>
-
-            {/* 描述 */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            >
-              {t("description")}
-            </motion.p>
-          </div>
-        </BlurFade>
-
-        {/* 步骤卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-
+        <div className="mt-14 grid gap-5 lg:grid-cols-4">
+          {steps.map((item, index) => {
+            const Icon = icons[index];
             return (
-              <BlurFade key={step.step} delay={index * 0.1} inView>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  {/* MagicCard 包裹 */}
-                  <MagicCard
-                    className="h-full rounded-2xl border border-border bg-card dark:bg-black/40 backdrop-blur-xl"
-                    gradientFrom={step.gradient.from}
-                    gradientTo={step.gradient.to}
-                    gradientSize={200}
-                    gradientOpacity={0.12}
-                  >
-                    <div className="relative p-6 h-full flex flex-col">
-                      {/* 步骤编号 + 图标 */}
-                      <div className="flex items-center gap-3 mb-5">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                          style={{
-                            background: `linear-gradient(135deg, ${step.gradient.from}, ${step.gradient.to})`,
-                          }}
-                        >
-                          {step.step}
-                        </div>
-                        <motion.div
-                          whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
-                          transition={{ duration: 0.4 }}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md"
-                          style={{
-                            background: `linear-gradient(135deg, ${step.gradient.from}20, ${step.gradient.to}20)`,
-                          }}
-                        >
-                          <Icon className="h-6 w-6" style={{ color: step.gradient.from }} />
-                        </motion.div>
-                      </div>
-
-                      {/* 标题 */}
-                      <h3 className="text-lg font-semibold mb-2 line-clamp-1">
-                        {t(step.titleKey)}
-                      </h3>
-
-                      {/* 描述 */}
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 flex-1">
-                        {t(step.descKey)}
-                      </p>
-
-                      {/* 统计数据 */}
-                      {step.stat && (
-                        <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">
-                            {t(step.stat.labelKey)}
-                          </span>
-                          <span className="text-lg font-bold tabular-nums">
-                            <NumberTicker value={step.stat.value} />
-                            <span className="text-muted-foreground text-sm ml-0.5">
-                              {step.stat.suffix}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </MagicCard>
-                </motion.div>
-              </BlurFade>
+              <motion.article
+                key={item.step}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08, duration: 0.45 }}
+                className="rounded-[26px] border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold tracking-[0.24em] text-white/45">{item.step}</span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+                <h3 className="mt-8 text-xl font-semibold text-white">{item.title}</h3>
+                <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.description}</p>
+              </motion.article>
             );
           })}
         </div>
 
-        {/* 底部 CTA */}
-        <BlurFade delay={0.5} inView>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-16 flex justify-center"
-          >
-            <LocaleLink href="/#generator">
-              <ShimmerButton
-                shimmerColor="#ffffff"
-                shimmerSize="0.05em"
-                shimmerDuration="3s"
-                borderRadius="100px"
-                background="oklch(from var(--primary) l c h)"
-                className="px-8 py-3 text-base font-medium shadow-lg shadow-primary/25"
-              >
-                {t("cta")}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </ShimmerButton>
-            </LocaleLink>
-          </motion.div>
-        </BlurFade>
+        <div className="mt-10 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,17,24,0.92),rgba(10,10,16,0.96))] p-8 md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-medium uppercase tracking-[0.22em] text-white/45">
+                {isZh ? "适合视频 SaaS 的落地页结构" : "Landing page logic"}
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-white md:text-3xl">
+                {isZh ? "先讲输入与结果，再讲能力与定价，转化路径会自然很多" : "Lead with input and output, then explain capabilities and pricing"}
+              </h3>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm leading-7 text-muted-foreground md:max-w-sm">
+              {isZh
+                ? "这次保留你已有的鉴权、支付、积分和 provider 接法，只把前端营销结构调整到更接近成熟竞品的状态。"
+                : "This pass keeps auth, billing, credits, and provider plumbing intact while moving the frontend closer to a polished competitor layout."}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

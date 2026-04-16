@@ -281,16 +281,16 @@ export function GeneratorPanel({
   return (
     <div className="h-full flex flex-col">
       {/* Main Card - Pollo.ai Style */}
-      <div className="flex-1 flex flex-col rounded-xl bg-card border border-border overflow-hidden text-foreground">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(24,24,34,0.98),rgba(12,12,18,0.96))] text-foreground shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
         {/* Header Bar */}
-        <div className="px-5 py-3 bg-muted/40 border-b border-border shrink-0">
-          <h2 className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
+        <div className="shrink-0 border-b border-white/10 bg-white/[0.03] px-5 py-4">
+          <h2 className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
             {getPageTitle()}
           </h2>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
+        <div className="flex-1 space-y-5 overflow-y-auto p-5 custom-scrollbar">
           {!hasAvailableModels && (
             <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
               No models are currently available for this tool under the active AI
@@ -302,32 +302,32 @@ export function GeneratorPanel({
             <>
           {/* Model Selection */}
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-              MODEL
-            </span>
-            {currentModel && (
+             <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
+               MODEL
+             </span>
+             {currentModel && (
                 <DropdownMenu open={isModelDropdownOpen} onOpenChange={setIsModelDropdownOpen}>
                 <DropdownMenuTrigger asChild disabled={isLoading}>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors text-sm text-white"
+                    className="flex items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.05] px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/[0.08]"
                   >
                     {renderModelIcon(currentModel.id, currentModel.name, "sm")}
                     <span>{currentModel.name}</span>
                     <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-zinc-900 border-zinc-800 w-80 max-h-[400px] overflow-y-scroll custom-scrollbar">
-                  <DropdownMenuLabel className="text-zinc-400 text-xs">
+                <DropdownMenuContent className="custom-scrollbar max-h-[400px] w-80 overflow-y-scroll border-white/10 bg-black/92 text-white backdrop-blur-2xl">
+                  <DropdownMenuLabel className="text-xs text-zinc-400">
                     Video Models
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-zinc-800" />
+                  <DropdownMenuSeparator className="bg-white/10" />
                   {availableModels.map((model) => (
                     <DropdownMenuItem
                       key={model.id}
                       data-model-id={model.id}
                       onClick={() => setSelectedModel(model.id)}
-                      className="text-white hover:bg-zinc-800 flex flex-col items-start py-3"
+                       className="flex flex-col items-start py-3 text-white hover:bg-white/6 focus:bg-white/6"
                     >
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ export function GeneratorPanel({
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe the video you want to create, e.g., A cat playing in a sunny garden with natural lighting and fresh atmosphere..."
               disabled={isLoading}
-              className="w-full min-h-[100px] max-h-[200px] px-4 py-3 rounded-lg bg-muted/40 border border-border text-foreground placeholder:text-muted-foreground/70 resize-none focus:outline-none focus:border-primary transition-colors text-sm leading-relaxed"
+               className="min-h-[120px] max-h-[220px] w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-foreground transition-colors placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none"
               rows={4}
               maxLength={2000}
             />
@@ -384,7 +384,7 @@ export function GeneratorPanel({
                   {toolType === "reference-to-video" ? "REFERENCE IMAGE" : "IMAGE SOURCE"}
                 </SectionLabel>
                 {imageFile || imageUrl ? (
-                  <div className="relative group h-32 rounded-lg overflow-hidden border-2 border-zinc-700">
+                   <div className="group relative h-32 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -401,14 +401,14 @@ export function GeneratorPanel({
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-muted/80 hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity"
+                       className="absolute right-2 top-2 rounded-full border border-white/10 bg-black/70 p-1.5 opacity-0 transition-opacity hover:bg-black group-hover:opacity-100"
                     >
                       <X className="w-3.5 h-3.5 text-foreground" />
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors group">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-muted/60 group-hover:bg-muted transition-colors">
+                   <label className="group flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/14 bg-white/[0.02] transition-colors hover:border-primary/45 hover:bg-primary/6">
+                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.05] transition-colors group-hover:bg-white/[0.08]">
                       <ImageIcon className="w-6 h-6 text-muted-foreground group-hover:text-primary" />
                     </div>
                     <p className="text-sm text-muted-foreground mt-3">Upload image</p>
@@ -440,11 +440,11 @@ export function GeneratorPanel({
                       onClick={() => setAspectRatio(ar)}
                       disabled={isLoading}
                       className={cn(
-                        "aspect-square w-full rounded-lg text-xs font-medium transition-all border flex items-center justify-center",
-                        aspectRatio === ar
-                          ? "bg-primary/10 text-foreground border-primary"
-                          : "bg-muted/40 text-muted-foreground border-border hover:border-muted-foreground/40"
-                      )}
+                         "flex aspect-square w-full items-center justify-center rounded-2xl border text-xs font-medium transition-all",
+                         aspectRatio === ar
+                           ? "border-primary/50 bg-primary/10 text-foreground"
+                           : "border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/20"
+                       )}
                     >
                       <div className="flex flex-col items-center gap-2">
                         <div className={cn(
@@ -477,11 +477,11 @@ export function GeneratorPanel({
                         onClick={() => setDuration(d)}
                         disabled={isLoading}
                         className={cn(
-                          "h-10 rounded-lg text-sm font-medium transition-all",
-                          duration === d
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted/40 text-muted-foreground hover:bg-muted/60"
-                        )}
+                           "h-10 rounded-xl text-sm font-medium transition-all",
+                           duration === d
+                             ? "bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(139,92,246,0.26)]"
+                             : "bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08]"
+                         )}
                       >
                         {d}s
                       </button>
@@ -501,11 +501,11 @@ export function GeneratorPanel({
                         onClick={() => setQuality(q)}
                         disabled={isLoading}
                         className={cn(
-                          "h-10 rounded-lg text-sm font-medium transition-all capitalize",
-                          quality === q
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted/40 text-muted-foreground hover:bg-muted/60"
-                        )}
+                           "h-10 rounded-xl text-sm font-medium capitalize transition-all",
+                           quality === q
+                             ? "bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(139,92,246,0.26)]"
+                             : "bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08]"
+                         )}
                       >
                         {q}
                       </button>
@@ -520,7 +520,7 @@ export function GeneratorPanel({
         </div>
 
         {/* Bottom Section - Credits + Generate Button */}
-        <div className="px-5 py-4 bg-muted/40 border-t border-border space-y-4 shrink-0">
+        <div className="shrink-0 space-y-4 border-t border-white/10 bg-white/[0.03] px-5 py-4">
           {/* Credits Display */}
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Total Credits:</span>
@@ -536,11 +536,11 @@ export function GeneratorPanel({
             onClick={handleSubmit}
             disabled={!canSubmit}
             className={cn(
-              "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all",
-              canSubmit
-                ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
-            )}
+                  "flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition-all",
+                  canSubmit
+                    ? "bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(139,92,246,0.34)] hover:bg-primary/90"
+                    : "bg-white/[0.05] text-muted-foreground cursor-not-allowed"
+                )}
           >
             {isLoading ? (
               <>

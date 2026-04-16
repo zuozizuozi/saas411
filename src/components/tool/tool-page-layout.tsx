@@ -584,10 +584,11 @@ export function ToolPageLayout({
   if (!user) {
     return (
       <>
-        <div className="flex flex-1 flex-col lg:flex-row h-full overflow-hidden">
+        <div className="relative flex h-full flex-1 flex-col overflow-hidden lg:flex-row">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(129,92,246,0.18),transparent_26%),radial-gradient(circle_at_82%_24%,rgba(236,72,153,0.14),transparent_22%),linear-gradient(180deg,rgba(5,6,10,0.12),rgba(5,6,10,0))]" />
           {/* Mobile Tabs */}
           {showMobileTabs && (
-            <div className="lg:hidden flex border-b border-border shrink-0">
+            <div className="flex shrink-0 border-b border-white/10 lg:hidden">
               <button
                 type="button"
                 onClick={() => setActiveTab("generator")}
@@ -615,7 +616,7 @@ export function ToolPageLayout({
             but here we control the content area to be scrollable */}
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {/* Tool Area Container */}
-            <div className="container mx-auto max-w-[1600px] p-6 lg:p-8">
+            <div className="container mx-auto max-w-[1600px] px-4 py-6 lg:px-6 lg:py-8">
               <div className={`flex flex-col lg:flex-row gap-6 ${activeTab === "generator" ? "" : "lg:flex"}`}>
 
                 {/* Generator Panel Side */}
@@ -636,17 +637,18 @@ export function ToolPageLayout({
                 </div>
 
                 {/* Result/Preview Side */}
-                <div className={`${activeTab === "result" ? "block" : "hidden"} lg:block flex-1 min-h-[500px] rounded-2xl border border-border bg-muted/20 overflow-hidden relative`}>
+                <div className={`${activeTab === "result" ? "block" : "hidden"} lg:block relative min-h-[500px] flex-1 overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,18,24,0.96),rgba(10,10,15,0.94))] shadow-[0_24px_80px_rgba(0,0,0,0.4)]`}>
                   {/* Preview Placeholder for Unauthenticated Users */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-                    <div className="w-16 h-16 rounded-full bg-muted/50 mb-4 flex items-center justify-center">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                    <div className="absolute inset-x-10 top-10 h-24 rounded-full bg-primary/15 blur-[90px]" />
+                    <div className="mb-5 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border border-white/10 bg-white/[0.05]">
                       <svg className="w-8 h-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-medium mb-2">Detailed Preview</h3>
-                    <p className="text-sm max-w-xs">Login to generate and view your high-quality AI videos.</p>
+                    <h3 className="mb-2 text-lg font-medium text-white">Detailed Preview</h3>
+                    <p className="max-w-xs text-sm">Login to generate and preview your AI videos inside the full studio workspace.</p>
                   </div>
                 </div>
               </div>
@@ -669,10 +671,11 @@ export function ToolPageLayout({
   // Authenticated Layout: Three-column application mode
   return (
     <>
-      <div className="flex flex-1 flex-col h-full overflow-hidden p-4 lg:p-4 gap-6 bg-background">
+      <div className="relative flex h-full flex-1 flex-col gap-6 overflow-hidden bg-background px-4 py-4 lg:px-4">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_0%,rgba(129,92,246,0.18),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(236,72,153,0.14),transparent_20%)]" />
         {/* Mobile Tabs */}
         {showMobileTabs && (
-          <div className="lg:hidden flex border-b border-border mb-4 shrink-0">
+          <div className="mb-2 flex shrink-0 border-b border-white/10 lg:hidden">
             <button
               type="button"
               onClick={() => setActiveTab("generator")}
@@ -696,13 +699,13 @@ export function ToolPageLayout({
           </div>
         )}
 
-        <div className="grid min-h-0 h-fit max-h-[calc(100svh-120px)] grid-cols-1 lg:grid-cols-[380px_minmax(0,1.2fr)] gap-5">
+        <div className="grid h-fit min-h-0 max-h-[calc(100svh-120px)] grid-cols-1 gap-5 lg:grid-cols-[380px_minmax(0,1.2fr)]">
           {/* Generator Panel */}
           <div
             className={`${activeTab === "generator" ? "flex" : "hidden"
               } lg:flex flex-col h-full min-h-0`}
           >
-            <div className="h-full min-h-0 rounded-2xl bg-card/70 p-3">
+            <div className="h-full min-h-0 rounded-[32px] border border-white/10 bg-white/[0.03] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl">
               <GeneratorPanel
                 toolType={toolRoute as "image-to-video" | "text-to-video" | "reference-to-video"}
                 isLoading={isSubmitting}
