@@ -24,7 +24,8 @@ export async function ensureCustomer(userId: string) {
       authUserId: userId,
       plan: SubscriptionPlan.FREE,
     })
+    .onConflictDoNothing({ target: customers.authUserId })
     .returning();
 
-  return created ?? null;
+  return created ?? getCustomerByUserId(userId);
 }

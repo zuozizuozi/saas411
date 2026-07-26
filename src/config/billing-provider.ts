@@ -1,9 +1,9 @@
-export type BillingProvider = "creem" | "stripe";
+export type BillingProvider = "stripe";
 
-const providerEnv = process.env.NEXT_PUBLIC_BILLING_PROVIDER;
-
-export const billingProvider: BillingProvider =
-  providerEnv === "stripe" ? "stripe" : "creem";
-
-export const isCreemProvider = billingProvider === "creem";
-export const isStripeProvider = billingProvider === "stripe";
+/**
+ * Stripe is the only production billing path. Keeping this as code rather
+ * than an environment switch prevents two payment providers from issuing
+ * credits or subscriptions for the same account.
+ */
+export const billingProvider: BillingProvider = "stripe";
+export const isStripeProvider = true;

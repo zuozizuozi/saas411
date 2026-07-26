@@ -1,84 +1,130 @@
 import type Stripe from "stripe";
-
-import { SubscriptionPlan, customers, db } from "@/db";
 import { eq } from "drizzle-orm";
 
+import { getOnetimeProducts } from "@/config/credits";
+import { SubscriptionPlan, customers, db } from "@/db";
+import { CreditTransType, creditService } from "@/services/credit";
+import { ensureCustomer } from "@/services/customer";
 import { stripe } from ".";
-import { getSubscriptionPlan } from "./plans";
+import {
+  getSubscriptionCreditGrant,
+  getSubscriptionPlan,
+  isSubscriptionCreditInvoiceReason,
+} from "./plans";
+
+async function syncSubscription(subscription: Stripe.Subscription) {
+  const userId = subscription.metadata.userId;
+  if (!userId) throw new Error("Missing user id in Stripe subscription metadata");
+
+  const localCustomer = await ensureCustomer(userId);
+  if (!localCustomer) throw new Error("Failed to create local customer");
+
+  const priceId = subscription.items.data[0]?.price.id;
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+  const active = ["active", "trialing", "past_due"].includes(subscription.status);
+
+  await db
+    .update(customers)
+    .set({
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscription.id,
+      stripePriceId: active ? priceId : null,
+      stripeCurrentPeriodEnd: active
+        ? new Date(subscription.current_period_end * 1000)
+        : new Date(),
+      plan: active ? getSubscriptionPlan(priceId) : SubscriptionPlan.FREE,
+      updatedAt: new Date(),
+    })
+    .where(eq(customers.id, localCustomer.id));
+}
+
+async function fulfillCreditPurchase(session: Stripe.Checkout.Session) {
+  const { packageId, purchaseType, userId } = session.metadata ?? {};
+  if (purchaseType !== "credits" || !packageId || !userId) return false;
+  if (session.payment_status !== "paid") {
+    throw new Error(`Stripe credit session is not paid: ${session.id}`);
+  }
+
+  const product = getOnetimeProducts().find((item) => item.id === packageId);
+  if (!product) throw new Error(`Unknown credit package: ${packageId}`);
+
+  await creditService.recharge({
+    userId,
+    credits: product.credits,
+    orderNo: `stripe_${session.id}`,
+    transType: CreditTransType.ORDER_PAY,
+    expiryDays: product.expireDays,
+    remark: `Stripe credit purchase: ${product.name}`,
+  });
+  return true;
+}
+
+async function fulfillSubscriptionInvoice(
+  invoice: Stripe.Invoice,
+  subscription: Stripe.Subscription
+) {
+  if (invoice.status !== "paid") {
+    throw new Error(`Stripe subscription invoice is not paid: ${invoice.id}`);
+  }
+  if (!isSubscriptionCreditInvoiceReason(invoice.billing_reason)) {
+    return false;
+  }
+
+  const userId = subscription.metadata.userId;
+  if (!userId) throw new Error("Missing user id in Stripe subscription metadata");
+
+  const priceId = subscription.items.data[0]?.price.id;
+  const grant = getSubscriptionCreditGrant(priceId);
+  if (!grant) throw new Error(`Unknown Stripe subscription price: ${priceId}`);
+
+  await creditService.recharge({
+    userId,
+    credits: grant.credits,
+    orderNo: `stripe_invoice_${invoice.id}`,
+    transType: CreditTransType.SUBSCRIPTION,
+    expiryDays: grant.expiryDays,
+    remark: `Stripe subscription credits: ${grant.name}`,
+  });
+  return true;
+}
 
 export async function handleEvent(event: Stripe.DiscriminatedEvent) {
-  const session = event.data.object as Stripe.Checkout.Session;
   if (event.type === "checkout.session.completed") {
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
-    const customerId =
-      typeof subscription.customer === "string"
-        ? subscription.customer
-        : subscription.customer.id;
-    const { userId } = subscription.metadata;
-    if (!userId) {
-      throw new Error("Missing user id");
-    }
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.authUserId, userId))
-      .limit(1);
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (await fulfillCreditPurchase(session)) return;
 
-    if (customer) {
-      return await db
-        .update(customers)
-        .set({
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: subscription.items.data[0]?.price.id,
-        })
-        .where(eq(customers.id, customer.id));
+    if (session.subscription) {
+      const subscription = await stripe.subscriptions.retrieve(
+        typeof session.subscription === "string"
+          ? session.subscription
+          : session.subscription.id
+      );
+      await syncSubscription(subscription);
     }
+    return;
   }
 
   if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object as Stripe.Invoice;
+    if (!invoice.subscription) return;
     const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
+      typeof invoice.subscription === "string"
+        ? invoice.subscription
+        : invoice.subscription.id
     );
-    const customerId =
-      typeof subscription.customer === "string"
-        ? subscription.customer
-        : subscription.customer.id;
-    const { userId } = subscription.metadata;
-    if (!userId) {
-      throw new Error("Missing user id");
-    }
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.authUserId, userId))
-      .limit(1);
-
-    if (customer) {
-      const priceId = subscription.items.data[0]?.price.id;
-      if (!priceId) {
-        return;
-      }
-
-      const plan = getSubscriptionPlan(priceId);
-      return await db
-        .update(customers)
-        .set({
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: priceId,
-          stripeCurrentPeriodEnd: new Date(
-            subscription.current_period_end * 1000
-          ),
-          plan: plan || SubscriptionPlan.FREE,
-        })
-        .where(eq(customers.id, customer.id));
-    }
+    await syncSubscription(subscription);
+    await fulfillSubscriptionInvoice(invoice, subscription);
+    return;
   }
-  if (event.type === "customer.subscription.updated") {
-    console.log("event.type: ", event.type);
+
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    await syncSubscription(event.data.object as Stripe.Subscription);
   }
-  console.log("✅ Stripe Webhook Processed");
 }

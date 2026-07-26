@@ -1,34 +1,16 @@
 "use client";
 
-// ============================================
-// 左侧导航组件
-// ============================================
-
-import { useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ImagePlay, Type, Video, FolderOpen, Gem, User, Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { cn } from "@/components/ui";
-import { sidebarNavigation } from "@/config/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetClose,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { ShineBorder } from "@/registry/magicui/shine-border";
+import { Clock3, FolderOpen, Gem, ImagePlay, Sparkles, Type, User } from "lucide-react";
 
-const iconMap = {
-  ImagePlay,
-  Type,
-  Video,
-  FolderOpen,
-  Gem,
-  User,
-};
+import { cn } from "@/components/ui";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { sidebarNavigation } from "@/config/navigation";
+import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
+
+const iconMap = { ImagePlay, Type, FolderOpen, Gem, User };
 
 interface SidebarProps {
   lang?: string;
@@ -39,190 +21,62 @@ interface SidebarProps {
 export function Sidebar({ lang = "en", mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), "");
-  const t = useTranslations("Sidebar");
   const { openModal } = useUpgradeModal();
+  const isZh = lang === "zh";
 
-  // 判断是否为免费用户（可根据实际业务调整）
-  const isFreeUser = useMemo(() => true, []);
-
-  // 处理升级按钮点击
-  const handleUpgradeClick = () => {
-    console.log("Upgrade button clicked");
-    try {
-      openModal({ reason: "upgrade" });
-      console.log("Modal opened");
-    } catch (error) {
-      console.error("Failed to open modal:", error);
-    }
-  };
-
-  // 渲染导航项
-  const renderNavItem = (item: any, isActive: boolean) => {
-    const Icon = iconMap[item.icon as keyof typeof iconMap];
-
-    return (
-      <Link
-        key={item.id}
-        href={`/${lang}${item.href}`}
-        className={cn(
-          "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-medium transition-colors",
-          isActive
-            ? "bg-primary text-primary-foreground"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-        )}
-      >
-        {Icon && <Icon className="h-4 w-4 shrink-0" />}
-        <span className="truncate">{item.title}</span>
+  const navigation = (
+    <div className="flex h-full flex-col bg-[#070b15]">
+      <Link href={`/${lang}`} className="flex h-[60px] shrink-0 items-center gap-2.5 border-b border-slate-800 px-4 text-white">
+        <Image src="/logo.svg" alt="VideoFly" width={28} height={28} className="rounded-lg" />
+        <span className="text-lg font-bold tracking-tight">VideoFly</span>
       </Link>
-    );
-  };
 
-  // Desktop Sidebar
-  const DesktopNav = () => (
-    <div className="flex flex-col h-full py-4">
-      {/* 主导航 */}
-      <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
-        {sidebarNavigation.map((group) => (
-          <div key={group.id} className="space-y-1">
-            {group.title && (
-              <div className="px-2 mb-2 text-xs font-medium text-muted-foreground">
-                {group.title}
-              </div>
-            )}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const isActive = pathWithoutLang === item.href;
-                return renderNavItem(item, isActive);
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      {/* 底部升级区域 */}
-      {isFreeUser && (
-        <div className="px-3 pt-4 border-t border-border/50">
-          <button
-            onClick={handleUpgradeClick}
-            className="group relative w-full text-left overflow-hidden rounded-xl bg-background p-[1px] hover:translate-y-[-2px] transition-transform"
-            type="button"
-          >
-            <ShineBorder
-              shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
-              borderWidth={1}
-            />
-            <div className="relative bg-gradient-to-br from-primary/15 via-background to-primary/5 p-3 rounded-xl">
-              <div className="relative flex items-center gap-2 mb-1">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <Sparkles className="h-4 w-4" />
-                </span>
-                <span className="text-sm font-semibold text-foreground">
-                  {t("upgradeTitle")}
-                </span>
-              </div>
-              <p className="relative text-xs text-muted-foreground">
-                {t("upgradeSubtitle")}
-              </p>
-            </div>
-          </button>
+      <nav className="custom-scrollbar flex-1 overflow-y-auto px-3 py-4">
+        <div className="mb-5 flex items-center gap-2 px-2 text-sm font-semibold text-slate-200">
+          <Sparkles className="h-4 w-4 text-blue-400" />
+          {isZh ? "创作工作室" : "AI Studio"}
         </div>
-      )}
-    </div>
-  );
-
-  // Mobile Nav
-  const MobileNav = () => (
-    <div className="flex flex-col h-full py-4">
-      <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
         {sidebarNavigation.map((group) => (
-          <div key={group.id} className="space-y-1">
-            {group.title && (
-              <div className="px-2 mb-2 text-xs font-medium text-muted-foreground">
-                {group.title}
-              </div>
-            )}
-            <div className="space-y-0.5">
+          <div key={group.id} className="mb-5">
+            {group.title && <div className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{group.id === "video" ? (isZh ? "视频" : "Video") : group.title}</div>}
+            <div className="space-y-1">
               {group.items.map((item) => {
-                const isActive = pathWithoutLang === item.href;
+                const Icon = iconMap[item.icon as keyof typeof iconMap];
+                const active = pathWithoutLang === item.href;
+                const titleMap: Record<string, string> = { txt2vid: "文生视频", img2vid: "图生视频", creations: "我的创作", credits: "积分", settings: "账户" };
                 return (
-                  <SheetClose key={item.id} asChild>
-                    <Link
-                      href={`/${lang}${item.href}`}
-                      onClick={onMobileClose}
-                      className={cn(
-                        "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      {(() => {
-                        const Icon = iconMap[item.icon as keyof typeof iconMap];
-                        return Icon && <Icon className="h-4 w-4 shrink-0" />;
-                      })()}
-                      <span className="truncate">{item.title}</span>
-                    </Link>
-                  </SheetClose>
+                  <Link key={item.id} href={`/${lang}${item.href}`} onClick={onMobileClose} className={cn("flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm transition-colors", active ? "bg-blue-600/15 text-blue-300" : "text-slate-400 hover:bg-slate-800/70 hover:text-white")}>
+                    {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                    <span>{isZh ? titleMap[item.id] : item.title}</span>
+                  </Link>
                 );
               })}
             </div>
           </div>
         ))}
+        <Link href={`/${lang}/my-creations`} className="mt-1 flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm text-slate-400 transition-colors hover:bg-slate-800/70 hover:text-white">
+          <Clock3 className="h-4 w-4" />{isZh ? "生成历史" : "Generation history"}
+        </Link>
       </nav>
 
-      {/* 移动端升级区域 */}
-      {isFreeUser && (
-        <div className="px-3 pt-4 border-t border-border/50">
-          <SheetClose asChild>
-            <button
-              onClick={handleUpgradeClick}
-              className="group relative w-full text-left overflow-hidden rounded-xl bg-background p-[1px] hover:translate-y-[-2px] transition-transform"
-              type="button"
-            >
-              <ShineBorder
-                shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
-                borderWidth={1}
-              />
-              <div className="relative bg-gradient-to-br from-primary/15 via-background to-primary/5 p-3 rounded-xl">
-                <div className="relative flex items-center gap-2 mb-1">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
-                    <Sparkles className="h-4 w-4" />
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    {t("upgradeTitle")}
-                  </span>
-                </div>
-                <p className="relative text-xs text-muted-foreground">
-                  {t("upgradeSubtitle")}
-                </p>
-              </div>
-            </button>
-          </SheetClose>
-        </div>
-      )}
+      <div className="shrink-0 p-3">
+        <button type="button" onClick={() => openModal({ reason: "upgrade" })} className="w-full rounded-xl border border-blue-500/25 bg-gradient-to-br from-blue-600/15 to-violet-600/10 p-3 text-left transition-colors hover:border-blue-400/50">
+          <span className="mb-1 flex items-center gap-2 text-sm font-semibold text-white"><Gem className="h-4 w-4 text-amber-400" />{isZh ? "升级套餐" : "Upgrade plan"}</span>
+          <span className="text-xs leading-5 text-slate-400">{isZh ? "解锁更多积分、高清输出与快速队列" : "More credits, HD output and faster queues"}</span>
+        </button>
+      </div>
     </div>
   );
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-[200px] border-r border-border bg-background">
-        <DesktopNav />
-      </aside>
-
-      {/* Mobile Sidebar */}
-      {mobileOpen && (
-        <Sheet open={mobileOpen} onOpenChange={onMobileClose ? () => onMobileClose() : undefined}>
-          <SheetContent position="left" className="w-[280px] p-0">
-            <div className="flex flex-col h-full">
-              <SheetHeader className="sr-only">
-                <SheetTitle>{t("title")}</SheetTitle>
-              </SheetHeader>
-              <MobileNav />
-            </div>
-          </SheetContent>
-        </Sheet>
-      )}
+      <aside className="hidden h-screen w-56 shrink-0 border-r border-slate-800 lg:block">{navigation}</aside>
+      <Sheet open={Boolean(mobileOpen)} onOpenChange={(open) => { if (!open) onMobileClose?.(); }}>
+        <SheetContent position="left" className="w-64 border-slate-800 bg-[#070b15] p-0 text-white">
+          <SheetHeader className="sr-only"><SheetTitle>VideoFly</SheetTitle></SheetHeader>
+          {navigation}
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

@@ -36,36 +36,30 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   const offset = (page - 1) * limit;
 
   // 获取用户总数（带搜索）
-  let totalUsersResult;
-  if (search) {
-    totalUsersResult = await db
+  const totalUsersResult = search
+    ? await db
       .select({ count: count() })
       .from(users)
-      .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`);
-  } else {
-    totalUsersResult = await db.select({ count: count() }).from(users);
-  }
+      .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`)
+    : await db.select({ count: count() }).from(users);
   const totalUsers = totalUsersResult[0]?.count || 0;
   const totalPages = Math.ceil(totalUsers / limit);
 
   // 获取用户列表
-  let usersList;
-  if (search) {
-    usersList = await db
+  const usersList = search
+    ? await db
       .select()
       .from(users)
       .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`)
       .orderBy(desc(users.createdAt))
       .limit(limit)
-      .offset(offset);
-  } else {
-    usersList = await db
+      .offset(offset)
+    : await db
       .select()
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
-  }
 
   // 获取每个用户的统计信息
   const usersWithStats = await Promise.all(

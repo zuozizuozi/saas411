@@ -36,6 +36,8 @@ export interface ModelConfig {
   provider: ProviderType;
   description: string;
   supportImageToVideo: boolean;
+  /** Whether the provider accepts an audio-generation flag for this model. */
+  supportAudio?: boolean;
   maxDuration: number;
   durations: number[];
   aspectRatios: string[];
@@ -191,6 +193,7 @@ export const CREDITS_CONFIG = {
             provider: "apimart" as const,
             description: "models.seedance.description",
             supportImageToVideo: true,
+            supportAudio: true,
             maxDuration: 12,
             durations: [4, 5, 6, 8, 10, 12],
             aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],
@@ -202,6 +205,7 @@ export const CREDITS_CONFIG = {
             provider: "apimart" as const,
             description: "models.seedance10fast.description",
             supportImageToVideo: true,
+            supportAudio: true,
             maxDuration: 12,
             durations: [2, 4, 5, 6, 8, 10, 12],
             aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],
@@ -213,6 +217,7 @@ export const CREDITS_CONFIG = {
             provider: "apimart" as const,
             description: "models.seedance10quality.description",
             supportImageToVideo: true,
+            supportAudio: true,
             maxDuration: 12,
             durations: [2, 4, 5, 6, 8, 10, 12],
             aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],

@@ -14,6 +14,7 @@ import {
 
 export const subscriptionPlanEnum = pgEnum("SubscriptionPlan", [
   "FREE",
+  "BASIC",
   "PRO",
   "BUSINESS",
 ]);
@@ -66,7 +67,7 @@ export const customers = pgTable(
     updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   },
   (table) => ({
-    authUserIdIdx: index("Customer_authUserId_idx").on(table.authUserId),
+    authUserIdIdx: uniqueIndex("Customer_authUserId_idx").on(table.authUserId),
   })
 );
 
@@ -81,6 +82,7 @@ export const users = pgTable("user", {
   isAdmin: boolean("isAdmin").default(false).notNull(),
 });
 
+/** Legacy table retained only for non-destructive upgrades; no runtime code uses it. */
 export const creemSubscriptions = pgTable(
   "creem_subscriptions",
   {
@@ -247,6 +249,7 @@ export const creditPackages = pgTable(
       table.userId,
       table.expiredAt
     ),
+    orderNoIdx: uniqueIndex("credit_packages_order_no_idx").on(table.orderNo),
   })
 );
 
@@ -300,6 +303,7 @@ export const videos = pgTable(
   {
     id: serial("id").primaryKey(),
     uuid: text("uuid").notNull().unique(),
+    batchUuid: text("batch_uuid"),
     userId: text("user_id").notNull(),
     prompt: text("prompt").notNull(),
     model: text("model").notNull(),
@@ -325,8 +329,54 @@ export const videos = pgTable(
   },
   (table) => ({
     userIdx: index("videos_user_id_idx").on(table.userId),
+    batchIdx: index("videos_batch_uuid_idx").on(table.batchUuid),
     statusIdx: index("videos_status_idx").on(table.status),
     createdAtIdx: index("videos_created_at_idx").on(table.createdAt),
+  })
+);
+
+/** User-owned uploads that can be reused as image-to-video inputs. */
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: serial("id").primaryKey(),
+    uuid: text("uuid").notNull().unique(),
+    userId: text("user_id").notNull(),
+    kind: text("kind").notNull().default("IMAGE"),
+    storageKey: text("storage_key").notNull().unique(),
+    url: text("url").notNull(),
+    fileName: text("file_name").notNull(),
+    contentType: text("content_type").notNull(),
+    fileSize: integer("file_size").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userCreatedIdx: index("media_assets_user_created_at_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+  })
+);
+
+export const providerEvents = pgTable(
+  "provider_events",
+  {
+    id: serial("id").primaryKey(),
+    provider: text("provider").notNull(),
+    model: text("model").notNull(),
+    videoUuid: text("video_uuid"),
+    operation: text("operation").notNull(),
+    success: boolean("success").notNull(),
+    latencyMs: integer("latency_ms").notNull(),
+    creditsQuoted: integer("credits_quoted").default(0).notNull(),
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    providerCreatedIdx: index("provider_events_provider_created_at_idx").on(
+      table.provider,
+      table.createdAt
+    ),
   })
 );
 
@@ -336,9 +386,12 @@ export type CreditPackage = typeof creditPackages.$inferSelect;
 export type CreditHold = typeof creditHolds.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Video = typeof videos.$inferSelect;
+export type MediaAsset = typeof mediaAssets.$inferSelect;
+export type ProviderEvent = typeof providerEvents.$inferSelect;
 
 export const SubscriptionPlan = {
   FREE: "FREE",
+  BASIC: "BASIC",
   PRO: "PRO",
   BUSINESS: "BUSINESS",
 } as const;

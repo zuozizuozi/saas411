@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/error";
 import { handleApiError, apiSuccess } from "@/lib/api/response";
 import { getStorage } from "@/lib/storage";
+import { mediaAssetService } from "@/services/media-asset";
 
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
@@ -46,7 +47,16 @@ export async function POST(request: Request) {
       contentType: file.type,
     });
 
-    return apiSuccess({ publicUrl: uploaded.url, key });
+    const asset = await mediaAssetService.create({
+      userId: user.id,
+      storageKey: uploaded.key,
+      url: uploaded.url,
+      fileName: file.name,
+      contentType: file.type,
+      fileSize: file.size,
+    });
+
+    return apiSuccess({ publicUrl: uploaded.url, key, asset });
   } catch (error) {
     return handleApiError(error);
   }

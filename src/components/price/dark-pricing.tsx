@@ -5,8 +5,13 @@ import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import * as Icons from "@/components/ui/icons";
 import { toast } from "sonner";
+import { useAction } from "next-safe-action/hooks";
 
-import { creem } from "@/lib/auth/client";
+import {
+  createStripeCreditSessionAction,
+  createStripeSessionAction,
+} from "@/actions/stripe";
+import { priceDataMap } from "@/config/price/price-data";
 import { cn } from "@/lib/utils";
 import { useSigninModal } from "@/hooks/use-signin-modal";
 import {
@@ -55,6 +60,8 @@ export function DarkPricing({
   const isZh = locale === "zh";
   const [activeTab, setActiveTab] = useState<PricingTab>("monthly");
   const [isPending, startTransition] = useTransition();
+  const subscriptionCheckout = useAction(createStripeSessionAction);
+  const creditCheckout = useAction(createStripeCreditSessionAction);
   const signInModal = useSigninModal();
   const { balance } = useCredits();
   const userPlan = balance?.plan || "FREE";
@@ -93,38 +100,39 @@ export function DarkPricing({
     }
 
     startTransition(async () => {
-      const origin = window.location.origin;
-      const currentPath = window.location.pathname;
-      const isPricingPage = currentPath.includes("/pricing");
-      const returnTo = isPricingPage ? "" : encodeURIComponent(currentPath);
+      let result: { data?: { url?: string | null } } | undefined;
+      if (product.billingPeriod) {
+        const planId = product.name.startsWith("Basic")
+          ? "basic"
+          : product.name.startsWith("Pro")
+            ? "pro"
+            : "ultimate";
+        const offer = (priceDataMap[locale] ?? priceDataMap.en).find(
+          (item) => item.id === planId
+        );
+        const stripePriceId =
+          product.billingPeriod === "year"
+            ? offer?.stripeIds.yearly
+            : offer?.stripeIds.monthly;
+        if (!stripePriceId) {
+          toast.error("Checkout is not configured for this plan.");
+          return;
+        }
+        result = await subscriptionCheckout.executeAsync({
+          planId: stripePriceId,
+        });
+      } else {
+        result = await creditCheckout.executeAsync({ packageId: product.id });
+      }
 
-      const successUrl = returnTo
-        ? `${origin}/credits?payment=success&returnTo=${returnTo}`
-        : `${origin}/credits?payment=success`;
-
-      const { data, error } = await creem.createCheckout({
-        productId: product.id,
-        successUrl,
-        metadata: {
-          plan: product.id,
-        },
-      });
-
-      if (error) {
+      if (!result?.data?.url) {
         toast.error("Checkout error", {
-          description: error.message ?? "Failed to create checkout session.",
+          description: "Failed to create Stripe checkout session.",
         });
         return;
       }
 
-      if (!data || !("url" in data) || !data.url) {
-        toast.error("Checkout error", {
-          description: "Missing checkout URL from Creem.",
-        });
-        return;
-      }
-
-      window.location.href = data.url;
+      window.location.href = result.data.url;
     });
   };
 

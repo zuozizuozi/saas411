@@ -2,7 +2,9 @@ import { customers, db } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
 import { stripe } from "@/payment";
 import { pricingData } from "@/payment/subscriptions";
+import { getOnetimeProducts } from "@/config/credits";
 import { eq } from "drizzle-orm";
+import { ensureCustomer } from "./customer";
 
 export type UserSubscriptionPlan = {
   title: string;
@@ -27,23 +29,24 @@ export type UserSubscriptionPlan = {
 };
 
 export async function createStripeSession(userId: string, planId: string) {
-  const [customer] = await db
-    .select({
-      id: customers.id,
-      plan: customers.plan,
-      stripeCustomerId: customers.stripeCustomerId,
-    })
-    .from(customers)
-    .where(eq(customers.authUserId, userId))
-    .limit(1);
+  const requestedPlan = pricingData.some(
+    (plan) => plan.stripeIds.monthly === planId || plan.stripeIds.yearly === planId
+  );
+  if (!requestedPlan) {
+    throw new Error("Unknown Stripe price ID");
+  }
+
+  // Every Stripe flow needs a local customer row before the webhook arrives.
+  // This also makes a first purchase work for users who never opened settings.
+  const customer = await ensureCustomer(userId);
 
   const returnUrl = process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
     : "/dashboard";
 
-  if (customer?.plan && customer.plan !== "FREE") {
+  if (customer?.plan && customer.plan !== "FREE" && customer.stripeCustomerId) {
     const session = await stripe.billingPortal.sessions.create({
-      customer: customer.stripeCustomerId!,
+      customer: customer.stripeCustomerId,
       return_url: returnUrl,
     });
     return { success: true as const, url: session.url };
@@ -70,6 +73,47 @@ export async function createStripeSession(userId: string, planId: string) {
   return { success: true as const, url: session.url };
 }
 
+export async function createStripeCreditSession(userId: string, packageId: string) {
+  const product = getOnetimeProducts().find((item) => item.id === packageId);
+  if (!product) throw new Error("Unknown credit package");
+
+  const user = await getCurrentUser();
+  if (!user || user.id !== userId) {
+    return { success: false as const, url: null };
+  }
+
+  const returnUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/credits`
+    : "/credits";
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    payment_method_types: ["card"],
+    customer_email: user.email,
+    client_reference_id: userId,
+    metadata: {
+      purchaseType: "credits",
+      packageId: product.id,
+      credits: String(product.credits),
+      userId,
+    },
+    cancel_url: returnUrl,
+    success_url: `${returnUrl}?checkout=success`,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: product.price.currency.toLowerCase(),
+          unit_amount: product.price.amount,
+          product_data: { name: product.name },
+        },
+      },
+    ],
+  });
+
+  if (!session.url) return { success: false as const, url: null };
+  return { success: true as const, url: session.url };
+}
+
 export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan | undefined> {
   const [custom] = await db
     .select({
@@ -83,7 +127,16 @@ export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan
     .limit(1);
 
   if (!custom) {
-    return undefined;
+    return {
+      ...pricingData[0]!,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      stripePriceId: null,
+      stripeCurrentPeriodEnd: 0,
+      isPaid: false,
+      interval: null,
+      isCanceled: false,
+    };
   }
 
   const isPaid =

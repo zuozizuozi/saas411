@@ -10,6 +10,10 @@ export interface SubscriptionPlanTranslation {
     monthly: number;
     yearly: number;
   };
+  stripeIds: {
+    monthly: string | null;
+    yearly: string | null;
+  };
   credits?: {
     monthly: number;
     yearly: number;
@@ -50,7 +54,7 @@ function generatePriceData() {
   const popularMap: Record<string, boolean> = {};
 
   for (const product of SUBSCRIPTION_PRODUCTS) {
-    const planId = planIdMap[product.name];
+    const planId = planIdMap[product.name.replace(" (Yearly)", "")];
     if (!planId) continue;
 
     if (!pricesMap[planId]) {
@@ -163,6 +167,20 @@ function generatePriceData() {
   };
 
   const plans: ("basic" | "pro" | "ultimate")[] = ["basic", "pro", "ultimate"];
+  const stripeIds: Record<string, { monthly: string | null; yearly: string | null }> = {
+    basic: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID ?? null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID ?? null,
+    },
+    pro: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID ?? null,
+    },
+    ultimate: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID ?? null,
+      yearly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID ?? null,
+    },
+  };
 
   // 生成中文数据
   const zhData = plans.map((planId) => ({
@@ -172,6 +190,7 @@ function generatePriceData() {
     benefits: planFeatures[planId].benefits.zh,
     limitations: planFeatures[planId].limitations.zh,
     prices: pricesMap[planId],
+    stripeIds: stripeIds[planId],
     credits: creditsMap[planId],
     popular: popularMap[planId],
   }));
@@ -184,6 +203,7 @@ function generatePriceData() {
     benefits: planFeatures[planId].benefits.en,
     limitations: planFeatures[planId].limitations.en,
     prices: pricesMap[planId],
+    stripeIds: stripeIds[planId],
     credits: creditsMap[planId],
     popular: popularMap[planId],
   }));

@@ -14,9 +14,6 @@ export const env = createEnv({
     // Stripe (optional - only required if using Stripe as billing provider)
     STRIPE_API_KEY: z.string().min(1).optional(),
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-    // Creem
-    CREEM_API_KEY: z.string().min(1).optional(),
-    CREEM_WEBHOOK_SECRET: z.string().optional(),
     // Resend Email
     RESEND_API_KEY: z.string().min(1),
     RESEND_FROM: z.string().min(1),
@@ -36,12 +33,11 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     STRIPE_API_KEY: process.env.STRIPE_API_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    CREEM_API_KEY: process.env.CREEM_API_KEY,
-    CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM: process.env.RESEND_FROM,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     IS_DEBUG: process.env.IS_DEBUG,
   },
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

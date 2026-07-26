@@ -1,26 +1,20 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { DarkPricing } from "@/components/price/dark-pricing";
 import { PricingCards } from "@/components/price/pricing-cards";
-import { billingProvider } from "@/config/billing-provider";
+import { StripeCreditPacks } from "@/components/price/stripe-credit-packs";
 import { getUserPlans } from "@/services/billing";
-import type { CreditsDictionary } from "@/hooks/use-credit-packages";
 import type { UserSubscriptionPlan } from "@/types";
 
 export async function PricingSection() {
   const user = await getCurrentUser();
   const locale = await getLocale();
   let subscriptionPlan: UserSubscriptionPlan | undefined;
-  const isCreem = billingProvider === "creem";
-
-  if (user && !isCreem) {
+  if (user) {
     subscriptionPlan = await getUserPlans(user.id);
   }
 
   const t = await getTranslations("PricingCards");
-  const dictPrice = (await getTranslations()).raw("PricingCards") as Record<string, string>;
-  const dictCredits = (await getTranslations()).raw("Credits") as CreditsDictionary;
   const isZh = locale === "zh";
 
   return (
@@ -41,18 +35,11 @@ export async function PricingSection() {
         </div>
 
         <div className="mx-auto max-w-6xl">
-          {isCreem ? (
-            <DarkPricing
-              userId={user?.id}
-              dictPrice={dictPrice}
-              dictCredits={dictCredits}
-            />
-          ) : (
-            <PricingCards
-              userId={user?.id}
-              subscriptionPlan={subscriptionPlan}
-            />
-          )}
+          <PricingCards
+            userId={user?.id}
+            subscriptionPlan={subscriptionPlan}
+          />
+          <StripeCreditPacks userId={user?.id} />
         </div>
       </div>
     </section>

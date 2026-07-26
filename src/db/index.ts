@@ -37,6 +37,9 @@ function createDb() {
   const sql = postgres(databaseUrl, {
     max: 10,
     ssl: parseSslConfig(databaseUrl),
+    // Supabase's transaction pooler (the correct endpoint for Vercel
+    // serverless functions) does not support PostgreSQL prepared statements.
+    prepare: false,
   });
   return drizzle(sql, { schema });
 }

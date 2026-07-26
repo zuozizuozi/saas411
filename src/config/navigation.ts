@@ -36,12 +36,6 @@ export const sidebarNavigation: NavGroup[] = [
         href: "/image-to-video",
         icon: "ImagePlay",
       },
-      {
-        id: "ref2vid",
-        title: "Reference Video",
-        href: "/reference-to-video",
-        icon: "Video",
-      },
     ],
   },
   // 未来 IMAGE 分组扩展示例
@@ -110,12 +104,6 @@ export const headerTools = [
     title: "Image to Video",
     href: "/image-to-video",
     icon: "ImagePlay",
-  },
-  {
-    id: "ref2vid",
-    title: "Reference to Video",
-    href: "/reference-to-video",
-    icon: "Video",
   },
 ];
 

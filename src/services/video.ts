@@ -1,19 +1,23 @@
 import { VideoStatus, db, videos } from "@/db";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, lt } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getStorage } from "@/lib/storage";
-import { getModelConfig, calculateModelCredits } from "../config/credits";
+import { calculateModelCredits } from "../config/credits";
 import { getProvider, type ProviderType, type VideoTaskResponse } from "../ai";
 import {
-  isModelModeSupported,
-  isModelSupported,
-  normalizeGenerationMode,
-} from "../ai/model-mapping";
+  getProviderCandidates,
+  isRetryableProviderError,
+} from "../ai/routing";
 import { creditService } from "./credit";
+import { generationQuotaService } from "./generation-quota";
+import { providerHealthService } from "./provider-health";
 import { generateSignedCallbackUrl } from "@/ai/utils/callback-signature";
 import { emitVideoEvent } from "@/lib/video-events";
 import { ApiError } from "@/lib/api/error";
-import { getConfiguredAIProvider } from "@/ai/provider-config";
+import { scheduleVideoReconciliation } from "@/lib/upstash";
+import { validateGenerationParams } from "./video-validation";
+
+export { validateGenerationParams } from "./video-validation";
 
 export interface GenerateVideoParams {
   userId: string;
@@ -27,15 +31,22 @@ export interface GenerateVideoParams {
   mode?: string;
   outputNumber?: number;
   generateAudio?: boolean;
+  removeWatermark?: boolean;
+  /** Internal grouping key used when one request creates multiple tasks. */
+  batchUuid?: string;
+  /** Internal reservation created atomically by generateBatch. */
+  reservedVideoUuid?: string;
 }
 
 export interface VideoGenerationResult {
+  batchUuid?: string;
   videoUuid: string;
   taskId: string;
   provider: ProviderType;
   status: string;
   estimatedTime?: number;
   creditsUsed: number;
+  outputs?: VideoGenerationResult[];
 }
 
 export class VideoService {
@@ -75,42 +86,23 @@ export class VideoService {
    * Create video generation task
    */
   async generate(params: GenerateVideoParams): Promise<VideoGenerationResult> {
-    const modelConfig = getModelConfig(params.model);
-    if (!modelConfig) {
-      throw new ApiError(`Unsupported model: ${params.model}`, 400, {
-        code: "UNSUPPORTED_MODEL",
-        model: params.model,
-      });
+    const validated = validateGenerationParams(params);
+    const requestedOutputs = validated.outputNumber;
+    if (requestedOutputs > 1 && !params.batchUuid) {
+      return this.generateBatch(params, requestedOutputs);
     }
 
-    const effectiveDuration = params.duration || modelConfig.durations[0] || 5;
+    const modelConfig = validated.modelConfig;
+    const effectiveDuration = validated.duration;
 
-    const outputNumber = Math.max(1, params.outputNumber ?? 1);
+    const outputNumber = 1;
     const creditsRequired = calculateModelCredits(params.model, {
       duration: effectiveDuration,
       quality: params.quality,
     }) * outputNumber;
 
-    const hasImageInput =
-      (params.imageUrls && params.imageUrls.length > 0) || Boolean(params.imageUrl);
-    const resolvedMode = normalizeGenerationMode(params.mode, hasImageInput);
-
-    if (
-      (resolvedMode === "image-to-video" ||
-        resolvedMode === "reference-to-video" ||
-        resolvedMode === "frames-to-video") &&
-      !hasImageInput
-    ) {
-      throw new ApiError(
-        `Mode ${resolvedMode} requires uploaded input media`,
-        400,
-        {
-          code: "MISSING_INPUT_MEDIA",
-          mode: resolvedMode,
-          model: params.model,
-        }
-      );
-    }
+    const hasImageInput = validated.imageUrls.length > 0;
+    const resolvedMode = validated.mode;
 
     if (hasImageInput && !modelConfig.supportImageToVideo) {
       throw new ApiError(
@@ -123,39 +115,27 @@ export class VideoService {
       );
     }
 
-    const configuredProvider = getConfiguredAIProvider();
-    if (configuredProvider && !isModelSupported(params.model, configuredProvider)) {
+    let providerCandidates = getProviderCandidates(params.model, resolvedMode);
+    if (providerCandidates.length === 0) {
       throw new ApiError(
-        `Model ${params.model} is not available for provider ${configuredProvider}`,
+        `No configured provider can run ${params.model} in ${resolvedMode} mode`,
         400,
         {
-          code: "MODEL_NOT_AVAILABLE_FOR_PROVIDER",
-          model: params.model,
-          provider: configuredProvider,
-        }
-      );
-    }
-
-    const actualProvider = configuredProvider || modelConfig.provider;
-    if (!isModelModeSupported(params.model, actualProvider, resolvedMode)) {
-      throw new ApiError(
-        `Mode ${resolvedMode} is not supported for model ${params.model} on provider ${actualProvider}`,
-        400,
-        {
-          code: "MODE_NOT_SUPPORTED",
+          code: "MODEL_ROUTE_UNAVAILABLE",
           model: params.model,
           mode: resolvedMode,
-          provider: actualProvider,
+          configuredProvider: modelConfig.provider,
         }
       );
     }
+    providerCandidates = await providerHealthService.prioritize(providerCandidates);
 
-    const videoUuid = `vid_${nanoid(21)}`;
+    const initialProvider = providerCandidates[0]!;
 
-    const [videoResult] = await db
-      .insert(videos)
-      .values({
+    const videoUuid = params.reservedVideoUuid ?? `vid_${nanoid(21)}`;
+    const reservationValues = {
         uuid: videoUuid,
+        batchUuid: params.batchUuid,
         userId: params.userId,
         prompt: params.prompt,
         model: params.model,
@@ -168,101 +148,151 @@ export class VideoService {
           imageUrl: params.imageUrl,
           imageUrls: params.imageUrls,
           generateAudio: params.generateAudio,
+          removeWatermark: params.removeWatermark,
         },
         status: VideoStatus.PENDING,
         startImageUrl: params.imageUrls?.[0] || params.imageUrl || null,
         creditsUsed: creditsRequired,
         duration: effectiveDuration,
         aspectRatio: params.aspectRatio || null,
-        provider: actualProvider,
+        provider: initialProvider,
         updatedAt: new Date(),
-      })
-      .returning({ uuid: videos.uuid, id: videos.id });
+      } satisfies typeof videos.$inferInsert;
 
-    if (!videoResult) {
-      throw new Error("Failed to create video record");
-    }
-
-    let freezeResult: { success: boolean; holdId: number };
-    try {
-      freezeResult = await creditService.freeze({
-        userId: params.userId,
-        credits: creditsRequired,
-        videoUuid: videoResult.uuid,
-      });
-    } catch (error) {
-      await db
-        .update(videos)
-        .set({
-          status: VideoStatus.FAILED,
-          errorMessage: String(error),
-          updatedAt: new Date(),
-        })
-        .where(eq(videos.uuid, videoResult.uuid));
-
-      const insufficientCreditsError = this.toInsufficientCreditsApiError(
-        error,
-        creditsRequired
+    let videoResult: { uuid: string; id: number };
+    if (params.reservedVideoUuid) {
+      const [reserved] = await db
+        .select({ uuid: videos.uuid, id: videos.id })
+        .from(videos)
+        .where(
+          and(
+            eq(videos.uuid, params.reservedVideoUuid),
+            eq(videos.userId, params.userId),
+            eq(videos.status, VideoStatus.PENDING)
+          )
+        )
+        .limit(1);
+      if (!reserved) throw new Error("Reserved video task is unavailable");
+      videoResult = reserved;
+    } else {
+      videoResult = await generationQuotaService.reserveVideo(
+        params.userId,
+        params.model,
+        reservationValues
       );
-      if (insufficientCreditsError) {
-        throw insufficientCreditsError;
+
+      try {
+        await creditService.freeze({
+          userId: params.userId,
+          credits: creditsRequired,
+          videoUuid: videoResult.uuid,
+        });
+      } catch (error) {
+        await db
+          .update(videos)
+          .set({
+            status: VideoStatus.FAILED,
+            errorMessage: String(error),
+            updatedAt: new Date(),
+          })
+          .where(eq(videos.uuid, videoResult.uuid));
+
+        const insufficientCreditsError = this.toInsufficientCreditsApiError(
+          error,
+          creditsRequired
+        );
+        if (insufficientCreditsError) throw insufficientCreditsError;
+        throw error;
       }
-      throw error;
     }
-
-    if (!freezeResult.success) {
-      await db
-        .update(videos)
-        .set({
-          status: VideoStatus.FAILED,
-          errorMessage: `Insufficient credits. Required: ${creditsRequired}`,
-          updatedAt: new Date(),
-        })
-        .where(eq(videos.uuid, videoResult.uuid));
-      throw new ApiError("Insufficient credits", 402, {
-        code: "INSUFFICIENT_CREDITS",
-        requiredCredits: creditsRequired,
-      });
-    }
-
-    const provider = getProvider(actualProvider);
-
-    const callbackUrl = this.callbackBaseUrl
-      ? generateSignedCallbackUrl(
-        `${this.callbackBaseUrl}/${actualProvider}`,
-        videoResult.uuid
-      )
-      : undefined;
 
     try {
-      const result = await provider.createTask({
-        model: params.model,
-        prompt: params.prompt,
-        duration: effectiveDuration,  // ✅ 使用计算后的时长
-        aspectRatio: params.aspectRatio,
-        quality: params.quality,
-        imageUrl: params.imageUrl,
-        imageUrls: params.imageUrls,
-        mode: resolvedMode,
-        outputNumber,
-        generateAudio: params.generateAudio,
-        callbackUrl,
-      });
+      let result: VideoTaskResponse | undefined;
+      let selectedProvider: ProviderType | undefined;
+      const routingErrors: string[] = [];
+
+      for (const providerType of providerCandidates) {
+        const startedAt = Date.now();
+        const callbackUrl = this.callbackBaseUrl
+          ? generateSignedCallbackUrl(
+            `${this.callbackBaseUrl}/${providerType}`,
+            videoResult.uuid
+          )
+          : undefined;
+
+        try {
+          result = await getProvider(providerType).createTask({
+            model: params.model,
+            prompt: params.prompt,
+            duration: effectiveDuration,
+            aspectRatio: params.aspectRatio,
+            quality: params.quality,
+            imageUrl: params.imageUrl,
+            imageUrls: params.imageUrls,
+            mode: resolvedMode,
+            outputNumber,
+            generateAudio: params.generateAudio,
+            removeWatermark: params.removeWatermark,
+            callbackUrl,
+          });
+          void providerHealthService.record({
+            provider: providerType,
+            model: params.model,
+            videoUuid: videoResult.uuid,
+            operation: "submit",
+            success: true,
+            latencyMs: Date.now() - startedAt,
+            creditsQuoted: creditsRequired,
+          }).catch((metricsError) => {
+            console.error("Failed to record provider success metric", metricsError);
+          });
+          selectedProvider = providerType;
+          break;
+        } catch (error) {
+          void providerHealthService.record({
+            provider: providerType,
+            model: params.model,
+            videoUuid: videoResult.uuid,
+            operation: "submit",
+            success: false,
+            latencyMs: Date.now() - startedAt,
+            creditsQuoted: creditsRequired,
+            errorMessage: String(error),
+          }).catch((metricsError) => {
+            console.error("Failed to record provider failure metric", metricsError);
+          });
+          routingErrors.push(`${providerType}: ${String(error)}`);
+          if (!isRetryableProviderError(error)) throw error;
+        }
+      }
+
+      if (!result || !selectedProvider) {
+        throw new Error(`All provider routes failed. ${routingErrors.join(" | ")}`);
+      }
 
       await db
         .update(videos)
         .set({
           status: VideoStatus.GENERATING,
           externalTaskId: result.taskId,
-          provider: actualProvider,
+          provider: selectedProvider,
           updatedAt: new Date(),
         })
         .where(eq(videos.uuid, videoResult.uuid));
 
+      // Optional in development. Production queues a durable fallback poll so
+      // a missed provider webhook cannot strand a paid generation forever.
+      void scheduleVideoReconciliation({
+        videoUuid: videoResult.uuid,
+        userId: params.userId,
+      }).catch((error) => {
+        console.error("Failed to schedule video reconciliation", error);
+      });
+
       return {
         videoUuid: videoResult.uuid,
         taskId: result.taskId,
-        provider: actualProvider,
+        provider: selectedProvider,
         status: "GENERATING",
         estimatedTime: result.estimatedTime,
         creditsUsed: creditsRequired,
@@ -305,6 +335,13 @@ export class VideoService {
       return;
     }
 
+    if (video.provider && video.provider !== providerType) {
+      console.error(
+        `Provider mismatch: expected ${video.provider}, got ${providerType}`
+      );
+      return;
+    }
+
     if (video.externalTaskId && video.externalTaskId !== result.taskId) {
       console.error(
         `Task ID mismatch: expected ${video.externalTaskId}, got ${result.taskId}`
@@ -315,7 +352,7 @@ export class VideoService {
     if (result.status === "completed" && result.videoUrl) {
       await this.tryCompleteGeneration(video.uuid, result);
     } else if (result.status === "failed") {
-      await this.tryFailGeneration(video.uuid, result.error?.message);
+      await this.failGeneration(video.uuid, result.error?.message);
     }
   }
 
@@ -348,6 +385,27 @@ export class VideoService {
       };
     }
 
+    // UPLOADING is a short lease, not a terminal state. If a function crashed
+    // after claiming it, a later poll or recovery pass must be able to resume.
+    if (video.status === VideoStatus.UPLOADING) {
+      if (video.updatedAt.getTime() >= Date.now() - 5 * 60 * 1000) {
+        return { status: VideoStatus.UPLOADING };
+      }
+      const [releasedLease] = await db
+        .update(videos)
+        .set({ status: VideoStatus.GENERATING, updatedAt: new Date() })
+        .where(
+          and(
+            eq(videos.uuid, video.uuid),
+            eq(videos.status, VideoStatus.UPLOADING),
+            eq(videos.updatedAt, video.updatedAt)
+          )
+        )
+        .returning({ uuid: videos.uuid });
+      if (!releasedLease) return { status: VideoStatus.UPLOADING };
+      video.status = VideoStatus.GENERATING;
+    }
+
     if (video.externalTaskId && video.provider) {
       try {
         const provider = getProvider(video.provider as ProviderType);
@@ -362,7 +420,7 @@ export class VideoService {
         }
 
         if (result.status === "failed") {
-          const updated = await this.tryFailGeneration(
+          const updated = await this.failGeneration(
             video.uuid,
             result.error?.message
           );
@@ -413,40 +471,37 @@ export class VideoService {
     videoUuid: string,
     result: VideoTaskResponse
   ): Promise<{ status: string; videoUrl?: string | null }> {
-    return db.transaction(async (trx) => {
-      const [video] = await trx
-        .select()
-        .from(videos)
-        .where(eq(videos.uuid, videoUuid))
-        .limit(1);
+    const [video] = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.uuid, videoUuid))
+      .limit(1);
+    if (!video) throw new Error("Video not found");
+    if (video.status === VideoStatus.COMPLETED) {
+      return { status: video.status, videoUrl: video.videoUrl };
+    }
+    if (video.status === VideoStatus.FAILED) {
+      return { status: video.status, videoUrl: null };
+    }
+    if (video.status === VideoStatus.UPLOADING) {
+      return { status: video.status, videoUrl: video.videoUrl };
+    }
+    if (video.status !== VideoStatus.GENERATING) {
+      return { status: video.status, videoUrl: video.videoUrl };
+    }
 
-      if (!video) {
-        throw new Error("Video not found");
-      }
+    const [claimed] = await db
+      .update(videos)
+      .set({
+        status: VideoStatus.UPLOADING,
+        originalVideoUrl: result.videoUrl,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(videos.uuid, videoUuid), eq(videos.status, VideoStatus.GENERATING)))
+      .returning({ uuid: videos.uuid });
+    if (!claimed) return { status: VideoStatus.UPLOADING };
 
-      if (video.status === VideoStatus.COMPLETED) {
-        return { status: video.status, videoUrl: video.videoUrl };
-      }
-      if (video.status === VideoStatus.FAILED) {
-        return { status: video.status, videoUrl: null };
-      }
-
-      if (
-        video.status !== VideoStatus.GENERATING &&
-        video.status !== VideoStatus.UPLOADING
-      ) {
-        return { status: video.status, videoUrl: video.videoUrl };
-      }
-
-      await trx
-        .update(videos)
-        .set({
-          status: VideoStatus.UPLOADING,
-          originalVideoUrl: result.videoUrl,
-          updatedAt: new Date(),
-        })
-        .where(eq(videos.uuid, videoUuid));
-
+    try {
       const storage = getStorage();
       const key = `videos/${videoUuid}/${Date.now()}.mp4`;
       const uploaded = await storage.downloadAndUpload({
@@ -457,7 +512,7 @@ export class VideoService {
 
       await creditService.settle(videoUuid);
 
-      await trx
+      await db
         .update(videos)
         .set({
           status: VideoStatus.COMPLETED,
@@ -477,18 +532,154 @@ export class VideoService {
       });
 
       return { status: VideoStatus.COMPLETED, videoUrl: uploaded.url };
+    } catch (error) {
+      // Let the durable workflow retry completion. Credits remain frozen until
+      // storage and settlement both succeed.
+      await db
+        .update(videos)
+        .set({
+          status: VideoStatus.GENERATING,
+          errorMessage: `Completion retry required: ${String(error)}`,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(videos.uuid, videoUuid), eq(videos.status, VideoStatus.UPLOADING)));
+      throw error;
+    }
+  }
+
+  private async generateBatch(
+    params: GenerateVideoParams,
+    outputNumber: number
+  ): Promise<VideoGenerationResult> {
+    const validated = validateGenerationParams(params);
+    const balance = await creditService.getBalance(params.userId);
+    const plan = (balance.plan ?? "FREE") as "FREE" | "BASIC" | "PRO" | "BUSINESS";
+    const policy = generationQuotaService.getPolicy(plan);
+    if (outputNumber > policy.maxConcurrent) {
+      throw new ApiError("Multiple outputs require a higher concurrency plan", 429, {
+        code: "BATCH_OUTPUT_PLAN_LIMIT",
+        requested: outputNumber,
+        limit: policy.maxConcurrent,
+      });
+    }
+
+    let providerCandidates = getProviderCandidates(params.model, validated.mode);
+    if (providerCandidates.length === 0) {
+      throw new ApiError(
+        `No configured provider can run ${params.model} in ${validated.mode} mode`,
+        400,
+        { code: "MODEL_ROUTE_UNAVAILABLE" }
+      );
+    }
+    providerCandidates = await providerHealthService.prioritize(providerCandidates);
+    const initialProvider = providerCandidates[0]!;
+    const creditsPerOutput = calculateModelCredits(params.model, {
+      duration: validated.duration,
+      quality: params.quality,
     });
+    const requiredCredits = creditsPerOutput * outputNumber;
+    if (balance.availableCredits < requiredCredits) {
+      throw new ApiError("Insufficient credits", 402, {
+        code: "INSUFFICIENT_CREDITS",
+        requiredCredits,
+        availableCredits: balance.availableCredits,
+      });
+    }
+
+    const batchUuid = `batch_${nanoid(21)}`;
+    const reservations = await generationQuotaService.reserveVideos(
+      params.userId,
+      params.model,
+      Array.from({ length: outputNumber }, () => ({
+        uuid: `vid_${nanoid(21)}`,
+        batchUuid,
+        userId: params.userId,
+        prompt: params.prompt,
+        model: params.model,
+        parameters: {
+          duration: validated.duration,
+          aspectRatio: params.aspectRatio,
+          quality: params.quality,
+          outputNumber: 1,
+          mode: validated.mode,
+          imageUrl: validated.imageUrls[0],
+          imageUrls: validated.imageUrls,
+          generateAudio: params.generateAudio,
+          removeWatermark: params.removeWatermark,
+        },
+        status: VideoStatus.PENDING,
+        startImageUrl: validated.imageUrls[0] ?? null,
+        creditsUsed: creditsPerOutput,
+        duration: validated.duration,
+        aspectRatio: params.aspectRatio ?? null,
+        provider: initialProvider,
+        updatedAt: new Date(),
+      }))
+    );
+
+    try {
+      await creditService.freezeMany(
+        reservations.map((reservation) => ({
+          userId: params.userId,
+          credits: creditsPerOutput,
+          videoUuid: reservation.uuid,
+        }))
+      );
+    } catch (error) {
+      await db
+        .update(videos)
+        .set({
+          status: VideoStatus.FAILED,
+          errorMessage: String(error),
+          updatedAt: new Date(),
+        })
+        .where(eq(videos.batchUuid, batchUuid));
+      const insufficientCreditsError = this.toInsufficientCreditsApiError(
+        error,
+        requiredCredits
+      );
+      if (insufficientCreditsError) throw insufficientCreditsError;
+      throw error;
+    }
+
+    const settled = await Promise.allSettled(
+      reservations.map((reservation) =>
+        this.generate({
+          ...params,
+          outputNumber: 1,
+          batchUuid,
+          reservedVideoUuid: reservation.uuid,
+        })
+      )
+    );
+    const outputs = settled
+      .filter((result): result is PromiseFulfilledResult<VideoGenerationResult> => result.status === "fulfilled")
+      .map((result) => result.value);
+
+    if (outputs.length === 0) {
+      const firstFailure = settled.find(
+        (result): result is PromiseRejectedResult => result.status === "rejected"
+      );
+      throw firstFailure?.reason ?? new Error("Every batch output failed to submit");
+    }
+
+    const primary = outputs[0]!;
+    return {
+      ...primary,
+      batchUuid,
+      creditsUsed: outputs.reduce((sum, output) => sum + output.creditsUsed, 0),
+      outputs,
+    };
   }
 
   /**
    * Try to mark as failed (transaction + optimistic lock)
    */
-  private async tryFailGeneration(
+  async failGeneration(
     videoUuid: string,
     errorMessage?: string
   ): Promise<{ status: string; errorMessage?: string | null }> {
-    return db.transaction(async (trx) => {
-      const [video] = await trx
+    const [video] = await db
         .select()
         .from(videos)
         .where(eq(videos.uuid, videoUuid))
@@ -498,20 +689,32 @@ export class VideoService {
         throw new Error("Video not found");
       }
 
-      if (video.status === VideoStatus.COMPLETED || video.status === VideoStatus.FAILED) {
+      if (video.status === VideoStatus.COMPLETED) {
         return { status: video.status, errorMessage: video.errorMessage };
       }
 
-      await creditService.release(videoUuid);
+      if (video.status === VideoStatus.FAILED) {
+        await creditService.release(videoUuid);
+        return { status: video.status, errorMessage: video.errorMessage };
+      }
 
-      await trx
+      const [claimed] = await db
         .update(videos)
         .set({
           status: VideoStatus.FAILED,
           errorMessage: errorMessage || "Generation failed",
           updatedAt: new Date(),
         })
-        .where(eq(videos.uuid, videoUuid));
+        .where(
+          and(
+            eq(videos.uuid, videoUuid),
+            eq(videos.status, video.status)
+          )
+        )
+        .returning({ uuid: videos.uuid });
+      if (!claimed) return { status: video.status, errorMessage: video.errorMessage };
+
+      await creditService.release(videoUuid);
 
       emitVideoEvent({
         userId: video.userId,
@@ -524,7 +727,6 @@ export class VideoService {
         status: VideoStatus.FAILED,
         errorMessage: errorMessage || "Generation failed",
       };
-    });
   }
 
   /**
@@ -543,6 +745,38 @@ export class VideoService {
       )
       .limit(1);
     return video ?? null;
+  }
+
+  async retryVideo(uuid: string, userId: string) {
+    const video = await this.getVideo(uuid, userId);
+    if (!video) throw new ApiError("Video not found", 404);
+    if (video.status !== VideoStatus.FAILED) {
+      throw new ApiError("Only failed generations can be retried", 409);
+    }
+    const parameters = (video.parameters ?? {}) as {
+      duration?: number;
+      aspectRatio?: string;
+      quality?: string;
+      mode?: string;
+      imageUrl?: string;
+      imageUrls?: string[];
+      generateAudio?: boolean;
+      removeWatermark?: boolean;
+    };
+    return this.generate({
+      userId,
+      prompt: video.prompt,
+      model: video.model,
+      duration: parameters.duration ?? video.duration ?? undefined,
+      aspectRatio: parameters.aspectRatio ?? video.aspectRatio ?? undefined,
+      quality: parameters.quality,
+      mode: parameters.mode,
+      imageUrl: parameters.imageUrl ?? video.startImageUrl ?? undefined,
+      imageUrls: parameters.imageUrls,
+      generateAudio: parameters.generateAudio,
+      removeWatermark: parameters.removeWatermark,
+      outputNumber: 1,
+    });
   }
 
   /**
@@ -599,10 +833,20 @@ export class VideoService {
    * Delete video (soft delete)
    */
   async deleteVideo(uuid: string, userId: string): Promise<void> {
-    await db
+    const [deleted] = await db
       .update(videos)
       .set({ isDeleted: true, updatedAt: new Date() })
-      .where(and(eq(videos.uuid, uuid), eq(videos.userId, userId)));
+      .where(
+        and(
+          eq(videos.uuid, uuid),
+          eq(videos.userId, userId),
+          inArray(videos.status, [VideoStatus.COMPLETED, VideoStatus.FAILED])
+        )
+      )
+      .returning({ uuid: videos.uuid });
+    if (!deleted) {
+      throw new ApiError("Only completed or failed videos can be deleted", 409);
+    }
   }
 }
 

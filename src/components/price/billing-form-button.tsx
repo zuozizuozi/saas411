@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import * as Icons from "@/components/ui/icons";
 
 import { createStripeSessionAction } from "@/actions/stripe";
-import type { SubscriptionPlan, UserSubscriptionPlan } from "@/types";
+import type { UserSubscriptionPlan } from "@/types";
+import type { SubscriptionPlanTranslation } from "@/config/price/price-data";
 
 interface BillingFormButtonProps {
-  offer: SubscriptionPlan;
+  offer: SubscriptionPlanTranslation;
   subscriptionPlan: UserSubscriptionPlan;
   year: boolean;
 }
@@ -34,12 +35,13 @@ export function BillingFormButton({
     : offer?.stripeIds?.monthly;
 
   const stripeSessionAction = () => createSession(stripePlanId!);
+  const isFreeOffer = !stripePlanId;
 
   return (
     <Button
       variant="default"
       className="w-full"
-      disabled={isPending}
+      disabled={isPending || isFreeOffer}
       onClick={stripeSessionAction}
     >
       {isPending ? (
@@ -48,7 +50,9 @@ export function BillingFormButton({
         </>
       ) : (
         <>
-          {subscriptionPlan.stripePriceId
+          {isFreeOffer
+            ? subscriptionPlan.isPaid ? t('upgrade') : "Current plan"
+            : subscriptionPlan.stripePriceId
             ? t('manage_subscription')
             : t('upgrade')}
         </>

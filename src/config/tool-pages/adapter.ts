@@ -143,7 +143,6 @@ function getTitleFromMode(mode: string): string {
   const titles: Record<string, string> = {
     "text-to-video": "Text to Video",
     "image-to-video": "Image to Video",
-    "reference-to-video": "Reference to Video",
     "image-to-image": "Image to Image",
   };
   return titles[mode] || mode;
@@ -156,7 +155,6 @@ function getIconFromMode(mode: string): "text" | "image" | "reference" | "frames
   const icons: Record<string, "text" | "image" | "reference" | "frames"> = {
     "text-to-video": "text",
     "image-to-video": "image",
-    "reference-to-video": "reference",
     "image-to-image": "image",
   };
   return icons[mode] || "text";

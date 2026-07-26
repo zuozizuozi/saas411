@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
 import { HeaderSimple } from "@/components/layout/header-simple";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { RefineAdminProvider } from "@/components/admin/refine-admin-provider";
 interface AdminLayoutProps {
   children?: React.ReactNode;
   params: Promise<{
@@ -36,7 +37,9 @@ export default async function AdminLayout({
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6">{children}</div>
+          <RefineAdminProvider>
+            <div className="p-6">{children}</div>
+          </RefineAdminProvider>
         </main>
       </div>
     </div>

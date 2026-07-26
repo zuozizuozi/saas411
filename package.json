@@ -12,6 +12,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -23,7 +24,8 @@
     "script:test-proxy": "node scripts/test-proxy.mjs"
   },
   "dependencies": {
-    "@creem_io/better-auth": "^0.0.12",
+    "@aws-sdk/client-s3": "^3.1094.0",
+    "@aws-sdk/s3-request-presigner": "^3.1094.0",
     "@dinero.js/currencies": "2.0.0-alpha.14",
     "@formatjs/intl-localematcher": "0.5.4",
     "@hookform/resolvers": "3.3.4",
@@ -61,6 +63,8 @@
     "@react-email/html": "0.0.12",
     "@react-three/drei": "10.7.7",
     "@react-three/fiber": "9.5.0",
+    "@refinedev/core": "^5.0.12",
+    "@refinedev/nextjs-router": "^7.0.5",
     "@t3-oss/env-nextjs": "0.13.10",
     "@tabler/icons-react": "^3.36.1",
     "@tanstack/react-query": "5.90.17",
@@ -69,6 +73,8 @@
     "@tsparticles/engine": "3.3.0",
     "@tsparticles/react": "3.0.0",
     "@tsparticles/slim": "3.3.0",
+    "@upstash/qstash": "^2.11.3",
+    "@upstash/workflow": "^1.3.3",
     "@vercel/analytics": "1.1.3",
     "@vercel/speed-insights": "1.0.9",
     "better-auth": "^1.4.17",
@@ -96,9 +102,6 @@
     "react-dom": "19.2.3",
     "react-hook-form": "7.71.1",
     "react-image-crop": "11.0.5",
-    "react-server-dom-parcel": "^19.2.3",
-    "react-server-dom-turbopack": "^19.2.3",
-    "react-server-dom-webpack": "^19.2.3",
     "react-tweet": "^3.3.0",
     "react-wrap-balancer": "1.1.0",
     "recharts": "3.6.0",
@@ -111,6 +114,7 @@
     "three": "0.163.0",
     "three-globe": "2.31.0",
     "tw-animate-css": "^1.2.4",
+    "undici": "6.21.1",
     "use-intl": "^4.7.0",
     "vaul": "1.1.2",
     "zod": "^4.2.1",
@@ -136,6 +140,7 @@
     "react-email": "^5.2.5",
     "tailwindcss": "^4.0.14",
     "tsx": "^4.19.2",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "vitest": "^4.1.10"
   }
 }

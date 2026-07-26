@@ -23,7 +23,7 @@ export interface CreditsDictionary {
 
 /**
  * Get package key from product ID or name
- * Handles both old format (prod_sub_basic) and new Creem format (prod_xxx)
+ * Supports legacy product identifiers while preferring stable internal IDs.
  */
 function getPackageKey(productId: string, productName: string): string {
   // Try to extract from old Product ID format first
@@ -33,7 +33,7 @@ function getPackageKey(productId: string, productName: string): string {
     return rawKey.replace(/_(monthly|yearly)$/, "");
   }
 
-  // For new Creem Product IDs, map from product name
+  // Fall back to the display name for products without a legacy identifier.
   const nameToKeyMap: Record<string, string> = {
     "Basic Plan": "basic",
     "Pro Plan": "pro",

@@ -3,13 +3,24 @@
 import { z } from "zod";
 
 import { userActionClient } from "@/lib/safe-action";
-import { createStripeSession, getMySubscription, getUserPlans } from "@/services/billing";
+import {
+  createStripeCreditSession,
+  createStripeSession,
+  getMySubscription,
+  getUserPlans,
+} from "@/services/billing";
 
 export const createStripeSessionAction = userActionClient
   .schema(z.object({ planId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
     const result = await createStripeSession(ctx.user.id, parsedInput.planId);
     return { success: result.success, url: result.url };
+  });
+
+export const createStripeCreditSessionAction = userActionClient
+  .schema(z.object({ packageId: z.string().min(1) }))
+  .action(async ({ parsedInput, ctx }) => {
+    return createStripeCreditSession(ctx.user.id, parsedInput.packageId);
   });
 
 export const getUserPlansAction = userActionClient

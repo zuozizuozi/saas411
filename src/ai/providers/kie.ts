@@ -8,6 +8,7 @@ import {
   getProviderModelId,
   transformParamsForProvider,
 } from "../model-mapping";
+import { providerFetch, requireProviderTaskId } from "../provider-http";
 
 export class KieProvider implements AIVideoProvider {
   name = "kie";
@@ -46,7 +47,7 @@ export class KieProvider implements AIVideoProvider {
       body.callBackUrl = params.callbackUrl;
     }
 
-    const response = await fetch(`${this.baseUrl}${apiEndpoint}`, {
+    const response = await providerFetch(`${this.baseUrl}${apiEndpoint}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -59,7 +60,7 @@ export class KieProvider implements AIVideoProvider {
     if (result.code !== 200) throw new Error(result.msg || "API error");
 
     return {
-      taskId: result.data.taskId,
+      taskId: requireProviderTaskId(result.data?.taskId, "KIE"),
       provider: "kie",
       status: "pending",
       raw: result,
@@ -71,7 +72,7 @@ export class KieProvider implements AIVideoProvider {
       return this.getVeoTaskStatus(taskId);
     }
 
-    const response = await fetch(
+    const response = await providerFetch(
       `${this.baseUrl}/api/v1/jobs/recordInfo?taskId=${taskId}`,
       { headers: { Authorization: `Bearer ${this.apiKey}` } }
     );
@@ -92,7 +93,7 @@ export class KieProvider implements AIVideoProvider {
     }
 
     return {
-      taskId: data.taskId,
+      taskId: requireProviderTaskId(data.taskId || taskId, "KIE status"),
       provider: "kie",
       status: this.mapStatus(data.state),
       videoUrl,
@@ -123,7 +124,7 @@ export class KieProvider implements AIVideoProvider {
     }
 
     return {
-      taskId: data.taskId,
+      taskId: requireProviderTaskId(data.taskId, "KIE callback"),
       provider: "kie",
       status: this.mapStatus(data.state),
       videoUrl,
@@ -171,7 +172,7 @@ export class KieProvider implements AIVideoProvider {
   }
 
   private async getVeoTaskStatus(taskId: string): Promise<VideoTaskResponse> {
-    const response = await fetch(
+    const response = await providerFetch(
       `${this.baseUrl}/api/v1/veo/record-info?taskId=${taskId}`,
       { headers: { Authorization: `Bearer ${this.apiKey}` } }
     );
@@ -204,7 +205,7 @@ export class KieProvider implements AIVideoProvider {
       payload.code === 200 && videoUrl ? "completed" : "failed";
 
     return {
-      taskId: data.taskId,
+      taskId: requireProviderTaskId(data.taskId, "KIE Veo callback"),
       provider: "kie",
       status,
       videoUrl,

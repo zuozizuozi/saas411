@@ -1,0 +1,2039 @@
+{
+  "backgrounds": [],
+  "bodyStyle": {
+    "backgroundColor": "rgb(3, 7, 18)",
+    "border": "0px solid rgb(79, 105, 146)",
+    "color": "rgb(228, 229, 231)",
+    "display": "block",
+    "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "height": "7252.75px",
+    "lineHeight": "24px",
+    "position": "static",
+    "transition": "all"
+  },
+  "buttons": [
+    {
+      "aria": "Open sidebar",
+      "style": {
+        "backgroundColor": "rgb(17, 24, 39)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "36px",
+        "lineHeight": "20px",
+        "padding": "0px 12px",
+        "position": "fixed",
+        "top": "8px",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "zIndex": "70"
+      },
+      "text": ""
+    },
+    {
+      "aria": "Close sidebar",
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "36px",
+        "lineHeight": "20px",
+        "padding": "0px 12px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(209, 213, 219)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "height": "20px",
+        "lineHeight": "20px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "加入 Telegram"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(13, 92, 211)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "display": "inline-flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "padding": "8px 16px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "立即升级"
+    },
+    {
+      "aria": "Collapse sidebar",
+      "style": {
+        "backgroundColor": "rgba(31, 41, 55, 0.5)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "8px",
+        "color": "rgb(255, 255, 255)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "position": "absolute",
+        "top": "450px",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "zIndex": "10"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(15, 23, 36)",
+        "border": "0px none rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(148, 152, 158)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "gap": "normal 8px",
+        "height": "32px",
+        "lineHeight": "20px",
+        "padding": "8px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "text": "中文"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "32px",
+        "lineHeight": "20px",
+        "margin": "0px 0px 0px 16px",
+        "padding": "0px 12px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "Login"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(13, 92, 211)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "32px",
+        "lineHeight": "20px",
+        "margin": "0px 0px 0px 16px",
+        "padding": "0px 12px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "Start for Free"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(79, 105, 146)",
+        "border": "2px solid rgba(0, 0, 0, 0)",
+        "borderRadius": "9999px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "24px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "6px",
+        "color": "rgb(209, 213, 219)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "12px",
+        "fontWeight": "500",
+        "gap": "6px",
+        "height": "24px",
+        "lineHeight": "16px",
+        "padding": "4px 8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "AI 提示词"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(31, 41, 55)",
+        "border": "1px solid rgb(55, 65, 81)",
+        "borderRadius": "6px",
+        "color": "rgb(255, 255, 255)",
+        "display": "inline-flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "36px",
+        "lineHeight": "20px",
+        "padding": "8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "Seedance 1.5 Pro"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(13, 92, 211)",
+        "border": "2px solid rgba(0, 0, 0, 0)",
+        "borderRadius": "9999px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "24px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(13, 92, 211)",
+        "border": "2px solid rgba(0, 0, 0, 0)",
+        "borderRadius": "9999px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "24px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "1px solid rgb(75, 85, 99)",
+        "borderRadius": "6px",
+        "color": "rgb(209, 213, 219)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "36px",
+        "lineHeight": "20px",
+        "padding": "0px 12px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "充电"
+    },
+    {
+      "aria": null,
+      "style": {
+        "backgroundColor": "rgb(13, 92, 211)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "8px",
+        "color": "rgb(255, 255, 255)",
+        "display": "inline-flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "600",
+        "gap": "8px",
+        "height": "44px",
+        "lineHeight": "20px",
+        "padding": "12px 24px",
+        "position": "static",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "生成视频"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "9999px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "9999px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "9999px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "borderRadius": "9999px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "gap": "8px",
+        "height": "40px",
+        "lineHeight": "20px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "position": "relative",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "boxShadow": "rgb(15, 23, 36) 0px 0px 0px 2px, rgb(13, 92, 211) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "margin": "0px 0px 0px 8px",
+        "position": "relative",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "margin": "0px 0px 0px 8px",
+        "position": "relative",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": ""
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "margin": "0px 0px 0px 8px",
+        "position": "relative",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "AI"
+    },
+    {
+      "aria": null,
+      "style": {
+        "color": "rgb(228, 229, 231)",
+        "display": "inline-block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "104px",
+        "lineHeight": "24px",
+        "padding": "8px 0px 8px 16px",
+        "position": "static",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "将产品视频成本降低高达 70%在为工作室拍摄、创作者或编辑付费之前，将产品页面、功能项目符号和发布简介转换为视频草稿。"
+    },
+    {
+      "aria": null,
+      "style": {
+        "color": "rgb(228, 229, 231)",
+        "display": "inline-block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "104px",
+        "lineHeight": "24px",
+        "padding": "8px 0px 8px 16px",
+        "position": "static",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "广告变体的启动速度提高了 75%将一份营销活动简报转换为多个文本、视频挂钩、宣传角度和付费社交草稿，以便更快地进行创意测试。"
+    },
+    {
+      "aria": null,
+      "style": {
+        "color": "rgb(228, 229, 231)",
+        "display": "inline-block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "104px",
+        "lineHeight": "24px",
+        "padding": "8px 0px 8px 16px",
+        "position": "static",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "将故事板到预览的时间缩短高达 80%将脚本、镜头列表和故事板注释转换为动态预览，以便客户和创意团队在制作前进行协调。"
+    },
+    {
+      "aria": null,
+      "style": {
+        "color": "rgb(228, 229, 231)",
+        "display": "inline-block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "104px",
+        "lineHeight": "24px",
+        "padding": "8px 0px 8px 16px",
+        "position": "static",
+        "transition": "0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "将短视频输出提高高达 68%将趋势、字幕和创作者提示转变为新鲜的 AI 视频片段，用于短片、短片和日常社交帖子。"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "Seedance 文本生成视频是什么？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "如何用文字生成视频？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "什么样的提示词更适合文本生成视频？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "Seedance 文本生成视频可以免费试用吗？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "我可以使用哪些 AI 视频模型？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "我可以将生成的视频用于商业项目吗？"
+    },
+    {
+      "aria": null,
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "height": "60px",
+        "lineHeight": "28px",
+        "padding": "16px 0px",
+        "position": "static",
+        "transition": "0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "text": "我可以改进或重新生成文本转视频的结果吗？"
+    }
+  ],
+  "fonts": [
+    "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+    "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+  ],
+  "headings": [
+    {
+      "i": 0,
+      "rect": {
+        "height": 28,
+        "width": 362,
+        "x": 264,
+        "y": 85
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "height": "28px",
+        "lineHeight": "28px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H1",
+      "text": "文本转视频"
+    },
+    {
+      "i": 1,
+      "rect": {
+        "height": 40,
+        "width": 693,
+        "x": 692,
+        "y": 240.09375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "lineHeight": "40px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H1",
+      "text": "Seedance 文本生成视频 AI 生成器"
+    },
+    {
+      "i": 2,
+      "rect": {
+        "height": 48,
+        "width": 1185,
+        "x": 232,
+        "y": 962
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "48px",
+        "fontWeight": "700",
+        "height": "48px",
+        "lineHeight": "48px",
+        "margin": "0px 0px 16px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "用 Seedance 将任何想法视频化"
+    },
+    {
+      "i": 3,
+      "rect": {
+        "height": 40,
+        "width": 737.125,
+        "x": 455.9375,
+        "y": 1749.96875
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "maxWidth": "768px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "Seedance 文本生成视频，让创意不受制作限制"
+    },
+    {
+      "i": 4,
+      "rect": {
+        "height": 32,
+        "width": 548.5,
+        "x": 844.5,
+        "y": 1923.921875
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "将任何想法变成视觉起点"
+    },
+    {
+      "i": 5,
+      "rect": {
+        "height": 32,
+        "width": 548.5,
+        "x": 256,
+        "y": 2289.328125
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "控制场景、运动、相机和风格"
+    },
+    {
+      "i": 6,
+      "rect": {
+        "height": 32,
+        "width": 548.5,
+        "x": 844.5,
+        "y": 2654.734375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "在缩放内容之前比较变体"
+    },
+    {
+      "i": 7,
+      "rect": {
+        "height": 40,
+        "width": 768,
+        "x": 440.5,
+        "y": 3100.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "margin": "0px 184.5px",
+        "maxWidth": "768px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "用文字生成你的第一个 AI 视频"
+    },
+    {
+      "i": 8,
+      "rect": {
+        "height": 40,
+        "width": 768,
+        "x": 440.5,
+        "y": 3467.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "margin": "0px 184.5px",
+        "maxWidth": "768px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "适合各种业务的强大文本生成视频 AI"
+    },
+    {
+      "i": 9,
+      "rect": {
+        "height": 28,
+        "width": 525.5,
+        "x": 274,
+        "y": 3649.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "height": "28px",
+        "lineHeight": "28px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "tag": "H3",
+      "text": "将产品视频成本降低高达 70%"
+    },
+    {
+      "i": 10,
+      "rect": {
+        "height": 28,
+        "width": 525.5,
+        "x": 274,
+        "y": 3753.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgba(228, 229, 231, 0.7)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "height": "28px",
+        "lineHeight": "28px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "tag": "H3",
+      "text": "广告变体的启动速度提高了 75%"
+    },
+    {
+      "i": 11,
+      "rect": {
+        "height": 28,
+        "width": 525.5,
+        "x": 274,
+        "y": 3857.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgba(228, 229, 231, 0.7)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "height": "28px",
+        "lineHeight": "28px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "tag": "H3",
+      "text": "将故事板到预览的时间缩短高达 80%"
+    },
+    {
+      "i": 12,
+      "rect": {
+        "height": 28,
+        "width": 525.5,
+        "x": 274,
+        "y": 3961.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgba(228, 229, 231, 0.7)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "height": "28px",
+        "lineHeight": "28px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "color 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), text-decoration-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), fill 0.15s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "tag": "H3",
+      "text": "将短视频输出提高高达 68%"
+    },
+    {
+      "i": 13,
+      "rect": {
+        "height": 40,
+        "width": 768,
+        "x": 440.5,
+        "y": 4334.1875
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "margin": "0px 64px",
+        "maxWidth": "768px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "如何用 Seedance 从文本生成 AI 视频"
+    },
+    {
+      "i": 14,
+      "rect": {
+        "height": 32,
+        "width": 313,
+        "x": 281,
+        "y": 4540.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "第 1 步：编写清晰的视频提示"
+    },
+    {
+      "i": 15,
+      "rect": {
+        "height": 64,
+        "width": 313,
+        "x": 668,
+        "y": 4540.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "64px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "第 2 步：选择型号和视频设置"
+    },
+    {
+      "i": 16,
+      "rect": {
+        "height": 32,
+        "width": 313,
+        "x": 1055,
+        "y": 4540.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 12px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "第 3 步：生成、审查和完善"
+    },
+    {
+      "i": 17,
+      "rect": {
+        "height": 40,
+        "width": 386.109375,
+        "x": 631.4375,
+        "y": 4905.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "文本生成视频教程与指南"
+    },
+    {
+      "i": 18,
+      "rect": {
+        "height": 32,
+        "width": 357.65625,
+        "x": 256,
+        "y": 5228.734375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "Seedance 2.5 与 Kling 2.5 对比：哪款 AI 视频模型更好？"
+    },
+    {
+      "i": 19,
+      "rect": {
+        "height": 32,
+        "width": 357.671875,
+        "x": 645.65625,
+        "y": 5228.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "Seedance 2.5 评测 (2026)：官方演示证明了什么，又没有证明什么"
+    },
+    {
+      "i": 20,
+      "rect": {
+        "height": 32,
+        "width": 357.65625,
+        "x": 1035.328125,
+        "y": 5228.734375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "height": "32px",
+        "lineHeight": "32px",
+        "margin": "0px 0px 8px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "Seedance 视频提示词指南：15 个可直接复制的 Seedance 2.0 视频提示词"
+    },
+    {
+      "i": 21,
+      "rect": {
+        "height": 40,
+        "width": 432.390625,
+        "x": 248,
+        "y": 5464.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "margin": "16px 0px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "常见问题"
+    },
+    {
+      "i": 22,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5448.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "Seedance 文本生成视频是什么？"
+    },
+    {
+      "i": 23,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5577.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "如何用文字生成视频？"
+    },
+    {
+      "i": 24,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5638.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "什么样的提示词更适合文本生成视频？"
+    },
+    {
+      "i": 25,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5699.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "Seedance 文本生成视频可以免费试用吗？"
+    },
+    {
+      "i": 26,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5760.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "我可以使用哪些 AI 视频模型？"
+    },
+    {
+      "i": 27,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5821.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "我可以将生成的视频用于商业项目吗？"
+    },
+    {
+      "i": 28,
+      "rect": {
+        "height": 60,
+        "width": 672.609375,
+        "x": 728.390625,
+        "y": 5882.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "flex",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "60px",
+        "lineHeight": "24px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H3",
+      "text": "我可以改进或重新生成文本转视频的结果吗？"
+    },
+    {
+      "i": 29,
+      "rect": {
+        "height": 40,
+        "width": 768,
+        "x": 440.5,
+        "y": 6152.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "36px",
+        "fontWeight": "700",
+        "height": "40px",
+        "letterSpacing": "-0.9px",
+        "lineHeight": "40px",
+        "margin": "0px 184.5px",
+        "maxWidth": "768px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "H2",
+      "text": "试用 Seedance 文本生成视频 AI 生成器"
+    }
+  ],
+  "images": [
+    {
+      "alt": "Seedance",
+      "height": 345,
+      "loading": "auto",
+      "src": "https://www.seedance.tv/logo.png",
+      "width": 346
+    },
+    {
+      "alt": "kieai",
+      "height": 16,
+      "loading": "lazy",
+      "src": "https://www.seedance.tv/_next/image?url=%2Fimgs%2Fintro%2Fseedance.png&w=16&q=75&dpl=dpl_D8p5vZUbrkvo8fNqV1hBJamppqpr",
+      "width": 16
+    },
+    {
+      "alt": "",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://www.seedance.tv/_next/image?url=%2Fimgs%2Fcta-bg.png&w=3840&q=75&dpl=dpl_D8p5vZUbrkvo8fNqV1hBJamppqpr",
+      "width": 0
+    },
+    {
+      "alt": "将产品视频成本降低高达 70%",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://r2.seedance.tv/images/seo/image-to-video/e40fb101-fbf8-492f-aab6-969d0ef7607b.webp",
+      "width": 0
+    },
+    {
+      "alt": "Seedance 2.5 与 Kling 2.5 对比：哪款 AI 视频模型更好？",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://r2.seedance.tv/blog/seedance-2-5-vs-kling-2-5-cover-v3.png",
+      "width": 0
+    },
+    {
+      "alt": "Seedance 2.5 评测 (2026)：官方演示证明了什么，又没有证明什么",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://r2.seedance.tv/blog/seedance-2-5-review-2026-cover-v2.png",
+      "width": 0
+    },
+    {
+      "alt": "Seedance 视频提示词指南：15 个可直接复制的 Seedance 2.0 视频提示词",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://r2.seedance.tv/blog/seedance-video-prompt-guide-cover-v2.webp",
+      "width": 0
+    },
+    {
+      "alt": "",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://www.seedance.tv/_next/image?url=%2Fimgs%2Fcta-bg.png&w=3840&q=75&dpl=dpl_D8p5vZUbrkvo8fNqV1hBJamppqpr",
+      "width": 0
+    },
+    {
+      "alt": "Seedance AI 视频生成器",
+      "height": 0,
+      "loading": "lazy",
+      "src": "https://r2.seedance.tv/brand/seedance-logo.png",
+      "width": 0
+    },
+    {
+      "alt": "",
+      "height": 0,
+      "loading": "auto",
+      "src": "https://bat.bing.com/action/0?ti=187240443&Ver=2&mid=8e267546-b57d-42eb-840d-ba85f945db82&bo=1&sid=209b7750886111f192e25fffff0af26e&vid=209baa20886111f1be1243ad9b87e9e7&vids=1&msclkid=N&uach=pv%3D10.0.0&pi=918639831&lg=zh-CN&sw=1080&sh=1920&sc=24&tl=Seedance%20%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91%20AI%20-%20%E5%85%8D%E8%B4%B9%E7%94%A8%E6%96%87%E5%AD%97%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91%20%7C%20Seedance&kw=Seedance%20%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91,%20%E6%96%87%E6%9C%AC%E8%BD%AC%E8%A7%86%E9%A2%91%20AI,%20AI%20%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90%E5%99%A8,%20%E6%96%87%E5%AD%97%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91,%20%E6%8F%90%E7%A4%BA%E8%AF%8D%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91,%20%E6%96%87%E7%94%9F%E8%A7%86%E9%A2%91,%20%E7%94%A8%E6%96%87%E5%AD%97%E5%81%9A%E8%A7%86%E9%A2%91&p=https%3A%2F%2Fwww.seedance.tv%2Fzh%2Ftext-to-video&r=&lt=1576&mtp=10&evt=pageLoad&sv=2&cdb=AQAQ&rn=749784",
+      "width": 0
+    }
+  ],
+  "links": [
+    {
+      "href": "https://www.seedance.tv/zh",
+      "text": "Seedance"
+    },
+    {
+      "href": "https://www.seedance.tv/video-agent",
+      "text": "视频 AgentNew"
+    },
+    {
+      "href": "https://www.seedance.tv/product-ads",
+      "text": "商品广告"
+    },
+    {
+      "href": "https://www.seedance.tv/product-photos",
+      "text": "商品照片"
+    },
+    {
+      "href": "https://www.seedance.tv/image-to-video",
+      "text": "图像到视频"
+    },
+    {
+      "href": "https://www.seedance.tv/text-to-video",
+      "text": "文本转视频"
+    },
+    {
+      "href": "https://www.seedance.tv/reference-to-video",
+      "text": "参考视频"
+    },
+    {
+      "href": "https://www.seedance.tv/text-to-image",
+      "text": "🍌文本到图像"
+    },
+    {
+      "href": "https://www.seedance.tv/image-to-image",
+      "text": "🍌图像到图像"
+    },
+    {
+      "href": "https://www.seedance.tv/history",
+      "text": "我的创作"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "从文本生成"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "指导你的场景"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "测试提示变化"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "试用文本生成视频"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "尝试文本到视频生成器"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "尝试文本到视频生成器"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/blog/seedance-2-5-vs-kling-2-5",
+      "text": "Seedance 2.5 与 Kling 2.5 对比：哪款 AI 视频模型更好？从运动表现、提示词遵循、一致性、控制能力、访问方式和成本等方面比较 Seedance 2.5 与 Kling 2.5 Turbo，选择更适合项目的模型。"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/blog/seedance-2-5-review",
+      "text": "Seedance 2.5 评测 (2026)：官方演示证明了什么，又没有证明什么一份基于证据的 Seedance 2.5 评测，涵盖了官方演示、时间线控制、参考输入、多语言音频、编辑、局限性、价格和发布状态。"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/blog/seedance-video-prompt-guide",
+      "text": "Seedance 视频提示词指南：15 个可直接复制的 Seedance 2.0 视频提示词使用这份 Seedance 视频提示词指南，复制 15 个 Seedance 2.0 视频提示词，学习如何控制摄像机运动、使用参考图以及修复 AI "
+    },
+    {
+      "href": "mailto:support@seedance.tv",
+      "text": "我们的客服团队"
+    },
+    {
+      "href": "https://www.seedance.tv/zh/text-to-video#boarding",
+      "text": "创建你的视频"
+    },
+    {
+      "href": "https://www.seedance.tv/text-to-video",
+      "text": "文生视频"
+    },
+    {
+      "href": "https://www.seedance.tv/image-to-video",
+      "text": "图生视频"
+    },
+    {
+      "href": "https://www.seedance.tv/reference-to-video",
+      "text": "参考生视频"
+    },
+    {
+      "href": "https://www.seedance.tv/product-ads",
+      "text": "商品广告"
+    },
+    {
+      "href": "https://www.seedance.tv/ai-book-trailer-maker",
+      "text": "AI 图书预告片生成器"
+    },
+    {
+      "href": "https://www.seedance.tv/product-photos",
+      "text": "商品照片"
+    },
+    {
+      "href": "https://www.seedance.tv/video-effects",
+      "text": "视频特效"
+    },
+    {
+      "href": "https://www.seedance.tv/text-to-image",
+      "text": "文生图"
+    },
+    {
+      "href": "https://www.seedance.tv/image-to-image",
+      "text": "图生图"
+    },
+    {
+      "href": "https://www.seedance.tv/sora-2",
+      "text": "Sora 2"
+    },
+    {
+      "href": "https://www.seedance.tv/veo-3-1",
+      "text": "Veo 3.1"
+    },
+    {
+      "href": "https://www.seedance.tv/kling-3-0",
+      "text": "Kling 3.0"
+    },
+    {
+      "href": "https://www.seedance.tv/kling-3-motion-control",
+      "text": "Kling Motion Control"
+    },
+    {
+      "href": "https://www.seedance.tv/hailuo-2-3",
+      "text": "Hailuo 2.3"
+    },
+    {
+      "href": "https://www.seedance.tv/seedance-2-0",
+      "text": "Seedance 2.0"
+    },
+    {
+      "href": "https://www.seedance.tv/seedance-2-5",
+      "text": "Seedance 2.5"
+    },
+    {
+      "href": "https://www.seedance.tv/seedance-2-mini",
+      "text": "Seedance 2 Mini"
+    },
+    {
+      "href": "https://www.seedance.tv/seedance-1-5",
+      "text": "Seedance 1.5 Pro"
+    },
+    {
+      "href": "https://www.seedance.tv/seedream-5-0",
+      "text": "Seedream 5.0 Pro"
+    },
+    {
+      "href": "https://www.seedance.tv/seedream-4-5",
+      "text": "Seedream 4.5"
+    },
+    {
+      "href": "https://www.seedance.tv/gpt-image-2",
+      "text": "GPT Image 2"
+    },
+    {
+      "href": "https://www.seedance.tv/nano-banana-pro",
+      "text": "Nano Banana Pro"
+    },
+    {
+      "href": "https://www.seedance.tv/nano-banana",
+      "text": "Nano Banana"
+    },
+    {
+      "href": "https://www.seedance.tv/history",
+      "text": "我的创作"
+    },
+    {
+      "href": "https://www.seedance.tv/pricing",
+      "text": "定价"
+    },
+    {
+      "href": "https://www.seedance.tv/blog",
+      "text": "博客"
+    },
+    {
+      "href": "mailto:support@seedance.tv",
+      "text": "support@seedance.tv"
+    },
+    {
+      "href": "https://www.seedance.tv/privacy-policy",
+      "text": "隐私政策"
+    },
+    {
+      "href": "https://www.seedance.tv/refund-policy",
+      "text": "退款政策"
+    },
+    {
+      "href": "https://www.seedance.tv/terms-of-service",
+      "text": "服务条款"
+    }
+  ],
+  "sections": [
+    {
+      "classes": "fixed left-0 top-[var(--product-ads-off-banner-height,0px)] z-[60] hidden h-[calc(100vh-var(--product-ads-off-banner-height,0px))] transition-all duration-300 md:block w-56",
+      "i": 0,
+      "id": "",
+      "rect": {
+        "height": 900,
+        "width": 224,
+        "x": 0,
+        "y": 0
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "900px",
+        "lineHeight": "24px",
+        "position": "fixed",
+        "transition": "0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        "zIndex": "60"
+      },
+      "tag": "DIV",
+      "text": "Seedance[data-radix-scroll-area-viewport]{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;}[data-radix-scroll-area-viewport]::-webkit-scrollbar{display:none}Studio视频 AgentNew商品广告商品照片Video图像到视频文本转视频参考视频Image🍌文本"
+    },
+    {
+      "classes": "transition-all duration-300 md:ml-56",
+      "i": 1,
+      "id": "",
+      "rect": {
+        "height": 7252.75,
+        "width": 1201,
+        "x": 224,
+        "y": 0
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "7252.75px",
+        "lineHeight": "24px",
+        "margin": "0px 0px 0px 224px",
+        "position": "static",
+        "transition": "0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "tag": "DIV",
+      "text": "中文LoginStart for Free文本转视频提示提示增强0/20000AI 提示词设置模型Seedance 1.5 Pro比例16:99:161:14:33:421:9时长4s8s10s12s分辨率480p720p1080p声音水印积分: -成本: 4 ⚡充电生成视频探索示例Seedance 文本生成视频 AI 生成器将文本提示词转换为 AI 生成视频。描述你的想法，指定镜头方向，在线免费生成电影感视频短片。用 Seedance 将任何想法视频化用 Seedance "
+    },
+    {
+      "classes": "scroll-mt-20 px-2 md:scroll-mt-24",
+      "i": 2,
+      "id": "boarding",
+      "rect": {
+        "height": 793,
+        "width": 1185,
+        "x": 232,
+        "y": 65
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "793px",
+        "lineHeight": "24px",
+        "padding": "0px 8px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "文本转视频提示提示增强0/20000AI 提示词设置模型Seedance 1.5 Pro比例16:99:161:14:33:421:9时长4s8s10s12s分辨率480p720p1080p声音水印积分: -成本: 4 ⚡充电生成视频探索示例Seedance 文本生成视频 AI 生成器将文本提示词转换为 AI 生成视频。描述你的想法，指定镜头方向，在线免费生成电影感视频短片。"
+    },
+    {
+      "classes": "w-full py-16",
+      "i": 3,
+      "id": "",
+      "rect": {
+        "height": 787.96875,
+        "width": 1185,
+        "x": 232,
+        "y": 898
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "787.969px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "DIV",
+      "text": "用 Seedance 将任何想法视频化用 Seedance 让创意变成视频。从简单提示词开始，加入场景、运动、镜头和风格，在线生成精致的 AI 视频短片。Your browser does not support the video tag.Prompt: 索桥前盛开着动漫风格的玫瑰，花瓣在空中翩翩起舞。Your browser does not support the video tag.Prompt: 索桥前盛开着动漫风格的玫瑰，花瓣在空中翩翩起舞。AI"
+    },
+    {
+      "classes": "py-16",
+      "i": 4,
+      "id": "text-to-video-workflow-features",
+      "rect": {
+        "height": 1269.46875,
+        "width": 1185,
+        "x": 232,
+        "y": 1685.96875
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "1269.47px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "Seedance 文本生成视频，让创意不受制作限制将简报、脚本、产品想法和广告概念转成 AI 视频，减少传统制作流程中的阻碍。将任何想法变成视觉起点从一个简短想法、产品卖点、场景描述或脚本台词开始。Seedance 可以快速帮助你判断这个概念是否适合做成动态内容。从文本生成控制场景、运动、相机和风格通过实用的提示细节（例如主体运动、镜头类型、灯光、节奏、环境和视觉情绪）来指导输出。清晰的方向有助于 AI 视频结果让人感觉有意为之。指导你的场景在缩放内容之前比较变体从同一提示生"
+    },
+    {
+      "classes": "py-16 relative w-full overflow-hidden",
+      "i": 5,
+      "id": "text-to-video-cta-banner",
+      "rect": {
+        "height": 448,
+        "width": 1185,
+        "x": 232,
+        "y": 2955.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "448px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "relative",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "用文字生成你的第一个 AI 视频写下提示词，选择视频设置，用 Seedance 把创意变成 AI 生成短片。试用文本生成视频"
+    },
+    {
+      "classes": "py-16",
+      "i": 6,
+      "id": "text-to-video-preview-features",
+      "rect": {
+        "height": 866.75,
+        "width": 1185,
+        "x": 232,
+        "y": 3403.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "866.75px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "适合各种业务的强大文本生成视频 AI使用 Seedance 从文字创建 AI 视频，降低制作成本，更快测试广告概念，并扩展短视频内容生产。将产品视频成本降低高达 70%在为工作室拍摄、创作者或编辑付费之前，将产品页面、功能项目符号和发布简介转换为视频草稿。广告变体的启动速度提高了 75%将一份营销活动简报转换为多个文本、视频挂钩、宣传角度和付费社交草稿，以便更快地进行创意测试。将故事板到预览的时间缩短高达 80%将脚本、镜头列表和故事板注释转换为动态预览，以便客户和创意团队在"
+    },
+    {
+      "classes": "py-16 bg-gray-950",
+      "i": 7,
+      "id": "text-to-video-how-to-use",
+      "rect": {
+        "height": 571.25,
+        "width": 1185,
+        "x": 232,
+        "y": 4270.1875
+      },
+      "style": {
+        "backgroundColor": "rgb(3, 7, 18)",
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "571.25px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "如何用 Seedance 从文本生成 AI 视频Seedance 让基于提示词的视频生成更直接：描述场景，选择设置，生成并继续优化。01第 1 步：编写清晰的视频提示描述主题、动作、背景、视觉风格和情绪。在重要时添加相机方向，例如特写镜头、广角镜头、慢速推入或手持。02第 2 步：选择型号和视频设置选择适合您的内容目标的可用模型、持续时间、宽高比、分辨率和音频选项。03第 3 步：生成、审查和完善生成您的 AI 视频，比较输出，然后修改您的提示或设置以创建更强大的版本。尝试文"
+    },
+    {
+      "classes": "py-16",
+      "i": 8,
+      "id": "",
+      "rect": {
+        "height": 543.3125,
+        "width": 1185,
+        "x": 232,
+        "y": 4841.4375
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "543.312px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "文本生成视频教程与指南查看 Seedance 文本生成视频的 AI 视频提示词、创意工作流和制作思路。Seedance 2.5 与 Kling 2.5 对比：哪款 AI 视频模型更好？从运动表现、提示词遵循、一致性、控制能力、访问方式和成本等方面比较 Seedance 2.5 与 Kling 2.5 Turbo，选择更适合项目的模型。Seedance 2.5 评测 (2026)：官方演示证明了什么，又没有证明什么一份基于证据的 Seedance 2.5 评测，涵盖了官方演示、"
+    },
+    {
+      "classes": "py-16",
+      "i": 9,
+      "id": "",
+      "rect": {
+        "height": 623,
+        "width": 1185,
+        "x": 232,
+        "y": 5384.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "623px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "static",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "常见问题没找到想要的答案？请联系 我们的客服团队Seedance 文本生成视频是什么？Seedance 是一款把文本提示词生成视频短片的 AI 视频生成器。描述场景、主体、镜头运动和风格，就能无需拍摄或手动动画生成视频。如何用文字生成视频？什么样的提示词更适合文本生成视频？Seedance 文本生成视频可以免费试用吗？我可以使用哪些 AI 视频模型？我可以将生成的视频用于商业项目吗？我可以改进或重新生成文本转视频的结果吗？"
+    },
+    {
+      "classes": "py-16 relative w-full overflow-hidden",
+      "i": 10,
+      "id": "text-to-video-cta-banner-bottom",
+      "rect": {
+        "height": 448,
+        "width": 1185,
+        "x": 232,
+        "y": 6007.75
+      },
+      "style": {
+        "border": "0px solid rgb(79, 105, 146)",
+        "color": "rgb(228, 229, 231)",
+        "display": "block",
+        "fontFamily": "__Inter_f367f3, __Inter_Fallback_f367f3, ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "height": "448px",
+        "lineHeight": "24px",
+        "padding": "64px 0px",
+        "position": "relative",
+        "transition": "all"
+      },
+      "tag": "SECTION",
+      "text": "试用 Seedance 文本生成视频 AI 生成器把脚本、产品概念、广告创意或故事场景交给 Seedance，几分钟内生成可分享的 AI 视频。创建你的视频"
+    }
+  ],
+  "videos": [
+    {
+      "autoplay": true,
+      "height": 720,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/cover-video.mp4",
+      "width": 1280
+    },
+    {
+      "autoplay": false,
+      "height": 720,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Glass-Strawberry-Shatters.mp4",
+      "width": 1280
+    },
+    {
+      "autoplay": true,
+      "height": 480,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Anime-Rose-Blooming-Bridge.mp4",
+      "width": 864
+    },
+    {
+      "autoplay": false,
+      "height": 1088,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Monkey-Seagull-Moonlit-Dance.mp4",
+      "width": 1920
+    },
+    {
+      "autoplay": true,
+      "height": 480,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Anime-Rose-Blooming-Bridge.mp4",
+      "width": 864
+    },
+    {
+      "autoplay": false,
+      "height": 0,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Glass-Strawberry-Shatters.mp4",
+      "width": 0
+    },
+    {
+      "autoplay": false,
+      "height": 0,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Anime-Rose-Blooming-Bridge.mp4",
+      "width": 0
+    },
+    {
+      "autoplay": false,
+      "height": 0,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Monkey-Seagull-Moonlit-Dance.mp4",
+      "width": 0
+    },
+    {
+      "autoplay": false,
+      "height": 0,
+      "loop": false,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.veo3ai.io/intro/text-to-video/t2v-Monarch-Butterfly-on-Flowers.mp4",
+      "width": 0
+    },
+    {
+      "autoplay": true,
+      "height": 1080,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.seedance.tv/videos/seo/text-to-video/fbb28670-b39a-430c-9439-8d4e634c77bf.mp4",
+      "width": 1510
+    },
+    {
+      "autoplay": true,
+      "height": 720,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.seedance.tv/videos/seo/text-to-video/57a17bd3-ab71-4f70-9440-f89aed02c1cb.mp4",
+      "width": 1280
+    },
+    {
+      "autoplay": true,
+      "height": 1600,
+      "loop": true,
+      "muted": true,
+      "poster": "",
+      "src": "https://r2.seedance.tv/videos/seo/image-to-video/workflow-validate-ideas-early.mp4",
+      "width": 2848
+    }
+  ],
+  "viewport": {
+    "height": 900,
+    "scrollHeight": 7253,
+    "width": 1440
+  }
+}

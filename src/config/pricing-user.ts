@@ -120,7 +120,7 @@ export const CREDIT_EXPIRATION = {
 export const SUBSCRIPTION_PRODUCTS = [
   // ===== 月付订阅 =====
   {
-    id: "prod_jsRIeZmqn3L9NN2fiFIn6", // 从 Creem 后台复制 Basic Monthly Product ID
+    id: "sub_basic_monthly",
     name: "Basic Plan",
     priceUsd: 9.9,
     credits: 280, // ~28 Veo 3.1 视频 (60% 毛利率)
@@ -130,7 +130,7 @@ export const SUBSCRIPTION_PRODUCTS = [
     features: ["hd_videos", "fast_generation"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq21zX2Z16", // 从 Creem 后台复制 Pro Monthly Product ID
+    id: "sub_pro_monthly",
     name: "Pro Plan",
     priceUsd: 29.9,
     credits: 960, // ~96 Veo 3.1 视频 (55% 毛利率，比 Basic 便宜 12%)
@@ -140,7 +140,7 @@ export const SUBSCRIPTION_PRODUCTS = [
     features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z18", // 从 Creem 后台复制 Ultimate Monthly Product ID
+    id: "sub_business_monthly",
     name: "Ultimate Plan",
     priceUsd: 79.9,
     credits: 2850, // ~285 Veo 3.1 视频 (50% 毛利率，比 Basic 便宜 21%)
@@ -152,7 +152,7 @@ export const SUBSCRIPTION_PRODUCTS = [
 
   // ===== 年付订阅（月付 × 10，买 10 送 2） =====
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z10", // 从 Creem 后台复制 Basic Yearly Product ID
+    id: "sub_basic_yearly",
     name: "Basic Plan (Yearly)",
     priceUsd: 99, // 月付 × 10 (省 2 个月)
     credits: 3360, // 280 × 12
@@ -162,7 +162,7 @@ export const SUBSCRIPTION_PRODUCTS = [
     features: ["hd_videos", "fast_generation"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z55", // 从 Creem 后台复制 Pro Yearly Product ID
+    id: "sub_pro_yearly",
     name: "Pro Plan (Yearly)",
     priceUsd: 299, // 月付 × 10 (省 2 个月)
     credits: 11520, // 960 × 12
@@ -172,7 +172,7 @@ export const SUBSCRIPTION_PRODUCTS = [
     features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z21", // 从 Creem 后台复制 Ultimate Yearly Product ID
+    id: "sub_business_yearly",
     name: "Ultimate Plan (Yearly)",
     priceUsd: 799, // 月付 × 10 (省 2 个月)
     credits: 34200, // 2850 × 12
@@ -201,7 +201,7 @@ export const SUBSCRIPTION_PRODUCTS = [
  */
 export const CREDIT_PACKAGES: CreditPackageConfig[] = [
   {
-    id: "prod_3tlZPSRNHZSaNq21zX2ZPO", // 从 Creem 后台复制 Starter Pack Product ID
+    id: "pack_starter",
     name: "Starter Pack",
     priceUsd: 14.9,
     credits: 280, // 和 Basic 月付积分相同
@@ -211,7 +211,7 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
     features: ["hd_videos", "fast_generation"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z12", // 从 Creem 后台复制 Standard Pack Product ID
+    id: "pack_standard",
     name: "Standard Pack",
     priceUsd: 39.9, // 比月付 Pro 贵 33%
     credits: 960, // 和 Pro 月付积分相同
@@ -221,7 +221,7 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
     features: ["hd_videos", "fast_generation", "no_watermark"],
   },
   {
-    id: "prod_3tlZPSRNHZSaNq22zX2Z13", // 从 Creem 后台复制 Pro Pack Product ID
+    id: "pack_pro",
     name: "Pro Pack",
     priceUsd: 99.9, // 比月付 Ultimate 贵 25%
     credits: 2850, // 和 Ultimate 月付积分相同
@@ -315,9 +315,9 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
  */
 export const PAYMENT_CONFIG = {
   /** 使用 Creem 支付 */
-  provider: "creem",
+  provider: "stripe",
   /** Creem Webhook URL（用于接收支付状态通知）*/
   webhookUrl: process.env.NEXT_PUBLIC_APP_URL
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/creem/webhook`
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/stripe`
     : "",
 };

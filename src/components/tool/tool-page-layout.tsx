@@ -27,6 +27,7 @@ import { siteConfig } from "@/config/site";
 import type { Video } from "@/db";
 import type { ToolPageConfig } from "@/config/tool-pages";
 import { GeneratorPanel, type GeneratorData } from "@/components/tool/generator-panel";
+import { ToolExamplesPanel } from "@/components/tool/tool-examples-panel";
 import { uploadImage } from "@/lib/video-api";
 import { ToolLandingPage } from "@/components/tool/tool-landing-page";
 import { VideoHistoryPanel } from "@/components/tool/video-history-panel";
@@ -439,10 +440,13 @@ export function ToolPageLayout({
 
     try {
       const selectedMode = config.generator.mode || toolRoute;
-      const imageUrl = data.imageFile
-        ? await uploadImage(data.imageFile)
-        : data.imageUrl;
-      const imageUrls = imageUrl ? [imageUrl] : undefined;
+      const [imageUrl, endImageUrl] = await Promise.all([
+        data.imageFile ? uploadImage(data.imageFile) : Promise.resolve(data.imageUrl),
+        data.endImageFile ? uploadImage(data.endImageFile) : Promise.resolve(data.endImageUrl),
+      ]);
+      const imageUrls = [imageUrl, endImageUrl].filter(
+        (value): value is string => Boolean(value)
+      );
       const response = await fetch("/api/v1/video/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -455,8 +459,9 @@ export function ToolPageLayout({
           quality: data.quality,
           outputNumber: data.outputNumber ?? 1,
           generateAudio: data.generateAudio,
-          imageUrls,
+          imageUrls: imageUrls.length ? imageUrls : undefined,
           imageUrl,
+          removeWatermark: data.removeWatermark,
         }),
       });
 
@@ -466,32 +471,38 @@ export function ToolPageLayout({
       }
 
       const result = await response.json();
-      const videoUuid = result.data.videoUuid as string;
+      const generatedOutputs = Array.isArray(result.data.outputs) && result.data.outputs.length > 0
+        ? result.data.outputs
+        : [result.data];
 
-      toast.success("Generation started");
+      toast.success(
+        generatedOutputs.length > 1
+          ? `${generatedOutputs.length} generations started`
+          : "Generation started"
+      );
 
       // 添加到历史记录
-      videoHistoryStorage.addHistory({
-        uuid: videoUuid,
-        userId: user.id,
-        prompt: data.prompt,
-        model: data.model,
-        status: "generating",
-        creditsUsed: data.estimatedCredits,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-      setHistoryItems(videoHistoryStorage.getHistory(user.id));
-
-      setActiveTab("result");
-      addGeneratingId(videoUuid);
-      startPolling(videoUuid);
-
-      if (user?.id) {
+      const creditsPerOutput = Math.ceil(
+        (data.estimatedCredits || 0) / generatedOutputs.length
+      );
+      for (const output of generatedOutputs) {
+        const videoUuid = output.videoUuid as string;
+        videoHistoryStorage.addHistory({
+          uuid: videoUuid,
+          userId: user.id,
+          prompt: data.prompt,
+          model: data.model,
+          status: "generating",
+          creditsUsed: output.creditsUsed ?? creditsPerOutput,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+        addGeneratingId(videoUuid);
+        startPolling(videoUuid);
         videoTaskStorage.addTask({
           userId: user.id,
           videoId: videoUuid,
-          taskId: result.data.taskId,
+          taskId: output.taskId,
           prompt: data.prompt,
           model: data.model,
           mode: selectedMode,
@@ -500,6 +511,9 @@ export function ToolPageLayout({
           notified: false,
         });
       }
+      setHistoryItems(videoHistoryStorage.getHistory(user.id));
+
+      setActiveTab("result");
     } catch (error) {
       console.error("Generation error:", error);
       // API 调用失败，回滚乐观更新（释放积分）
@@ -560,25 +574,52 @@ export function ToolPageLayout({
       if (!response.ok) {
         throw new Error("Failed to retry video");
       }
-      await response.json();
+      const payload = await response.json();
+      const retried = payload.data;
+      const newVideoUuid = retried.videoUuid as string;
       resetNotification(uuid);
       resetNotification(`${uuid}:failed`);
-      addGeneratingId(uuid);
-      startPolling(uuid);
-      setCurrentVideos((prev) =>
-        prev.map((v) =>
-          v.uuid === uuid ? { ...v, status: "GENERATING", errorMessage: null } : v
-        )
-      );
+      videoHistoryStorage.addHistory({
+        uuid: newVideoUuid,
+        userId: user.id,
+        prompt: historyItems.find((item) => item.uuid === uuid)?.prompt ?? "",
+        model: historyItems.find((item) => item.uuid === uuid)?.model ?? "",
+        status: "generating",
+        creditsUsed: retried.creditsUsed ?? 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      setHistoryItems(videoHistoryStorage.getHistory(user.id));
+      videoTaskStorage.addTask({
+        userId: user.id,
+        videoId: newVideoUuid,
+        taskId: retried.taskId,
+        prompt: historyItems.find((item) => item.uuid === uuid)?.prompt ?? "",
+        model: historyItems.find((item) => item.uuid === uuid)?.model ?? "",
+        mode: config.generator.mode || toolRoute,
+        status: "generating",
+        createdAt: Date.now(),
+        notified: false,
+      });
+      addGeneratingId(newVideoUuid);
+      startPolling(newVideoUuid);
       toast.success("Video retry started");
     } catch (error) {
       console.error("Retry error:", error);
       toast.error("Failed to retry video");
     }
-  }, [addGeneratingId, startPolling, resetNotification]);
+  }, [
+    addGeneratingId,
+    config.generator.mode,
+    historyItems,
+    resetNotification,
+    startPolling,
+    toolRoute,
+    user,
+  ]);
 
   // 移动端：显示标签导航
-  const showMobileTabs = true;
+  const showMobileTabs = Boolean(user);
 
   // Unauthenticated Layout: Scrollable, Tool Area + Landing Page
   if (!user) {
@@ -616,13 +657,14 @@ export function ToolPageLayout({
             but here we control the content area to be scrollable */}
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {/* Tool Area Container */}
-            <div className="container mx-auto max-w-[1600px] px-4 py-6 lg:px-6 lg:py-8">
-              <div className={`flex flex-col lg:flex-row gap-6 ${activeTab === "generator" ? "" : "lg:flex"}`}>
+            <div className="mx-auto w-full max-w-[1540px] px-3 py-4 sm:px-4 lg:px-5">
+              <div className={`flex flex-col gap-4 lg:flex-row ${activeTab === "generator" ? "" : "lg:flex"}`}>
 
                 {/* Generator Panel Side */}
-                <div className={`${activeTab === "generator" ? "block" : "hidden"} lg:block w-full lg:w-[380px] shrink-0`}>
+                <div className="block w-full shrink-0 lg:h-[calc(100svh-92px)] lg:min-h-[700px] lg:w-[440px]">
                   <GeneratorPanel
-                    toolType={toolRoute as "image-to-video" | "text-to-video" | "reference-to-video"}
+                    toolType={toolRoute as "image-to-video" | "text-to-video"}
+                    locale={locale}
                     isLoading={isSubmitting}
                     onSubmit={handleSubmit}
                     availableModelIds={config.generator.models.available}
@@ -633,24 +675,12 @@ export function ToolPageLayout({
                     initialAspectRatio={prefillData?.aspectRatio}
                     initialQuality={prefillData?.quality}
                     initialImageUrl={prefillData?.imageUrl}
+                    maxOutputNumber={balance?.plan === "PRO" || balance?.plan === "BUSINESS" ? 2 : 1}
                   />
                 </div>
 
                 {/* Result/Preview Side */}
-                <div className={`${activeTab === "result" ? "block" : "hidden"} lg:block relative min-h-[500px] flex-1 overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,18,24,0.96),rgba(10,10,15,0.94))] shadow-[0_24px_80px_rgba(0,0,0,0.4)]`}>
-                  {/* Preview Placeholder for Unauthenticated Users */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
-                    <div className="absolute inset-x-10 top-10 h-24 rounded-full bg-primary/15 blur-[90px]" />
-                    <div className="mb-5 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border border-white/10 bg-white/[0.05]">
-                      <svg className="w-8 h-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <h3 className="mb-2 text-lg font-medium text-white">Detailed Preview</h3>
-                    <p className="max-w-xs text-sm">Login to generate and preview your AI videos inside the full studio workspace.</p>
-                  </div>
-                </div>
+                <div className="min-w-0 flex-1"><ToolExamplesPanel locale={locale} /></div>
               </div>
             </div>
 
@@ -699,15 +729,16 @@ export function ToolPageLayout({
           </div>
         )}
 
-        <div className="grid h-fit min-h-0 max-h-[calc(100svh-120px)] grid-cols-1 gap-5 lg:grid-cols-[380px_minmax(0,1.2fr)]">
+        <div className="grid h-fit min-h-0 max-h-[calc(100svh-92px)] grid-cols-1 gap-4 lg:grid-cols-[440px_minmax(0,1.2fr)]">
           {/* Generator Panel */}
           <div
             className={`${activeTab === "generator" ? "flex" : "hidden"
               } lg:flex flex-col h-full min-h-0`}
           >
-            <div className="h-full min-h-0 rounded-[32px] border border-white/10 bg-white/[0.03] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+            <div className="h-full min-h-0">
               <GeneratorPanel
-                toolType={toolRoute as "image-to-video" | "text-to-video" | "reference-to-video"}
+                toolType={toolRoute as "image-to-video" | "text-to-video"}
+                locale={locale}
                 isLoading={isSubmitting}
                 onSubmit={handleSubmit}
                 availableModelIds={config.generator.models.available}
@@ -718,6 +749,7 @@ export function ToolPageLayout({
                 initialAspectRatio={prefillData?.aspectRatio}
                 initialQuality={prefillData?.quality}
                 initialImageUrl={prefillData?.imageUrl}
+                maxOutputNumber={balance?.plan === "PRO" || balance?.plan === "BUSINESS" ? 2 : 1}
               />
             </div>
           </div>

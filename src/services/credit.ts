@@ -14,6 +14,7 @@ import {
   desc,
   eq,
   gt,
+  inArray,
   isNull,
   lt,
   or,
@@ -31,7 +32,7 @@ export interface CreditBalance {
   frozenCredits: number; // 冻结中积分
   availableCredits: number; // 可用积分 (total - used - frozen)
   expiringSoon: number; // 即将过期（7天内）
-  plan?: "FREE" | "PRO" | "BUSINESS" | null; // 用户订阅计划
+  plan?: "FREE" | "BASIC" | "PRO" | "BUSINESS" | null; // 用户订阅计划
 }
 
 interface PackageAllocation {
@@ -112,6 +113,10 @@ export class CreditService {
     const { userId, credits, videoUuid } = params;
 
     return db.transaction(async (trx) => {
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${userId}`}))`
+      );
+
       const [existingHold] = await trx
         .select()
         .from(creditHolds)
@@ -196,27 +201,149 @@ export class CreditService {
     });
   }
 
+  /** Freeze every output in a batch under one user-scoped ledger lock. */
+  async freezeMany(
+    requests: Array<{ userId: string; credits: number; videoUuid: string }>
+  ): Promise<Array<{ success: true; holdId: number; videoUuid: string }>> {
+    if (requests.length === 0) return [];
+    const userId = requests[0]!.userId;
+    if (requests.some((request) => request.userId !== userId)) {
+      throw new Error("A credit batch cannot span multiple users");
+    }
+    if (new Set(requests.map((request) => request.videoUuid)).size !== requests.length) {
+      throw new Error("A credit batch cannot contain duplicate videos");
+    }
+
+    return db.transaction(async (trx) => {
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${userId}`}))`
+      );
+
+      const existing = await trx
+        .select()
+        .from(creditHolds)
+        .where(inArray(creditHolds.videoUuid, requests.map((item) => item.videoUuid)));
+      if (existing.length > 0) {
+        if (
+          existing.length === requests.length &&
+          existing.every((hold) => hold.status === "HOLDING")
+        ) {
+          return existing.map((hold) => ({
+            success: true as const,
+            holdId: hold.id,
+            videoUuid: hold.videoUuid,
+          }));
+        }
+        throw new Error("Credit batch was already partially processed");
+      }
+
+      const now = new Date();
+      const packages = await trx
+        .select()
+        .from(creditPackages)
+        .where(
+          and(
+            eq(creditPackages.userId, userId),
+            eq(creditPackages.status, CreditPackageStatus.ACTIVE),
+            gt(creditPackages.remainingCredits, 0),
+            or(isNull(creditPackages.expiredAt), gt(creditPackages.expiredAt, now))
+          )
+        )
+        .orderBy(
+          sql`${creditPackages.expiredAt} is null`,
+          asc(creditPackages.expiredAt),
+          asc(creditPackages.createdAt)
+        );
+
+      const totalRequired = requests.reduce((sum, request) => sum + request.credits, 0);
+      const totalAvailable = packages.reduce(
+        (sum, pkg) => sum + pkg.remainingCredits,
+        0
+      );
+      if (totalAvailable < totalRequired) {
+        throw new Error(
+          `Insufficient credits. Required: ${totalRequired}, Available: ${totalAvailable}`
+        );
+      }
+
+      const packageState = new Map(
+        packages.map((pkg) => [
+          pkg.id,
+          { remaining: pkg.remainingCredits, frozen: pkg.frozenCredits },
+        ])
+      );
+      const holdValues = requests.map((request) => {
+        let remaining = request.credits;
+        const allocation: PackageAllocation[] = [];
+        for (const pkg of packages) {
+          if (remaining <= 0) break;
+          const state = packageState.get(pkg.id)!;
+          const amount = Math.min(state.remaining, remaining);
+          if (amount <= 0) continue;
+          allocation.push({ packageId: pkg.id, credits: amount });
+          state.remaining -= amount;
+          state.frozen += amount;
+          remaining -= amount;
+        }
+        return {
+          userId,
+          videoUuid: request.videoUuid,
+          credits: request.credits,
+          status: "HOLDING",
+          packageAllocation: allocation,
+        };
+      });
+
+      for (const [packageId, state] of packageState) {
+        await trx
+          .update(creditPackages)
+          .set({
+            remainingCredits: state.remaining,
+            frozenCredits: state.frozen,
+          })
+          .where(eq(creditPackages.id, packageId));
+      }
+
+      const holds = await trx.insert(creditHolds).values(holdValues).returning({
+        id: creditHolds.id,
+        videoUuid: creditHolds.videoUuid,
+      });
+      if (holds.length !== requests.length) {
+        throw new Error("Failed to create every credit hold in the batch");
+      }
+      return holds.map((hold) => ({
+        success: true as const,
+        holdId: hold.id,
+        videoUuid: hold.videoUuid,
+      }));
+    });
+  }
+
   /**
    * 结算积分（任务成功时调用）
    */
   async settle(videoUuid: string): Promise<void> {
     await db.transaction(async (trx) => {
       const [hold] = await trx
-        .select()
-        .from(creditHolds)
-        .where(eq(creditHolds.videoUuid, videoUuid))
-        .limit(1);
+        .update(creditHolds)
+        .set({ status: "SETTLED", settledAt: new Date() })
+        .where(
+          and(
+            eq(creditHolds.videoUuid, videoUuid),
+            eq(creditHolds.status, "HOLDING")
+          )
+        )
+        .returning();
 
       if (!hold) {
-        throw new Error(`Hold not found for video: ${videoUuid}`);
-      }
-
-      if (hold.status === "SETTLED") {
-        return;
-      }
-
-      if (hold.status !== "HOLDING") {
-        throw new Error(`Invalid hold status: ${hold.status}`);
+        const [existing] = await trx
+          .select({ status: creditHolds.status })
+          .from(creditHolds)
+          .where(eq(creditHolds.videoUuid, videoUuid))
+          .limit(1);
+        if (existing?.status === "SETTLED") return;
+        if (!existing) throw new Error(`Hold not found for video: ${videoUuid}`);
+        throw new Error(`Invalid hold status: ${existing.status}`);
       }
 
       const allocation = hold.packageAllocation as PackageAllocation[];
@@ -255,14 +382,6 @@ export class CreditService {
         }
       }
 
-      await trx
-        .update(creditHolds)
-        .set({
-          status: "SETTLED",
-          settledAt: new Date(),
-        })
-        .where(eq(creditHolds.videoUuid, videoUuid));
-
       const balance = await this.getBalanceInTx(trx, hold.userId);
       await trx.insert(creditTransactions).values({
         transNo: `TXN${Date.now()}${nanoid(6)}`,
@@ -289,16 +408,28 @@ export class CreditService {
         .limit(1);
 
       if (!hold) {
-        throw new Error(`Hold not found for video: ${videoUuid}`);
-      }
-
-      if (hold.status === "RELEASED") {
         return;
       }
 
       if (hold.status !== "HOLDING") {
-        throw new Error(`Invalid hold status: ${hold.status}`);
+        return;
       }
+
+      const [claimed] = await trx
+        .update(creditHolds)
+        .set({
+          status: "RELEASED",
+          settledAt: new Date(),
+        })
+        .where(
+          and(
+            eq(creditHolds.videoUuid, videoUuid),
+            eq(creditHolds.status, "HOLDING")
+          )
+        )
+        .returning({ id: creditHolds.id });
+
+      if (!claimed) return;
 
       const allocation = hold.packageAllocation as PackageAllocation[];
 
@@ -319,14 +450,6 @@ export class CreditService {
             .where(eq(creditPackages.id, packageId));
         }
       }
-
-      await trx
-        .update(creditHolds)
-        .set({
-          status: "RELEASED",
-          settledAt: new Date(),
-        })
-        .where(eq(creditHolds.videoUuid, videoUuid));
 
       const balance = await this.getBalanceInTx(trx, hold.userId);
       await trx.insert(creditTransactions).values({
@@ -359,6 +482,15 @@ export class CreditService {
     const expiredAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
 
     return db.transaction(async (trx) => {
+      const [existingPackage] = await trx
+        .select({ id: creditPackages.id })
+        .from(creditPackages)
+        .where(eq(creditPackages.orderNo, params.orderNo))
+        .limit(1);
+      if (existingPackage) {
+        return { packageId: existingPackage.id };
+      }
+
       const [pkgResult] = await trx
         .insert(creditPackages)
         .values({
@@ -372,9 +504,16 @@ export class CreditService {
           expiredAt,
           updatedAt: new Date(),
         })
+        .onConflictDoNothing({ target: creditPackages.orderNo })
         .returning({ id: creditPackages.id });
 
       if (!pkgResult) {
+        const [concurrentPackage] = await trx
+          .select({ id: creditPackages.id })
+          .from(creditPackages)
+          .where(eq(creditPackages.orderNo, params.orderNo))
+          .limit(1);
+        if (concurrentPackage) return { packageId: concurrentPackage.id };
         throw new Error("Failed to create credit package");
       }
 

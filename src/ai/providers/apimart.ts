@@ -7,6 +7,7 @@ import {
   getProviderModelId,
   transformParamsForProvider,
 } from "../model-mapping";
+import { providerFetch, requireProviderTaskId } from "../provider-http";
 
 /**
  * APImart Provider
@@ -49,7 +50,7 @@ export class ApimartProvider implements AIVideoProvider {
       params
     );
 
-    const response = await fetch(`${this.baseUrl}/videos/generations`, {
+    const response = await providerFetch(`${this.baseUrl}/videos/generations`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -79,7 +80,7 @@ export class ApimartProvider implements AIVideoProvider {
     const taskId = taskData?.task_id || taskData?.id || data.task_id || data.id;
 
     return {
-      taskId,
+      taskId: requireProviderTaskId(taskId, "APImart"),
       provider: "apimart",
       status: this.mapStatus(taskData?.status || data.status || "pending"),
       progress: data.progress,
@@ -89,7 +90,7 @@ export class ApimartProvider implements AIVideoProvider {
   }
 
   async getTaskStatus(taskId: string): Promise<VideoTaskResponse> {
-    const response = await fetch(`${this.baseUrl}/tasks/${taskId}`, {
+    const response = await providerFetch(`${this.baseUrl}/tasks/${taskId}`, {
       headers: { Authorization: `Bearer ${this.apiKey}` },
     });
 
@@ -152,7 +153,7 @@ export class ApimartProvider implements AIVideoProvider {
     const thumbnailUrl = data.result?.thumbnail_url;
 
     return {
-      taskId: data.id || data.task_id,
+      taskId: requireProviderTaskId(data.id || data.task_id, "APImart callback"),
       provider: "apimart",
       status: this.mapStatus(data.status),
       progress: data.progress,

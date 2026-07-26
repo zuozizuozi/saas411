@@ -7,7 +7,6 @@
 import type { ToolPageConfig, ToolLandingConfig, GeneratorConfig, PageSEOConfig } from "./types";
 import { imageToVideoConfig } from "./image-to-video.config";
 import { textToVideoConfig } from "./text-to-video.config";
-import { referenceToVideoConfig } from "./reference-to-video.config";
 import { adaptToolPageConfigToGeneratorConfig } from "./adapter";
 import { getAvailableModels } from "@/config/credits";
 import type { ProviderType } from "@/ai";
@@ -18,7 +17,6 @@ export type { ToolPageConfig, ToolLandingConfig, GeneratorConfig, PageSEOConfig 
 // Export configs
 export { imageToVideoConfig } from "./image-to-video.config";
 export { textToVideoConfig } from "./text-to-video.config";
-export { referenceToVideoConfig } from "./reference-to-video.config";
 
 // Export adapter
 export { adaptToolPageConfigToGeneratorConfig } from "./adapter";
@@ -30,7 +28,6 @@ export { adaptToolPageConfigToGeneratorConfig } from "./adapter";
 const toolPageConfigs = {
   "image-to-video": imageToVideoConfig,
   "text-to-video": textToVideoConfig,
-  "reference-to-video": referenceToVideoConfig,
 } as const;
 
 export type ToolPageRoute = keyof typeof toolPageConfigs;

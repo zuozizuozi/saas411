@@ -1,0 +1,334 @@
+{
+  "headings": [
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 311,
+        "x": 32,
+        "y": 81
+      },
+      "tag": "H1",
+      "text": "文本转视频",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 56,
+        "width": 311,
+        "x": 32,
+        "y": 1060
+      },
+      "tag": "H1",
+      "text": "Seedance 文本生成视频 AI 生成器",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "30px",
+      "lineHeight": "36px",
+      "rect": {
+        "height": 72,
+        "width": 327,
+        "x": 24,
+        "y": 1495.1875
+      },
+      "tag": "H2",
+      "text": "用 Seedance 将任何想法视频化",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 64,
+        "width": 327,
+        "x": 24,
+        "y": 2196.625
+      },
+      "tag": "H2",
+      "text": "Seedance 文本生成视频，让创意不受制作限制",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 2559.9375
+      },
+      "tag": "H3",
+      "text": "将任何想法变成视觉起点",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 2994.75
+      },
+      "tag": "H3",
+      "text": "控制场景、运动、相机和风格",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 3455.5625
+      },
+      "tag": "H3",
+      "text": "在缩放内容之前比较变体",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 32,
+        "width": 327,
+        "x": 24,
+        "y": 3841.5625
+      },
+      "tag": "H2",
+      "text": "用文字生成你的第一个 AI 视频",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 64,
+        "width": 327,
+        "x": 24,
+        "y": 4217.5625
+      },
+      "tag": "H2",
+      "text": "适合各种业务的强大文本生成视频 AI",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "18px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 309,
+        "x": 42,
+        "y": 4417.3125
+      },
+      "tag": "H3",
+      "text": "将产品视频成本降低高达 70%",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "18px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 309,
+        "x": 42,
+        "y": 4547.3125
+      },
+      "tag": "H3",
+      "text": "广告变体的启动速度提高了 75%",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "18px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 309,
+        "x": 42,
+        "y": 4677.3125
+      },
+      "tag": "H3",
+      "text": "将故事板到预览的时间缩短高达 80%",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "18px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 309,
+        "x": 42,
+        "y": 4807.3125
+      },
+      "tag": "H3",
+      "text": "将短视频输出提高高达 68%",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 64,
+        "width": 327,
+        "x": 24,
+        "y": 5500.3125
+      },
+      "tag": "H2",
+      "text": "如何用 Seedance 从文本生成 AI 视频",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "27.5px",
+      "rect": {
+        "height": 27.5,
+        "width": 277,
+        "x": 49,
+        "y": 5789.0625
+      },
+      "tag": "H3",
+      "text": "第 1 步：编写清晰的视频提示",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "27.5px",
+      "rect": {
+        "height": 27.5,
+        "width": 277,
+        "x": 49,
+        "y": 6048.5625
+      },
+      "tag": "H3",
+      "text": "第 2 步：选择型号和视频设置",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "27.5px",
+      "rect": {
+        "height": 27.5,
+        "width": 277,
+        "x": 49,
+        "y": 6282.0625
+      },
+      "tag": "H3",
+      "text": "第 3 步：生成、审查和完善",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 32,
+        "width": 257.40625,
+        "x": 58.796875,
+        "y": 6636.5625
+      },
+      "tag": "H2",
+      "text": "文本生成视频教程与指南",
+      "textAlign": "center"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 6963.875
+      },
+      "tag": "H3",
+      "text": "Seedance 2.5 与 Kling 2.5 对比：哪款 AI 视频模型更好？",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 7280.6875
+      },
+      "tag": "H3",
+      "text": "Seedance 2.5 评测 (2026)：官方演示证明了什么，又没有证明什么",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "20px",
+      "lineHeight": "28px",
+      "rect": {
+        "height": 28,
+        "width": 327,
+        "x": 24,
+        "y": 7597.5
+      },
+      "tag": "H3",
+      "text": "Seedance 视频提示词指南：15 个可直接复制的 Seedance 2.0 视频提示词",
+      "textAlign": "left"
+    },
+    {
+      "fontSize": "24px",
+      "lineHeight": "32px",
+      "rect": {
+        "height": 32,
+        "width": 327,
+        "x": 24,
+        "y": 7829.5
+      },
+      "tag": "H2",
+      "text": "常见问题",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "rect": {
+        "height": 60,
+        "width": 327,
+        "x": 24,
+        "y": 7935.5
+      },
+      "tag": "H3",
+      "text": "Seedance 文本生成视频是什么？",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "rect": {
+        "height": 60,
+        "width": 327,
+        "x": 24,
+        "y": 8116.5
+      },
+      "tag": "H3",
+      "text": "如何用文字生成视频？",
+      "textAlign": "start"
+    },
+    {
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "rect": {
+        "height": 60,
+        "width": 327,
+        "x": 24,
+        "y": 8177.5
+      },
+      "tag": "H3",
+      "text": "什么样的提示词更适合文本生成视频？",
+      "textAlign": "start"
+    }
+  ],
+  "viewport": {
+    "height": 844,
+    "scrollHeight": 10760,
+    "width": 390
+  }
+}

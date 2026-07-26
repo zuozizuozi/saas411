@@ -1,8 +1,8 @@
 import { MetadataRoute } from "next";
 import { i18n } from "@/config/i18n-config";
-import { execSync } from "child_process";
-import { readdir, stat } from "fs/promises";
-import { join } from "path";
+import { execFileSync } from "node:child_process";
+import { readdir, stat } from "node:fs/promises";
+import { join } from "node:path";
 
 // Allow sitemap to be revalidated every hour (3600 seconds)
 export const revalidate = 3600;
@@ -10,8 +10,13 @@ export const revalidate = 3600;
 const getLastModified = (filePath: string): Date => {
   try {
     // 转义文件路径中的特殊字符，避免 shell 解析错误
-    const escapedPath = filePath.replace(/'/g, "'\\''");
-    const timestamp = execSync(`git log -1 --format=%cI '${escapedPath}'`)
+    const timestamp = execFileSync("git", [
+      "log",
+      "-1",
+      "--format=%cI",
+      "--",
+      filePath,
+    ])
       .toString()
       .trim();
     if (timestamp) {

@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get("userId");
-    const page = parseInt(searchParams.get("page") || "1");
+    const page = Number.parseInt(searchParams.get("page") || "1");
     const status = searchParams.get("status");
 
     if (!userId) {

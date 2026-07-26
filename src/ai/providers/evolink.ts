@@ -7,6 +7,7 @@ import {
   getProviderModelId,
   transformParamsForProvider,
 } from "../model-mapping";
+import { providerFetch, requireProviderTaskId } from "../provider-http";
 
 export class EvolinkProvider implements AIVideoProvider {
   name = "evolink";
@@ -31,7 +32,7 @@ export class EvolinkProvider implements AIVideoProvider {
       params
     );
 
-    const response = await fetch(`${this.baseUrl}/videos/generations`, {
+    const response = await providerFetch(`${this.baseUrl}/videos/generations`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -58,7 +59,7 @@ export class EvolinkProvider implements AIVideoProvider {
     const data = await response.json();
 
     return {
-      taskId: data.id,
+      taskId: requireProviderTaskId(data.id, "Evolink"),
       provider: "evolink",
       status: this.mapStatus(data.status),
       progress: data.progress,
@@ -68,7 +69,7 @@ export class EvolinkProvider implements AIVideoProvider {
   }
 
   async getTaskStatus(taskId: string): Promise<VideoTaskResponse> {
-    const response = await fetch(
+    const response = await providerFetch(
       `${this.baseUrl}/tasks/${taskId}`,
       {
         headers: { Authorization: `Bearer ${this.apiKey}` },
@@ -115,7 +116,7 @@ export class EvolinkProvider implements AIVideoProvider {
       : data.data?.video_url;
 
     return {
-      taskId: data.id,
+      taskId: requireProviderTaskId(data.id || taskId, "Evolink status"),
       provider: "evolink",
       status: this.mapStatus(data.status),
       progress: data.progress,
@@ -134,7 +135,7 @@ export class EvolinkProvider implements AIVideoProvider {
       : payload.data?.video_url;
 
     return {
-      taskId: payload.id,
+      taskId: requireProviderTaskId(payload.id, "Evolink callback"),
       provider: "evolink",
       status: this.mapStatus(payload.status),
       progress: payload.progress,
