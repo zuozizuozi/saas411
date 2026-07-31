@@ -1,5 +1,6 @@
 import { MobileMenuProvider } from "@/components/layout/mobile-menu-context";
 import { ToolLayoutContent } from "@/components/layout/tool-layout-content";
+import { ModalProvider } from "@/components/modal-provider";
 import { i18n } from "@/config/i18n-config";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -22,10 +23,12 @@ export default async function ToolLayout({
   const user = await getCurrentUser();
 
   return (
-    <MobileMenuProvider>
-      <ToolLayoutContent lang={locale} user={user}>
-        {children}
-      </ToolLayoutContent>
-    </MobileMenuProvider>
+    <ModalProvider>
+      <MobileMenuProvider>
+        <ToolLayoutContent lang={locale} user={user}>
+          {children}
+        </ToolLayoutContent>
+      </MobileMenuProvider>
+    </ModalProvider>
   );
 }
