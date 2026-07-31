@@ -279,7 +279,9 @@ export function GeneratorPanel({
       quality: currentModel.qualities?.includes(quality) ? quality : undefined,
       outputNumber,
       generateAudio: currentModel.supportAudio ? generateAudio : undefined,
-      removeWatermark,
+      removeWatermark: currentModel.supportRemoveWatermark === false
+        ? undefined
+        : removeWatermark,
       imageFile: imageFile || undefined,
       endImageFile: endImageFile || undefined,
       imageUrl: imageUrl || undefined,
@@ -372,7 +374,7 @@ export function GeneratorPanel({
             {maxOutputNumber > 1 && <ChoiceRow label={t.outputs} values={["1", "2"]} selected={String(outputNumber)} onSelect={(value) => setOutputNumber(Number(value))} disabled={isLoading} />}
 
             {currentModel.supportAudio && <SettingToggle icon={<Volume2 className="h-4 w-4" />} label={t.audio} checked={generateAudio} onChange={() => setGenerateAudio((value) => !value)} disabled={isLoading} />}
-            <SettingToggle icon={<Crown className="h-4 w-4 text-amber-400" />} label={t.watermark} checked={removeWatermark} onChange={() => setRemoveWatermark((value) => !value)} disabled={isLoading} />
+            {currentModel.supportRemoveWatermark !== false ? <SettingToggle icon={<Crown className="h-4 w-4 text-amber-400" />} label={t.watermark} checked={removeWatermark} onChange={() => setRemoveWatermark((value) => !value)} disabled={isLoading} /> : null}
           </div>
         )}
       </div>
