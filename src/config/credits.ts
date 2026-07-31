@@ -38,6 +38,8 @@ export interface ModelConfig {
   supportImageToVideo: boolean;
   /** Whether the provider accepts an audio-generation flag for this model. */
   supportAudio?: boolean;
+  /** Whether the provider accepts a per-request watermark removal flag. */
+  supportRemoveWatermark?: boolean;
   maxDuration: number;
   durations: number[];
   aspectRatios: string[];
@@ -158,11 +160,12 @@ export const CREDITS_CONFIG = {
         const baseConfigs: Record<string, Omit<ModelConfig, "creditCost">> = {
           "zhipu-video": {
             id: "zhipu-video",
-            name: "CogVideoX Flash",
+            name: "AI Video",
             provider: "zhipu" as const,
-            description: "Zhipu AI video generation with text, images, and audio",
+            description: "Configurable AI video generation with text, images, and audio",
             supportImageToVideo: true,
             supportAudio: true,
+            supportRemoveWatermark: false,
             maxDuration: 10,
             durations: [5, 10],
             aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
