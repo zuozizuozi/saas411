@@ -359,48 +359,6 @@ export function ToolPageLayout({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoIdFromQuery, user?.id]);
 
-  // SSE: listen for backend completion events
-  useEffect(() => {
-    if (!user?.id) return;
-    if (typeof window === "undefined" || !("EventSource" in window)) return;
-
-    const source = new EventSource("/api/v1/video/events");
-
-    const handleVideoEvent = async (event: MessageEvent) => {
-      try {
-        const payload = JSON.parse(event.data);
-        const videoId = payload.videoUuid as string;
-
-        if (!videoId) return;
-        stopPolling(videoId);
-
-        if (payload.status === "COMPLETED") {
-          const res = await fetch(`/api/v1/video/${videoId}`);
-          if (!res.ok) return;
-          const detail = await res.json();
-          handleCompleted(detail.data as Video);
-        } else if (payload.status === "FAILED") {
-          handleFailed({ videoId, error: payload.error });
-        }
-      } catch (error) {
-        console.warn("SSE event handling failed:", error);
-      }
-    };
-
-    source.addEventListener("video", handleVideoEvent);
-
-    const handleError = () => {
-      source.close();
-    };
-    source.addEventListener("error", handleError);
-
-    return () => {
-      source.removeEventListener("video", handleVideoEvent);
-      source.removeEventListener("error", handleError);
-      source.close();
-    };
-  }, [user?.id, handleCompleted, handleFailed, stopPolling]);
-
   // 处理生成提交
   const handleSubmit = useCallback(async (data: GeneratorData) => {
     // 检查登录

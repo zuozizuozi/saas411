@@ -35,7 +35,11 @@ function createDb() {
     );
   }
   const sql = postgres(databaseUrl, {
-    max: 10,
+    // Vercel scales by creating function instances. Keeping a single client
+    // per instance prevents those instances from exhausting Supavisor's
+    // client limit during traffic spikes.
+    max: 1,
+    idle_timeout: 20,
     ssl: parseSslConfig(databaseUrl),
     // Supabase's transaction pooler (the correct endpoint for Vercel
     // serverless functions) does not support PostgreSQL prepared statements.
