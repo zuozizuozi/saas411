@@ -117,6 +117,7 @@ export async function createStripeCreditSession(userId: string, packageId: strin
 export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan | undefined> {
   const [custom] = await db
     .select({
+      plan: customers.plan,
       stripeSubscriptionId: customers.stripeSubscriptionId,
       stripeCurrentPeriodEnd: customers.stripeCurrentPeriodEnd,
       stripeCustomerId: customers.stripeCustomerId,
@@ -139,20 +140,28 @@ export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan
     };
   }
 
-  const isPaid =
-    !!custom.stripePriceId &&
-    !!custom.stripeCurrentPeriodEnd &&
+  const entitlementPlan = custom.plan ?? "FREE";
+  const periodIsCurrent =
+    !custom.stripeCurrentPeriodEnd ||
     custom.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now();
+  const isPaid = entitlementPlan !== "FREE" && periodIsCurrent;
 
-  const customPlan =
+  const stripePlan =
     pricingData.find((plan) => plan.stripeIds.monthly === custom.stripePriceId) ??
     pricingData.find((plan) => plan.stripeIds.yearly === custom.stripePriceId);
+  const entitlementPlanIndex = {
+    FREE: 0,
+    BASIC: 1,
+    PRO: 2,
+    BUSINESS: 3,
+  }[entitlementPlan];
+  const customPlan = stripePlan ?? pricingData[entitlementPlanIndex];
   const plan = isPaid && customPlan ? customPlan : pricingData[0]!;
 
   const interval = isPaid
-    ? customPlan?.stripeIds.monthly === custom.stripePriceId
-      ? "month"
-      : customPlan?.stripeIds.yearly === custom.stripePriceId
+      ? stripePlan?.stripeIds.monthly === custom.stripePriceId
+        ? "month"
+      : stripePlan?.stripeIds.yearly === custom.stripePriceId
         ? "year"
         : null
     : null;
