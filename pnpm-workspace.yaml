@@ -1,0 +1,13 @@
+allowBuilds:
+  # esbuild's install script selects the platform-specific binary.
+  '@vercel/speed-insights': true
+  # core-js only uses postinstall for informational output.
+  core-js: false
+  esbuild: true
+minimumReleaseAgeExclude:
+  - '@posthog/browser-common@0.3.1'
+  - '@posthog/core@1.46.1'
+  - posthog-js@1.409.5
+overrides:
+  # Patched transitive dependency pulled by Drizzle's optional Gel adapter.
+  shell-quote: 1.10.0
