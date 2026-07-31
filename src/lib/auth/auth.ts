@@ -67,6 +67,7 @@ const plugins: AuthPlugin[] = [
   emailOTP({
     sendVerificationOTP: async ({ email, otp, type }) => {
       const { resend } = await import("@/lib/email");
+      const emailDomain = email.split("@").at(-1) ?? "unknown";
       const purpose = {
         "sign-in": "sign in to",
         "email-verification": "verify your email for",
@@ -83,8 +84,14 @@ const plugins: AuthPlugin[] = [
         headers: { "X-Entity-Ref-ID": crypto.randomUUID() },
       });
       if (error) {
+        console.error("[Auth OTP] delivery rejected", {
+          emailDomain,
+          type,
+          message: error.message,
+        });
         throw new Error(`Verification email delivery failed: ${error.message}`);
       }
+      console.info("[Auth OTP] delivery accepted", { emailDomain, type });
     },
     otpLength: 6,
     expiresIn: 300,
