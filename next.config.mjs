@@ -3,6 +3,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+const canonicalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+const canonicalOrigin = canonicalAppUrl
+  ? new URL(canonicalAppUrl).origin
+  : "https://seedance.co.com";
+const canonicalHostname = new URL(canonicalOrigin).hostname;
+
 if (!process.env.SKIP_ENV_VALIDATION) {
   await import("./src/env.mjs");
   await import("./src/lib/auth/env.mjs");
@@ -12,6 +18,16 @@ if (!process.env.SKIP_ENV_VALIDATION) {
 const config = {
   reactStrictMode: true,
   pageExtensions: ["ts", "tsx"],
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: `www.${canonicalHostname}` }],
+        destination: `${canonicalOrigin}/:path*`,
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
