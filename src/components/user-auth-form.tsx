@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth/client";
+import { getSafeAuthCallbackURL } from "@/lib/auth/callback-url";
 import { cn } from "@/components/ui";
 import { buttonVariants } from "@/components/ui/button";
 import { EmailOtpForm } from "@/components/email-otp-form";
@@ -24,7 +25,10 @@ export function UserAuthForm({
   const t = useTranslations("Login");
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const searchParams = useSearchParams();
-  const callbackURL = searchParams?.get("from") ?? `/${lang}/my-creations`;
+  const callbackURL = getSafeAuthCallbackURL(
+    searchParams?.get("from"),
+    `/${lang}/my-creations`,
+  );
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
