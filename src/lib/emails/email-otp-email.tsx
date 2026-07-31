@@ -11,7 +11,11 @@ import {
 
 interface EmailOtpEmailProps {
   otp: string;
-  purpose: "sign-in" | "email-verification" | "forget-password";
+  purpose:
+    | "sign-in"
+    | "email-verification"
+    | "forget-password"
+    | "change-email";
   siteName: string;
 }
 
@@ -19,6 +23,7 @@ const purposeCopy = {
   "sign-in": "sign in to",
   "email-verification": "verify your email for",
   "forget-password": "reset your password for",
+  "change-email": "change the email address for",
 } as const;
 
 export const EmailOtpEmail = ({
