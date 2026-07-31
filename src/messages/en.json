@@ -387,7 +387,8 @@
     "invalid_email": "Enter a valid email address.",
     "invalid_code": "Enter the 6-digit verification code.",
     "send_error": "We couldn't send the code. Please try again.",
-    "verify_error": "The code is invalid or expired. Please try again."
+    "verify_error": "The code is invalid or expired. Please try again.",
+    "verify_request_error": "We couldn't verify the code. Check your connection and try again."
   },
   "MainNav": {
     "introducing": "Introducing seedance.co"

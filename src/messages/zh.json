@@ -387,7 +387,8 @@
     "invalid_email": "请输入有效的邮箱地址。",
     "invalid_code": "请输入 6 位验证码。",
     "send_error": "验证码发送失败，请重试。",
-    "verify_error": "验证码无效或已过期，请重试。"
+    "verify_error": "验证码无效或已过期，请重试。",
+    "verify_request_error": "验证码验证请求失败，请检查网络后重试。"
   },
   "MainNav": {
     "introducing": "介绍 seedance.co"

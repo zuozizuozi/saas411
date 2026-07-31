@@ -63,7 +63,6 @@ const debugLogger =
 type AuthPlugin = ReturnType<typeof nextCookies> | ReturnType<typeof emailOTP>;
 
 const plugins: AuthPlugin[] = [
-  ...(process.env.NODE_ENV === "development" ? [] : [nextCookies()]),
   emailOTP({
     sendVerificationOTP: async ({ email, otp, type }) => {
       const { resend } = await import("@/lib/email");
@@ -98,6 +97,9 @@ const plugins: AuthPlugin[] = [
     allowedAttempts: 3,
     storeOTP: "hashed",
   }),
+  // Better Auth requires nextCookies to run last so it can forward every
+  // Set-Cookie header produced by the plugins above (including email OTP).
+  ...(process.env.NODE_ENV === "development" ? [] : [nextCookies()]),
 ];
 
 const skipEnvironmentValidation = Boolean(process.env.SKIP_ENV_VALIDATION);

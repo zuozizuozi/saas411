@@ -90,13 +90,22 @@ export function EmailOtpForm({
         email,
         otp,
       });
-      if (verifyError) throw new Error(verifyError.message);
+      if (verifyError) {
+        console.error("Email OTP verification rejected:", {
+          code: verifyError.code,
+          status: verifyError.status,
+          statusText: verifyError.statusText,
+          message: verifyError.message,
+        });
+        setError(t("verify_error"));
+        return;
+      }
 
       onSuccess?.();
       window.location.assign(callbackURL);
     } catch (verifyError) {
       console.error("Email OTP verification error:", verifyError);
-      setError(t("verify_error"));
+      setError(t("verify_request_error"));
     } finally {
       setIsVerifying(false);
     }
