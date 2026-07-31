@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 /**
  * useNotificationDeduplication - 跨标签页通知去重
@@ -59,7 +59,7 @@ export function useNotificationDeduplication() {
    * @param videoId 视频 ID
    * @returns 是否应该显示通知
    */
-  const shouldNotify = (videoId: string): boolean => {
+  const shouldNotify = useCallback((videoId: string): boolean => {
     // 如果已经通知过，不再重复通知
     if (notifiedRef.current.has(videoId)) {
       return false;
@@ -87,13 +87,13 @@ export function useNotificationDeduplication() {
     }
 
     return true;
-  };
+  }, []);
 
   /**
    * 标记视频已通知
    * @param videoId 视频 ID
    */
-  const markNotified = (videoId: string) => {
+  const markNotified = useCallback((videoId: string) => {
     notifiedRef.current.add(videoId);
 
     // 通过 BroadcastChannel 通知其他标签页
@@ -108,24 +108,24 @@ export function useNotificationDeduplication() {
         console.warn("BroadcastChannel closed, unable to send completed message");
       }
     }
-  };
+  }, []);
 
   /**
    * 重置指定视频的通知状态（用于重试等场景）
    * @param videoId 视频 ID
    */
-  const resetNotification = (videoId: string) => {
+  const resetNotification = useCallback((videoId: string) => {
     processingRef.current.delete(videoId);
     notifiedRef.current.delete(videoId);
-  };
+  }, []);
 
   /**
    * 清理所有通知状态
    */
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     processingRef.current.clear();
     notifiedRef.current.clear();
-  };
+  }, []);
 
   return {
     shouldNotify,

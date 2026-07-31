@@ -58,7 +58,7 @@ export function HeaderSimple({ user, lang = "en", onMobileMenuToggle }: HeaderSi
           </DropdownMenu>
         ) : (
           <>
-            <button type="button" onClick={signInModal.onOpen} className="hidden h-9 px-2 text-sm font-medium text-slate-200 hover:text-white min-[350px]:block">{isZh ? "登录" : "Login"}</button>
+            <button type="button" onClick={signInModal.onOpen} className="hidden h-9 px-2 text-sm font-medium text-slate-200 hover:text-white sm:block">{isZh ? "登录" : "Login"}</button>
             <Button size="sm" onClick={signInModal.onOpen} className="h-9 rounded-md bg-blue-600 px-3 text-white hover:bg-blue-500">{isZh ? "免费开始" : "Start for Free"}</Button>
           </>
         )}

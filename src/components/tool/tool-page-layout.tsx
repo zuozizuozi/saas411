@@ -12,7 +12,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth/client";
@@ -101,6 +101,7 @@ export function ToolPageLayout({
   const [generatingIds, setGeneratingIds] = useState<string[]>([]);
   const [historyItems, setHistoryItems] = useState<VideoHistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<"generator" | "result">("generator");
+  const historySyncUserRef = useRef<string | null>(null);
   const [prefillData, setPrefillData] = useState<{
     prompt?: string;
     model?: string;
@@ -277,19 +278,36 @@ export function ToolPageLayout({
 
   // 加载历史记录（用户登录时）
   useEffect(() => {
-    if (!user?.id) return;
+    const userId = user?.id;
+    if (!userId) {
+      historySyncUserRef.current = null;
+      return;
+    }
+    if (historySyncUserRef.current === userId) return;
+
+    historySyncUserRef.current = userId;
+
+    const abortController = new AbortController();
+    let disposed = false;
+    let completed = false;
 
     // 从 localStorage 加载历史记录
-    const history = videoHistoryStorage.getHistory(user.id);
+    const history = videoHistoryStorage.getHistory(userId);
     setHistoryItems(history);
 
     // 可选：从服务器同步最近 20 条视频
-    fetch(`/api/v1/video/list?limit=20`)
-      .then((res) => res.json())
+    fetch(`/api/v1/video/list?limit=20`, { signal: abortController.signal })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to sync video history (${res.status})`);
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (disposed) return;
         if (data.data?.videos) {
           videoHistoryStorage.syncFromServer(data.data.videos);
-          setHistoryItems(videoHistoryStorage.getHistory(user.id));
+          setHistoryItems(videoHistoryStorage.getHistory(userId));
           // Resume reconciliation for tasks created in another tab/device or
           // after local storage was cleared. Zhipu is polling-based, so server
           // history must be sufficient to recover a non-terminal generation.
@@ -305,10 +323,23 @@ export function ToolPageLayout({
             }
           }
         }
+        completed = true;
       })
       .catch((error) => {
+        if (abortController.signal.aborted) return;
+        if (historySyncUserRef.current === userId) {
+          historySyncUserRef.current = null;
+        }
         console.warn("Failed to sync video history from server:", error);
       });
+
+    return () => {
+      disposed = true;
+      abortController.abort();
+      if (!completed && historySyncUserRef.current === userId) {
+        historySyncUserRef.current = null;
+      }
+    };
   }, [user?.id, addGeneratingId, isPolling, startPolling]);
 
   useEffect(() => {
