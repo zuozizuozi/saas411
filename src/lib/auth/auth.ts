@@ -66,17 +66,20 @@ const plugins: AuthPlugin[] = [
   ...(process.env.NODE_ENV === "development" ? [] : [nextCookies()]),
   emailOTP({
     sendVerificationOTP: async ({ email, otp, type }) => {
-      const { EmailOtpEmail } = await import("@/lib/emails/email-otp-email");
       const { resend } = await import("@/lib/email");
+      const purpose = {
+        "sign-in": "sign in to",
+        "email-verification": "verify your email for",
+        "forget-password": "reset your password for",
+        "change-email": "change the email address for",
+      }[type];
+      const subject = `${otp} is your ${siteConfig.name} verification code`;
       const { error } = await resend.emails.send({
         from: env.RESEND_FROM,
         to: email,
-        subject: `${otp} is your ${siteConfig.name} verification code`,
-        react: EmailOtpEmail({
-          otp,
-          purpose: type,
-          siteName: siteConfig.name,
-        }),
+        subject,
+        html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;padding:24px"><h1 style="font-size:24px;text-align:center">${siteConfig.name}</h1><p>Enter this code to ${purpose} your account:</p><p style="font-size:36px;font-weight:700;letter-spacing:10px;text-align:center;background:#f4f4f5;border-radius:8px;padding:16px">${otp}</p><p>This code expires in 5 minutes and can only be used once.</p><p>If you did not request this code, you can safely ignore this email.</p></div>`,
+        text: `${subject}\n\nEnter this code to ${purpose} your account: ${otp}\n\nThis code expires in 5 minutes and can only be used once.`,
         headers: { "X-Entity-Ref-ID": crypto.randomUUID() },
       });
       if (error) {
