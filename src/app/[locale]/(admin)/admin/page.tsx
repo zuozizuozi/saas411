@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { users, videos, creditPackages, creditTransactions, VideoStatus } from "@/db/schema";
 import { count, eq, and, sql, gt } from "drizzle-orm";
+import { connection } from "next/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users as UsersIcon,
@@ -12,7 +13,10 @@ import {
   Clock,
 } from "@/components/ui/icons";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
+  await connection();
   // 获取统计数据
   const [
     totalUsersResult,
