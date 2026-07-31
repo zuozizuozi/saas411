@@ -9,6 +9,7 @@ import * as Icons from "@/components/ui/icons";
 
 import { BillingFormButton } from "@/components/price/billing-form-button";
 import { priceDataMap, type SubscriptionPlanTranslation } from "@/config/price/price-data";
+import { siteConfig } from "@/config/site";
 import { useSigninModal } from "@/hooks/use-signin-modal";
 import { UserSubscriptionPlan } from "@/types";
 
@@ -109,20 +110,22 @@ export function PricingCards({
         ))}
       </div>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
-        <Balancer>
-          Email{" "}
-          <a
-            className="font-medium text-primary hover:underline"
-            href="mailto:support@videofly.app"
-          >
-            support@videofly.app
-          </a>{" "}
-          {t('contact')}
-          <br />
-          <strong>{t('contact_2')}</strong>
-        </Balancer>
-      </p>
+      {siteConfig.supportEmail ? (
+        <p className="mt-6 text-center text-sm text-slate-500">
+          <Balancer>
+            Email{" "}
+            <a
+              className="font-medium text-primary hover:underline"
+              href={`mailto:${siteConfig.supportEmail}`}
+            >
+              {siteConfig.supportEmail}
+            </a>{" "}
+            {t('contact')}
+            <br />
+            <strong>{t('contact_2')}</strong>
+          </Balancer>
+        </p>
+      ) : null}
     </section>
   );
 }

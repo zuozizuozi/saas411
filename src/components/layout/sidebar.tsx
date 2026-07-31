@@ -27,8 +27,8 @@ export function Sidebar({ lang = "en", mobileOpen, onMobileClose }: SidebarProps
   const navigation = (
     <div className="flex h-full flex-col bg-[#070b15]">
       <Link href={`/${lang}`} className="flex h-[60px] shrink-0 items-center gap-2.5 border-b border-slate-800 px-4 text-white">
-        <Image src="/logo.svg" alt="VideoFly" width={28} height={28} className="rounded-lg" />
-        <span className="text-lg font-bold tracking-tight">VideoFly</span>
+        <Image src="/logo.svg" alt="seedance.co" width={28} height={28} className="rounded-lg" />
+        <span className="text-lg font-bold tracking-tight">seedance.co</span>
       </Link>
 
       <nav className="custom-scrollbar flex-1 overflow-y-auto px-3 py-4">
@@ -73,7 +73,7 @@ export function Sidebar({ lang = "en", mobileOpen, onMobileClose }: SidebarProps
       <aside className="hidden h-screen w-56 shrink-0 border-r border-slate-800 lg:block">{navigation}</aside>
       <Sheet open={Boolean(mobileOpen)} onOpenChange={(open) => { if (!open) onMobileClose?.(); }}>
         <SheetContent position="left" className="w-64 border-slate-800 bg-[#070b15] p-0 text-white">
-          <SheetHeader className="sr-only"><SheetTitle>VideoFly</SheetTitle></SheetHeader>
+          <SheetHeader className="sr-only"><SheetTitle>seedance.co</SheetTitle></SheetHeader>
           {navigation}
         </SheetContent>
       </Sheet>

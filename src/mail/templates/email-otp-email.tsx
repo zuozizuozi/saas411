@@ -1,24 +1,23 @@
 import type { BaseEmailProps } from "@/mail/types";
-import EmailButton from "@/mail/components/email-button";
 import EmailLayout from "@/mail/components/email-layout";
 import { Text } from "@react-email/components";
 import { createTranslator } from "use-intl/core";
 
-interface MagicLinkEmailProps extends BaseEmailProps {
+interface EmailOtpEmailProps extends BaseEmailProps {
   name?: string;
-  magicLink: string;
+  otp: string;
 }
 
-export default function MagicLinkEmail({
+export default function EmailOtpEmail({
   name = "there",
-  magicLink,
+  otp,
   locale,
   messages,
-}: MagicLinkEmailProps) {
+}: EmailOtpEmailProps) {
   const t = createTranslator({
     locale,
     messages,
-    namespace: "Mail.magicLink",
+    namespace: "Mail.emailOtp",
   });
 
   return (
@@ -31,9 +30,9 @@ export default function MagicLinkEmail({
       </Text>
       <Text className="text-base text-gray-900">{t("body")}</Text>
       <Text className="text-base text-gray-900">{t("instruction")}</Text>
-
-      <EmailButton href={magicLink}>{t("button")}</EmailButton>
-
+      <Text className="my-8 rounded-lg bg-gray-100 px-6 py-4 text-center text-4xl font-bold tracking-[0.3em] text-gray-900">
+        {otp}
+      </Text>
       <Text className="mt-8 text-sm text-gray-500">{t("validity")}</Text>
       <Text className="mt-4 text-sm text-gray-500">{t("security")}</Text>
       <Text className="mt-4 text-sm text-gray-500">{t("footer")}</Text>
@@ -41,8 +40,7 @@ export default function MagicLinkEmail({
   );
 }
 
-// Preview props for react-email CLI
-MagicLinkEmail.PreviewProps = {
+EmailOtpEmail.PreviewProps = {
   locale: "en",
   messages: {
     Mail: {
@@ -50,18 +48,17 @@ MagicLinkEmail.PreviewProps = {
         team: "{name} Team",
         copyright: "© {year} All Rights Reserved.",
       },
-      magicLink: {
+      emailOtp: {
         greeting: "Hi {name},",
-        title: "Sign In to VideoFly",
-        body: "We received a request to sign in to your VideoFly account.",
-        instruction: "Click the button below to sign in:",
-        button: "Sign In",
-        validity: "This link will expire in 24 hours.",
-        security: "For your security, this link can only be used once.",
+        title: "Your seedance.co verification code",
+        body: "We received a request to sign in to your seedance.co account.",
+        instruction: "Enter this verification code to continue:",
+        validity: "This code expires in 5 minutes.",
+        security: "For your security, the code can only be used once.",
         footer: "If you didn't request this, please ignore this email.",
       },
     },
   },
   name: "John Doe",
-  magicLink: "https://videofly.app/auth/callback?token=abc123",
+  otp: "123456",
 };

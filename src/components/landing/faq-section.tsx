@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { siteConfig } from "@/config/site";
 
 interface FAQItem {
   questionKey: string;
@@ -130,26 +131,27 @@ export function FAQSection() {
             </motion.div>
           </BlurFade>
 
-          {/* 底部提示 */}
-          <BlurFade delay={0.4} inView>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="text-center mt-12 p-6 rounded-2xl bg-primary/10 border border-primary/20"
-            >
-              <p className="text-muted-foreground">
-                {t("contact")}
-                <a
-                  href="mailto:support@videofly.app"
-                  className="text-primary hover:underline mx-1"
-                >
-                  support@videofly.app
-                </a>
-              </p>
-            </motion.div>
-          </BlurFade>
+          {siteConfig.supportEmail ? (
+            <BlurFade delay={0.4} inView>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="mt-12 rounded-2xl border border-primary/20 bg-primary/10 p-6 text-center"
+              >
+                <p className="text-muted-foreground">
+                  {t("contact")}{" "}
+                  <a
+                    href={`mailto:${siteConfig.supportEmail}`}
+                    className="text-primary hover:underline"
+                  >
+                    {siteConfig.supportEmail}
+                  </a>
+                </p>
+              </motion.div>
+            </BlurFade>
+          ) : null}
         </div>
       </div>
     </section>

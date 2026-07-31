@@ -24,7 +24,7 @@ export function SiteFooter({
             src="/images/avatars/saasfly-logo.svg"
             width="36"
             height="36"
-            alt="VideoFly Logo"
+            alt="seedance.co"
           />
           <p className="text-center text-sm leading-loose md:text-left">
             {t('copyright', { currentYear })}

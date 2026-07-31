@@ -2,11 +2,10 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { magicLink } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
+import { emailOTP } from "better-auth/plugins";
 
 import { siteConfig } from "@/config/site";
-import { db, users } from "@/db";
+import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { creditService } from "@/services/credit";
 import { env } from "./env.mjs";
@@ -61,37 +60,30 @@ const debugLogger =
       }
     : undefined;
 
-type AuthPlugin = ReturnType<typeof nextCookies> | ReturnType<typeof magicLink>;
+type AuthPlugin = ReturnType<typeof nextCookies> | ReturnType<typeof emailOTP>;
 
 const plugins: AuthPlugin[] = [
   ...(process.env.NODE_ENV === "development" ? [] : [nextCookies()]),
-  magicLink({
-    sendMagicLink: async ({ email, url }) => {
-      const { MagicLinkEmail } = await import("@/lib/emails/magic-link-email");
+  emailOTP({
+    sendVerificationOTP: async ({ email, otp, type }) => {
+      const { EmailOtpEmail } = await import("@/lib/emails/email-otp-email");
       const { resend } = await import("@/lib/email");
-      const [existingUser] = await db
-        .select({ name: users.name, emailVerified: users.emailVerified })
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-
-      const isReturningUser = Boolean(existingUser?.emailVerified);
       await resend.emails.send({
         from: env.RESEND_FROM,
         to: email,
-        subject: isReturningUser
-          ? `Sign-in link for ${siteConfig.name}`
-          : `Activate your ${siteConfig.name} account`,
-        react: MagicLinkEmail({
-          firstName: existingUser?.name ?? "",
-          actionUrl: url,
-          mailType: isReturningUser ? "login" : "register",
+        subject: `${otp} is your ${siteConfig.name} verification code`,
+        react: EmailOtpEmail({
+          otp,
+          purpose: type,
           siteName: siteConfig.name,
         }),
         headers: { "X-Entity-Ref-ID": crypto.randomUUID() },
       });
     },
+    otpLength: 6,
     expiresIn: 300,
+    allowedAttempts: 3,
+    storeOTP: "hashed",
   }),
 ];
 

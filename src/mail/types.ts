@@ -1,7 +1,7 @@
 import type { Locale, Messages } from "next-intl";
 import WelcomeEmail from "./templates/welcome-email";
 import ResetPasswordEmail from "./templates/reset-password-email";
-import MagicLinkEmail from "./templates/magic-link-email";
+import EmailOtpEmail from "./templates/email-otp-email";
 
 /**
  * List all the email templates here
@@ -9,7 +9,7 @@ import MagicLinkEmail from "./templates/magic-link-email";
 export const EmailTemplates = {
   welcome: WelcomeEmail,
   resetPassword: ResetPasswordEmail,
-  magicLink: MagicLinkEmail,
+  emailOtp: EmailOtpEmail,
 } as const;
 
 /**

@@ -19,7 +19,7 @@ export function ToolLandingPage({ config, locale = "en", className }: ToolLandin
   return (
     <div className={cn("border-t border-slate-800 bg-[#030712] text-slate-100", className)}>
       <section className="mx-auto max-w-6xl px-4 py-20 text-center sm:py-24">
-        <p className="mb-4 text-sm font-semibold text-blue-400">VideoFly AI Studio</p>
+        <p className="mb-4 text-sm font-semibold text-blue-400">seedance.co AI Studio</p>
         <h1 className="mx-auto max-w-4xl text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">{config.landing.hero.title}</h1>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">{config.landing.hero.description}</p>
       </section>

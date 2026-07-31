@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: ModelPageProps) {
   const info = modelInfo[pathSegment];
 
   return {
-    title: `${info?.name || "Model"} - VideoFly`,
+    title: `${info?.name || "Model"} - seedance.co`,
     description: info?.description || "AI Video Generation Platform",
     alternates: {
       canonical: alternates.canonical,

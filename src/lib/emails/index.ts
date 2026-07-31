@@ -1,10 +1,10 @@
 /**
  * Email Templates
  *
- * All email templates and utilities for VideoFly
+ * All email templates and utilities for seedance.co
  */
 
-export { MagicLinkEmail } from "./magic-link-email";
+export { EmailOtpEmail } from "./email-otp-email";
 export { WelcomeEmail } from "./welcome-email";
 export { ResetPasswordEmail } from "./reset-password-email";
 export {

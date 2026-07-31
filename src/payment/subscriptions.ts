@@ -11,7 +11,7 @@ export interface SubscriptionPlan {
 
 const freePlan: SubscriptionPlan = {
   title: "Free",
-  description: "Try VideoFly",
+  description: "Try seedance.co",
   benefits: ["Free starter credits", "Standard queue"],
   limitations: ["One concurrent generation", "No batch output"],
   prices: { monthly: 0, yearly: 0 },

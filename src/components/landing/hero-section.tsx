@@ -18,7 +18,7 @@ export function HeroSection({ currentProvider: _currentProvider }: HeroSectionPr
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,rgba(3,7,18,0.28)_70%)]" />
 
       <div className="relative z-10 mx-auto w-full max-w-5xl px-5 py-24 text-center">
-        <span className="mb-6 inline-flex rounded-full border border-white/20 bg-black/25 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur-md">VideoFly AI Video Studio</span>
+        <span className="mb-6 inline-flex rounded-full border border-white/20 bg-black/25 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur-md">seedance.co AI Video Studio</span>
         <h1 className="mx-auto max-w-4xl text-balance text-4xl font-bold leading-[1.08] tracking-[-0.04em] text-white sm:text-5xl lg:text-7xl">
           {isZh ? <>免费 <span className="text-blue-500">AI 视频</span>生成器</> : <>Create cinematic <span className="text-blue-500">AI videos</span></>}
         </h1>

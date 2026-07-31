@@ -16,7 +16,7 @@ export async function generateMetadata({
   const alternates = buildAlternates(`/${pathSegment}`, locale);
 
   return {
-    title: "Wan 2.6 - VideoFly",
+    title: "Wan 2.6 - seedance.co",
     description: "Advanced video generation model",
     alternates: {
       canonical: alternates.canonical,

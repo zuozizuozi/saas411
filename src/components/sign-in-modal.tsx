@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { EmailOtpForm } from "@/components/email-otp-form";
 import * as Icons from "@/components/ui/icons";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/components/ui";
 import { siteConfig } from "@/config/site";
 import { useSigninModal } from "@/hooks/use-signin-modal";
-import { toast } from "sonner";
 
 interface SignInModalContentProps {
   lang: string;
@@ -22,67 +20,30 @@ export const SignInModalContent = ({ lang }: SignInModalContentProps) => {
   const t = useTranslations("SignInModal");
   const signInModal = useSigninModal();
   const searchParams = useSearchParams();
-  const [signInClicked, setSignInClicked] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const callbackURL =
+    searchParams?.get("from") ??
+    `/${lang}${siteConfig.routes.defaultLoginRedirect}`;
 
-  const callbackURL = searchParams?.get("from") ?? `/${lang}${siteConfig.routes.defaultLoginRedirect}`;
-
-  const handleSocialLogin = async (provider: "google") => {
-    setSignInClicked(provider);
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
     try {
-      await authClient.signIn.social({
-        provider,
+      const { error } = await authClient.signIn.social({
+        provider: "google",
         callbackURL,
       });
+      if (error) throw new Error(error.message);
     } catch (error) {
-      console.error(`${provider} signIn error:`, error);
-      setSignInClicked(null);
-      toast.error("Login failed", {
-        description: `Could not sign in with ${provider}. Please try again.`,
+      console.error("Google signIn error:", error);
+      setIsGoogleLoading(false);
+      toast.error(t("login_failed"), {
+        description: t("google_error"),
       });
     }
   };
-
-  const handleMagicLinkLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      return;
-    }
-
-    setEmailError("");
-    setSignInClicked("email");
-
-    try {
-      await authClient.signIn.magicLink({
-        email: email.toLowerCase(),
-        callbackURL,
-      });
-
-      toast.success("Check your email", {
-        description: "We sent you a login link. Be sure to check your spam too.",
-      });
-
-      setEmail("");
-      signInModal.onClose();
-    } catch (error) {
-      console.error("Magic link signIn error:", error);
-      toast.error("Something went wrong", {
-        description: "Your sign in request failed. Please try again.",
-      });
-    } finally {
-      setSignInClicked(null);
-    }
-  };
-
-  const isLoading = signInClicked !== null;
 
   return (
     <div className="w-full">
-      {/* Header */}
       <div className="flex flex-col items-center justify-center space-y-3 border-b bg-background px-4 py-6 pt-8 text-center">
         <h3 className="font-urban text-2xl font-bold">
           {t("signin_title")}
@@ -92,29 +53,26 @@ export const SignInModalContent = ({ lang }: SignInModalContentProps) => {
         </p>
       </div>
 
-      {/* Body */}
       <div className="flex flex-col space-y-4 bg-secondary/50 px-4 py-8">
-        {/* Google Login - Priority */}
-        {siteConfig.auth.enableGoogleLogin && (
+        {siteConfig.auth.enableGoogleLogin ? (
           <Button
             variant="default"
             className="w-full"
-            disabled={isLoading}
-            onClick={() => handleSocialLogin("google")}
+            disabled={isGoogleLoading}
+            onClick={() => void handleGoogleLogin()}
           >
-            {signInClicked === "google" ? (
+            {isGoogleLoading ? (
               <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Icons.Google className="mr-2 h-4 w-4" />
             )}
             {t("continue_google")}
           </Button>
-        )}
+        ) : null}
 
-        {/* Magic Link Email Login */}
-        {siteConfig.auth.enableMagicLinkLogin && (
+        {siteConfig.auth.enableEmailOtpLogin ? (
           <>
-            {siteConfig.auth.enableGoogleLogin && (
+            {siteConfig.auth.enableGoogleLogin ? (
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
@@ -125,50 +83,19 @@ export const SignInModalContent = ({ lang }: SignInModalContentProps) => {
                   </span>
                 </div>
               </div>
-            )}
+            ) : null}
 
-            <form onSubmit={handleMagicLinkLogin} className="grid gap-2">
-              <div className="grid gap-1">
-                <Label className="sr-only" htmlFor="email">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setEmailError("");
-                  }}
-                  className={cn(emailError && "border-red-500")}
-                />
-                {emailError && (
-                  <p className="px-1 text-xs text-red-600">{emailError}</p>
-                )}
-              </div>
-              <Button
-                type="submit"
-                variant={siteConfig.auth.enableGoogleLogin ? "outline" : "default"}
-                className="w-full"
-                disabled={isLoading}
-              >
-                {signInClicked === "email" ? (
-                  <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.Mail className="mr-2 h-4 w-4" />
-                )}
-                {t("continue_email")}
-              </Button>
-            </form>
+            <EmailOtpForm
+              callbackURL={callbackURL}
+              buttonVariant={
+                siteConfig.auth.enableGoogleLogin ? "outline" : "default"
+              }
+              disabled={isGoogleLoading}
+              onSuccess={signInModal.onClose}
+            />
           </>
-        )}
+        ) : null}
 
-        {/* Footer text */}
         <p className="text-center text-xs text-muted-foreground">
           {t("terms_notice")}
         </p>

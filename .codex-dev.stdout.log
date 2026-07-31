@@ -1,0 +1,59 @@
+
+> videofly@ dev F:\saas411
+> next dev
+
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.105:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.9s
+ ✓ Compiled /middleware in 187ms (189 modules)
+ ○ Compiling /[locale] ...
+ ✓ Compiled /[locale] in 5.7s (8200 modules)
+ GET /zh 200 in 7824ms
+ GET /zh 200 in 216ms
+ ○ Compiling /api/v1/credit/balance ...
+ ✓ Compiled /api/v1/credit/balance in 2.5s (8225 modules)
+ GET /api/v1/credit/balance 401 in 2956ms
+ ✓ Compiled in 880ms (2722 modules)
+ GET /zh 200 in 321ms
+ GET /zh 200 in 40ms
+ GET /zh 200 in 629ms
+ GET /api/v1/credit/balance 401 in 20ms
+ GET /zh 200 in 309ms
+ GET /zh 200 in 54ms
+ ○ Compiling /[locale]/text-to-video ...
+ ✓ Compiled /[locale]/image-to-video in 5.8s (8333 modules)
+ GET /zh 200 in 758ms
+ GET /zh/image-to-video 200 in 4933ms
+ GET /zh/text-to-video 200 in 7549ms
+ ○ Compiling /[locale]/pricing ...
+ ✓ Compiled /[locale]/my-creations in 11.1s (8453 modules)
+ GET /zh/image-to-video 200 in 11784ms
+ GET /zh/text-to-video 200 in 11599ms
+ GET /zh 200 in 241ms
+ GET /zh 200 in 247ms
+ GET /zh/pricing 200 in 12795ms
+ GET /zh/my-creations 200 in 11144ms
+ GET /zh/image-to-video 200 in 77ms
+ ○ Compiling /api/auth/[...all] ...
+ ✓ Compiled /api/auth/[...all] in 2.5s (5635 modules)
+ ✓ Compiled in 2.1s (8466 modules)
+ GET /api/v1/assets?limit=8 401 in 6010ms
+ GET /api/v1/credit/balance 401 in 6075ms
+ GET /zh/text-to-video 200 in 3627ms
+ GET /api/v1/assets?limit=8 401 in 208ms
+ GET /zh 200 in 3649ms
+ GET /zh/text-to-video 200 in 154ms
+ GET /zh 200 in 170ms
+ GET /zh/text-to-video 200 in 54ms
+ GET /api/v1/credit/balance 401 in 19ms
+ GET /api/auth/get-session 200 in 6840ms
+ GET /api/auth/get-session 200 in 75ms
+ GET /api/auth/get-session 200 in 20ms
+ GET /api/auth/get-session 200 in 20ms
+ GET /api/auth/get-session 200 in 20ms
+ GET /api/auth/get-session 200 in 21ms
+ GET /api/auth/get-session 200 in 20ms
+ GET /api/auth/get-session 200 in 22ms

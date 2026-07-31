@@ -4,6 +4,7 @@
  */
 export interface SiteConfig {
   name: string;
+  supportEmail?: string;
   description: string;
   url: string;
   ogImage: string;
@@ -14,7 +15,7 @@ export interface SiteConfig {
   };
   auth: {
     enableGoogleLogin: boolean;
-    enableMagicLinkLogin: boolean;
+    enableEmailOtpLogin: boolean;
     defaultProvider: "google" | "email";
   };
   routes: {
@@ -23,14 +24,15 @@ export interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-  name: "VideoFly",
+  name: "seedance.co",
+  supportEmail: "support@seedance.co.com",
   description: "AI Video Generation Platform - Create stunning videos with Sora 2, Veo 3.1, and more",
-  url: process.env.NEXT_PUBLIC_APP_URL || "https://videofly.app",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://seedance.co.com",
   ogImage: "/og.png",
   links: {},
   auth: {
     enableGoogleLogin: true,
-    enableMagicLinkLogin: true,
+    enableEmailOtpLogin: true,
     defaultProvider: "google",
   },
   routes: {
@@ -42,6 +44,6 @@ export const siteConfig: SiteConfig = {
 export function getEnabledAuthProviders() {
   const providers: string[] = [];
   if (siteConfig.auth.enableGoogleLogin) providers.push("google");
-  if (siteConfig.auth.enableMagicLinkLogin) providers.push("email");
+  if (siteConfig.auth.enableEmailOtpLogin) providers.push("email");
   return providers;
 }

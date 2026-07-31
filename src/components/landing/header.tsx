@@ -33,7 +33,7 @@ export function LandingHeader({ user }: { user?: User | null }) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#030712]/70 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6">
-        <LocaleLink href="/" className="flex items-center gap-2.5 font-bold text-white"><Image src="/logo.svg" alt="VideoFly" width={30} height={30} className="rounded-lg" /><span className="text-lg">VideoFly</span></LocaleLink>
+        <LocaleLink href="/" className="flex items-center gap-2.5 font-bold text-white"><Image src="/logo.svg" alt="seedance.co" width={30} height={30} className="rounded-lg" /><span className="text-lg">seedance.co</span></LocaleLink>
         <nav className="hidden items-center gap-7 lg:flex">
           <LocaleLink href="/" className="text-sm text-white/70 hover:text-white">{isZh ? "首页" : "Home"}</LocaleLink>
           <DropdownMenu>
@@ -55,7 +55,7 @@ export function LandingHeader({ user }: { user?: User | null }) {
         <Sheet>
           <SheetTrigger asChild><button type="button" aria-label={isZh ? "打开菜单" : "Open menu"} className="flex h-10 w-10 items-center justify-center rounded-md text-white lg:hidden"><Menu className="h-5 w-5" /></button></SheetTrigger>
           <SheetContent className="w-72 border-slate-800 bg-[#070b15] text-white">
-            <SheetHeader><SheetTitle className="text-left text-white">VideoFly</SheetTitle></SheetHeader>
+            <SheetHeader><SheetTitle className="text-left text-white">seedance.co</SheetTitle></SheetHeader>
             <div className="mt-7 space-y-2"><LocaleLink href="/" className="block rounded-lg px-3 py-2.5 hover:bg-slate-800">{isZh ? "首页" : "Home"}</LocaleLink>{tools.map(({ label, href, icon: Icon }) => <LocaleLink key={href} href={href} className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-slate-800"><Icon className="h-4 w-4 text-blue-400" />{label}</LocaleLink>)}<LocaleLink href="/pricing" className="block rounded-lg px-3 py-2.5 hover:bg-slate-800">{isZh ? "定价" : "Pricing"}</LocaleLink><LocaleLink href="/my-creations" className="block rounded-lg px-3 py-2.5 hover:bg-slate-800">{isZh ? "我的创作" : "My creations"}</LocaleLink></div>
             <div className="mt-6 border-t border-slate-800 pt-6">{user ? <button type="button" onClick={async () => { await authClient.signOut(); router.refresh(); }} className="w-full rounded-lg px-3 py-2.5 text-left text-red-400 hover:bg-red-500/10">{isZh ? "退出登录" : "Sign out"}</button> : <Button onClick={signInModal.onOpen} className="w-full bg-blue-600 text-white hover:bg-blue-500">{isZh ? "免费开始" : "Start for Free"}</Button>}</div>
           </SheetContent>

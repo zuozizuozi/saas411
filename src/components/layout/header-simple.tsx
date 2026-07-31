@@ -31,7 +31,7 @@ export function HeaderSimple({ user, lang = "en", onMobileMenuToggle }: HeaderSi
     <header className="sticky top-0 z-40 flex h-[60px] shrink-0 items-center justify-between border-b border-slate-800 bg-[#070b15]/95 px-3 backdrop-blur-xl sm:px-4">
       <div className="flex items-center gap-2 lg:hidden">
         <button type="button" onClick={onMobileMenuToggle} aria-label={isZh ? "打开菜单" : "Open menu"} className="flex h-9 w-9 items-center justify-center rounded-md text-slate-300 hover:bg-slate-800"><Menu className="h-5 w-5" /></button>
-        <Link href={`/${lang}`} className="flex items-center gap-2 font-semibold text-white"><Image src="/logo.svg" alt="VideoFly" width={24} height={24} className="rounded-md" /><span className="hidden min-[360px]:inline">VideoFly</span></Link>
+        <Link href={`/${lang}`} className="flex items-center gap-2 font-semibold text-white"><Image src="/logo.svg" alt="seedance.co" width={24} height={24} className="rounded-md" /><span className="hidden min-[360px]:inline">seedance.co</span></Link>
       </div>
       <div className="hidden text-sm text-slate-400 lg:block">{isZh ? "AI 视频创作工作室" : "AI video creation studio"}</div>
 

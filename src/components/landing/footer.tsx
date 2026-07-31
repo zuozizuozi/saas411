@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { LocaleLink } from "@/i18n/navigation";
+import { siteConfig } from "@/config/site";
 
 export function LandingFooter() {
   const t = useTranslations("Footer");
@@ -37,8 +38,8 @@ export function LandingFooter() {
               href="/"
               className="mb-4 flex items-center gap-3 text-xl font-semibold text-white"
             >
-              <Image src="/logo.svg" alt="VideoFly" width={30} height={30} className="rounded-md" />
-              VideoFly
+              <Image src="/logo.svg" alt="seedance.co" width={30} height={30} className="rounded-md" />
+              seedance.co
             </LocaleLink>
             <p className="max-w-xs text-sm leading-6 text-muted-foreground">
               Transform your ideas into stunning videos with AI.
@@ -64,6 +65,20 @@ export function LandingFooter() {
               </ul>
             </div>
           ))}
+
+          {siteConfig.supportEmail ? (
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-white">
+                {t("support")}
+              </h3>
+              <a
+                href={`mailto:${siteConfig.supportEmail}`}
+                className="text-sm text-muted-foreground transition-colors hover:text-white"
+              >
+                {siteConfig.supportEmail}
+              </a>
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
@@ -73,7 +88,7 @@ export function LandingFooter() {
           <p className="flex items-center gap-1 text-sm text-muted-foreground">
             Made with
             <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
-            by VideoFly Team
+            by seedance.co
           </p>
         </div>
       </div>

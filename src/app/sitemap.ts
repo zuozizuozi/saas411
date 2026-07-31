@@ -110,7 +110,7 @@ async function scanPages(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://videofly.app";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://seedance.co.com";
 
   // 自动扫描所有页面
   const appDir = join(process.cwd(), 'src', 'app', '[locale]');
