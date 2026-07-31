@@ -290,12 +290,26 @@ export function ToolPageLayout({
         if (data.data?.videos) {
           videoHistoryStorage.syncFromServer(data.data.videos);
           setHistoryItems(videoHistoryStorage.getHistory(user.id));
+          // Resume reconciliation for tasks created in another tab/device or
+          // after local storage was cleared. Zhipu is polling-based, so server
+          // history must be sufficient to recover a non-terminal generation.
+          for (const video of data.data.videos as Video[]) {
+            const status = video.status.toLowerCase();
+            if (
+              status === "pending" ||
+              status === "generating" ||
+              status === "uploading"
+            ) {
+              addGeneratingId(video.uuid);
+              if (!isPolling(video.uuid)) startPolling(video.uuid);
+            }
+          }
         }
       })
       .catch((error) => {
         console.warn("Failed to sync video history from server:", error);
       });
-  }, [user?.id]);
+  }, [user?.id, addGeneratingId, isPolling, startPolling]);
 
   useEffect(() => {
     if (!user?.id) return;

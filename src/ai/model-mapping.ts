@@ -349,7 +349,7 @@ export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
   // -------------------------------------------------------------------------
   "zhipu-video": {
     internalId: "zhipu-video",
-    displayName: "CogVideoX Flash",
+    displayName: "AI Video",
     providers: {
       zhipu: {
         providerModelId: () =>

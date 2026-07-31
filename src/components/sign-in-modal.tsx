@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth/client";
+import { getSafeAuthCallbackURL } from "@/lib/auth/callback-url";
 import { Button } from "@/components/ui/button";
 import { EmailOtpForm } from "@/components/email-otp-form";
 import * as Icons from "@/components/ui/icons";
@@ -21,9 +22,10 @@ export const SignInModalContent = ({ lang }: SignInModalContentProps) => {
   const signInModal = useSigninModal();
   const searchParams = useSearchParams();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const callbackURL =
-    searchParams?.get("from") ??
-    `/${lang}${siteConfig.routes.defaultLoginRedirect}`;
+  const callbackURL = getSafeAuthCallbackURL(
+    searchParams?.get("from"),
+    `/${lang}${siteConfig.routes.defaultLoginRedirect}`,
+  );
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
