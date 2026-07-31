@@ -156,6 +156,18 @@ export const CREDITS_CONFIG = {
       .map(([modelId, pricing]) => {
         // 模型基础配置（从 defaults.ts 获取）
         const baseConfigs: Record<string, Omit<ModelConfig, "creditCost">> = {
+          "zhipu-video": {
+            id: "zhipu-video",
+            name: "CogVideoX Flash",
+            provider: "zhipu" as const,
+            description: "Zhipu AI video generation with text, images, and audio",
+            supportImageToVideo: true,
+            supportAudio: true,
+            maxDuration: 10,
+            durations: [5, 10],
+            aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
+            qualities: ["speed", "quality"],
+          },
           "sora-2": {
             id: "sora-2",
             name: "Sora 2",

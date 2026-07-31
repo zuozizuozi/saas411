@@ -41,6 +41,23 @@ import type {
 // ============================================================================
 
 export const DEFAULT_VIDEO_MODELS: VideoModel[] = [
+  {
+    id: "zhipu-video",
+    name: "CogVideoX Flash",
+    color: "#2563eb",
+    description: "Free Zhipu AI text and image video generation",
+    maxDuration: "10 sec",
+    creditCost: 1,
+    durations: ["5s", "10s"],
+    aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
+    resolutions: ["speed", "quality"],
+    maxImages: 2,
+    imageConstraints: {
+      maxSizeMB: 5,
+      formats: ["jpg", "jpeg", "png"],
+    },
+    supportsAudio: true,
+  },
   // ============================================================================
   // Seedance Series (Primary - APImart)
   // ============================================================================
@@ -166,6 +183,7 @@ export const DEFAULT_VIDEO_MODES: GeneratorMode[] = [
     // Supports T2V and I2V (upload image for I2V mode)
     // Sora, Wan, Veo, Seedance
     supportedModels: [
+      "zhipu-video",
       "seedance-1.5-pro",
       "seedance-1.0-pro-fast",
       "seedance-1.0-pro-quality",

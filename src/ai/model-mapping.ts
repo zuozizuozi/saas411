@@ -46,6 +46,7 @@ export interface ModelMapping {
     evolink?: ProviderModelConfig;
     kie?: ProviderModelConfig;
     apimart?: ProviderModelConfig;
+    zhipu?: ProviderModelConfig;
   };
 }
 
@@ -306,11 +307,59 @@ function apimartParamsTransformer(
   return result;
 }
 
+/** Transform unified video options to Zhipu's shared video request schema. */
+function zhipuParamsTransformer(
+  _internalModelId: string,
+  params: Record<string, any>
+): Record<string, any> {
+  const imageUrls = Array.isArray(params.imageUrls)
+    ? params.imageUrls.filter(Boolean)
+    : params.imageUrl
+      ? [params.imageUrl]
+      : [];
+  const sizeByAspectRatio: Record<string, string> = {
+    "16:9": "1280x720",
+    "9:16": "720x1280",
+    "1:1": "1024x1024",
+    "21:9": "2048x1080",
+  };
+  const quality = String(params.quality || "speed").toLowerCase();
+
+  return {
+    prompt: params.prompt,
+    quality: quality === "quality" ? "quality" : "speed",
+    with_audio: params.generateAudio ?? false,
+    // Zhipu only permits disabling the watermark after a separate waiver.
+    watermark_enabled: process.env.ZHIPU_WATERMARK_ENABLED !== "false",
+    size: sizeByAspectRatio[params.aspectRatio || "16:9"] || "1280x720",
+    fps: 30,
+    duration: params.duration || 5,
+    image_url:
+      imageUrls.length > 1 ? imageUrls.slice(0, 2) : imageUrls[0],
+  };
+}
+
 // ============================================================================
 // Model Mappings
 // ============================================================================
 
 export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
+  // -------------------------------------------------------------------------
+  // Zhipu video (the provider model is environment-configurable)
+  // -------------------------------------------------------------------------
+  "zhipu-video": {
+    internalId: "zhipu-video",
+    displayName: "CogVideoX Flash",
+    providers: {
+      zhipu: {
+        providerModelId: () =>
+          process.env.ZHIPU_VIDEO_MODEL?.trim() || "cogvideox-flash",
+        supported: true,
+        transformParams: zhipuParamsTransformer,
+      },
+    },
+  },
+
   // -------------------------------------------------------------------------
   // Sora 2
   // -------------------------------------------------------------------------
@@ -485,6 +534,9 @@ const MODEL_MODE_SUPPORT: Record<
   string,
   Partial<Record<ProviderType, GenerationMode[]>>
 > = {
+  "zhipu-video": {
+    zhipu: ["text-to-video", "image-to-video"],
+  },
   "sora-2": {
     evolink: ["text-to-video", "image-to-video"],
     kie: ["text-to-video", "image-to-video"],

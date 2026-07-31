@@ -2,6 +2,7 @@ import type { AIVideoProvider, ProviderType } from "./types";
 import { EvolinkProvider } from "./providers/evolink";
 import { KieProvider } from "./providers/kie";
 import { ApimartProvider } from "./providers/apimart";
+import { ZhipuProvider } from "./providers/zhipu";
 import {
   getConfiguredAIProvider,
   requireProviderApiKey,
@@ -22,6 +23,9 @@ export function getProvider(type: ProviderType): AIVideoProvider {
       break;
     case "apimart":
       provider = new ApimartProvider(requireProviderApiKey("apimart"));
+      break;
+    case "zhipu":
+      provider = new ZhipuProvider(requireProviderApiKey("zhipu"));
       break;
     default:
       throw new Error(`Unknown provider: ${type}`);

@@ -27,15 +27,15 @@ export const imageToVideoConfig: ToolPageConfig = {
     uiMode: "compact",
 
     defaults: {
-      model: "seedance-1.5-pro",
+      model: "zhipu-video",
       duration: 5,
       aspectRatio: "16:9",
       outputNumber: 1,
     },
 
     models: {
-      available: ["seedance-1.5-pro", "seedance-1.0-pro-fast", "seedance-1.0-pro-quality"],
-      default: "seedance-1.5-pro",
+      available: ["zhipu-video", "seedance-1.5-pro", "seedance-1.0-pro-fast", "seedance-1.0-pro-quality"],
+      default: "zhipu-video",
     },
 
     features: {
@@ -49,12 +49,13 @@ export const imageToVideoConfig: ToolPageConfig = {
     settings: {
       showDuration: true,
       showAspectRatio: true,
-      showQuality: false,
+      showQuality: true,
       showOutputNumber: false,
       showAudioGeneration: false,
 
-      durations: [2, 4, 5, 6, 8, 10, 12],
-      aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],
+      durations: [5, 10],
+      aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
+      qualities: ["speed", "quality"],
     },
   },
 
@@ -94,6 +95,7 @@ export const imageToVideoConfig: ToolPageConfig = {
     ],
 
     supportedModels: [
+      { name: "CogVideoX Flash", provider: "Zhipu AI", color: "#2563eb" },
       { name: "Seedance 1.5 Pro", provider: "ByteDance", color: "#10b981" },
       { name: "Seedance 1.0 Fast", provider: "ByteDance", color: "#34d399" },
       { name: "Seedance 1.0 Quality", provider: "ByteDance", color: "#059669" },

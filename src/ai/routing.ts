@@ -17,6 +17,7 @@ export interface ModelRoutePolicy {
 }
 
 const MODEL_ROUTE_POLICIES: Record<string, ModelRoutePolicy> = {
+  "zhipu-video": { primary: "zhipu", fallbacks: [] },
   "seedance-1.5-pro": { primary: "apimart", fallbacks: ["evolink", "kie"] },
   "seedance-1.0-pro-fast": { primary: "apimart", fallbacks: [] },
   "seedance-1.0-pro-quality": { primary: "apimart", fallbacks: [] },

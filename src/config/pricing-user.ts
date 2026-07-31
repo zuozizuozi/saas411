@@ -256,6 +256,13 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
  * - qualityMultiplier: 画质乘数（1080p vs 720p）
  */
 export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
+  /** Zhipu video - one site credit per generation request. */
+  "zhipu-video": {
+    baseCredits: 1,
+    perSecond: 0,
+    enabled: true,
+  },
+
   /** Seedance 1.5 Pro - 按秒计费（默认有音频） */
   "seedance-1.5-pro": {
     baseCredits: 0,
