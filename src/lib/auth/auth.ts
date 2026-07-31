@@ -68,7 +68,7 @@ const plugins: AuthPlugin[] = [
     sendVerificationOTP: async ({ email, otp, type }) => {
       const { EmailOtpEmail } = await import("@/lib/emails/email-otp-email");
       const { resend } = await import("@/lib/email");
-      await resend.emails.send({
+      const { error } = await resend.emails.send({
         from: env.RESEND_FROM,
         to: email,
         subject: `${otp} is your ${siteConfig.name} verification code`,
@@ -79,6 +79,9 @@ const plugins: AuthPlugin[] = [
         }),
         headers: { "X-Entity-Ref-ID": crypto.randomUUID() },
       });
+      if (error) {
+        throw new Error(`Verification email delivery failed: ${error.message}`);
+      }
     },
     otpLength: 6,
     expiresIn: 300,
