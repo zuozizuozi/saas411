@@ -1,9 +1,17 @@
 allowBuilds:
-  # esbuild's install script selects the platform-specific binary.
+  # Native/build-time dependencies required by Next.js and the toolchain.
+  '@biomejs/biome': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  '@swc/core': true
+  '@tsparticles/engine': true
   '@vercel/speed-insights': true
-  # core-js only uses postinstall for informational output.
+  bufferutil: true
   core-js: false
   esbuild: true
+  prisma: true
+  sharp: true
+  utf-8-validate: true
 minimumReleaseAgeExclude:
   - '@posthog/browser-common@0.3.1'
   - '@posthog/core@1.46.1'
