@@ -5,6 +5,7 @@ import { Play, Download, Trash2, Sparkles, Clock, Zap } from "lucide-react";
 import { cn } from "@/components/ui";
 import { Card, CardContent } from "@/components/ui/card";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { getPublicModelName } from "@/lib/model-display";
 
 interface Video {
   uuid: string;
@@ -233,7 +234,9 @@ export function VideoCard({ video, onDelete, showActions = true }: VideoCardProp
           {/* Meta Info */}
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-3">
-              <span className="text-zinc-500">{video.model}</span>
+              <span className="text-zinc-500">
+                {getPublicModelName(video.model)}
+              </span>
               <span className="text-zinc-600">•</span>
               <span className="text-zinc-500">{createdAt}</span>
             </div>

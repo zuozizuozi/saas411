@@ -2,6 +2,7 @@ import type { AIVideoProvider, ProviderType } from "./types";
 import { EvolinkProvider } from "./providers/evolink";
 import { KieProvider } from "./providers/kie";
 import { ApimartProvider } from "./providers/apimart";
+import { BailianProvider } from "./providers/bailian";
 import { ZhipuProvider } from "./providers/zhipu";
 import {
   getConfiguredAIProvider,
@@ -24,6 +25,9 @@ export function getProvider(type: ProviderType): AIVideoProvider {
     case "apimart":
       provider = new ApimartProvider(requireProviderApiKey("apimart"));
       break;
+    case "bailian":
+      provider = new BailianProvider(requireProviderApiKey("bailian"));
+      break;
     case "zhipu":
       provider = new ZhipuProvider(requireProviderApiKey("zhipu"));
       break;
@@ -36,7 +40,7 @@ export function getProvider(type: ProviderType): AIVideoProvider {
 }
 
 export function getDefaultProvider(): AIVideoProvider {
-  const type = getConfiguredAIProvider() || "evolink";
+  const type = getConfiguredAIProvider() || "bailian";
   return getProvider(type);
 }
 

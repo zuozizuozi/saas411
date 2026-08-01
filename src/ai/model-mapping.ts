@@ -46,6 +46,7 @@ export interface ModelMapping {
     evolink?: ProviderModelConfig;
     kie?: ProviderModelConfig;
     apimart?: ProviderModelConfig;
+    bailian?: ProviderModelConfig;
     zhipu?: ProviderModelConfig;
   };
 }
@@ -339,6 +340,49 @@ function zhipuParamsTransformer(
   };
 }
 
+/** Transform unified video options to Wan 2.7's multimodal request schema. */
+function bailianParamsTransformer(
+  _internalModelId: string,
+  params: Record<string, any>
+): Record<string, any> {
+  const imageUrls = (
+    Array.isArray(params.imageUrls)
+      ? params.imageUrls
+      : params.imageUrl
+        ? [params.imageUrl]
+        : []
+  ).filter(Boolean);
+  const duration = Math.min(
+    15,
+    Math.max(2, Math.round(Number(params.duration) || 5))
+  );
+  const aspectRatio = ["16:9", "9:16", "1:1", "4:3", "3:4"].includes(
+    params.aspectRatio
+  )
+    ? params.aspectRatio
+    : "16:9";
+  const quality = String(params.quality || "speed").toLowerCase();
+
+  const input: Record<string, any> = { prompt: params.prompt };
+  if (imageUrls.length > 0) {
+    input.media = imageUrls.slice(0, 2).map((url: string, index: number) => ({
+      type: index === 0 ? "first_frame" : "last_frame",
+      url,
+    }));
+  }
+
+  return {
+    input,
+    parameters: {
+      resolution: quality === "quality" ? "1080P" : "720P",
+      duration,
+      prompt_extend: true,
+      watermark: false,
+      ...(imageUrls.length === 0 ? { ratio: aspectRatio } : {}),
+    },
+  };
+}
+
 // ============================================================================
 // Model Mappings
 // ============================================================================
@@ -351,6 +395,18 @@ export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
     internalId: "zhipu-video",
     displayName: "AI Video",
     providers: {
+      bailian: {
+        providerModelId: (params) => {
+          const hasImage =
+            (Array.isArray(params.imageUrls) && params.imageUrls.length > 0) ||
+            Boolean(params.imageUrl);
+          return hasImage
+            ? process.env.BAILIAN_I2V_MODEL?.trim() || "wan2.7-i2v"
+            : process.env.BAILIAN_T2V_MODEL?.trim() || "wan2.7-t2v";
+        },
+        supported: true,
+        transformParams: bailianParamsTransformer,
+      },
       zhipu: {
         providerModelId: () =>
           process.env.ZHIPU_VIDEO_MODEL?.trim() || "cogvideox-flash",
@@ -535,6 +591,7 @@ const MODEL_MODE_SUPPORT: Record<
   Partial<Record<ProviderType, GenerationMode[]>>
 > = {
   "zhipu-video": {
+    bailian: ["text-to-video", "image-to-video"],
     zhipu: ["text-to-video", "image-to-video"],
   },
   "sora-2": {

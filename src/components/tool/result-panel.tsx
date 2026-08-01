@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { Video } from "@/db";
+import { getPublicModelName } from "@/lib/model-display";
 
 interface ResultPanelProps {
   currentVideos?: Video[];
@@ -245,7 +246,9 @@ export function ResultPanel({
                 <div className="p-4 space-y-3">
                   {/* Model & metadata */}
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="capitalize">{video.model || "N/A"}</span>
+                    <span className="capitalize">
+                      {getPublicModelName(video.model)}
+                    </span>
                     <span>•</span>
                     <span>{video.duration || 0}s</span>
                     {video.aspectRatio && (

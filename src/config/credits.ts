@@ -161,14 +161,14 @@ export const CREDITS_CONFIG = {
           "zhipu-video": {
             id: "zhipu-video",
             name: "AI Video",
-            provider: "zhipu" as const,
-            description: "Configurable AI video generation with text, images, and audio",
+            provider: "bailian" as const,
+            description: "AI video generation with text, images, and audio",
             supportImageToVideo: true,
             supportAudio: true,
             supportRemoveWatermark: false,
             maxDuration: 10,
             durations: [5, 10],
-            aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
+            aspectRatios: ["16:9", "9:16", "1:1"],
             qualities: ["speed", "quality"],
           },
           "sora-2": {

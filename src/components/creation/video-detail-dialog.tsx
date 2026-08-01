@@ -9,6 +9,7 @@ import { X, Download, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { cn } from "@/components/ui";
+import { getPublicModelName } from "@/lib/model-display";
 import {
   Dialog,
   DialogContent,
@@ -155,7 +156,9 @@ export function VideoDetailDialog({
               <div className="space-y-4">
                 <div className="space-y-1">
                   <div className="text-sm text-muted-foreground">{t("detail.model")}</div>
-                  <div className="font-medium capitalize">{video.model}</div>
+                  <div className="font-medium capitalize">
+                    {getPublicModelName(video.model)}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

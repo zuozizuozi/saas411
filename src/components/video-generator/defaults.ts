@@ -43,13 +43,13 @@ import type {
 export const DEFAULT_VIDEO_MODELS: VideoModel[] = [
   {
     id: "zhipu-video",
-    name: "CogVideoX Flash",
+    name: "AI Video",
     color: "#2563eb",
-    description: "Free Zhipu AI text and image video generation",
+    description: "AI text and image video generation",
     maxDuration: "10 sec",
     creditCost: 1,
     durations: ["5s", "10s"],
-    aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
+    aspectRatios: ["16:9", "9:16", "1:1"],
     resolutions: ["speed", "quality"],
     maxImages: 2,
     imageConstraints: {

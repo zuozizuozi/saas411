@@ -10,6 +10,7 @@ import { Play, Clock, AlertCircle, MoreHorizontal, Download, Trash2 } from "luci
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { cn } from "@/components/ui";
+import { getPublicModelName } from "@/lib/model-display";
 import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu,
@@ -233,7 +234,9 @@ export function CreationCard({
         <div className="p-2 space-y-1.5">
           {/* Model & Aspect Ratio */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="font-medium capitalize">{video.model}</span>
+            <span className="font-medium capitalize">
+              {getPublicModelName(video.model)}
+            </span>
             <span>{video.aspectRatio}</span>
           </div>
 
