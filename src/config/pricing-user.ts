@@ -268,7 +268,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     baseCredits: 0,
     perSecond: 4, // 720p 有音频: 3.557 Credits/秒 → 4 积分/秒
     qualityMultiplier: 2, // 1080p = 720p × 2
-    enabled: true,
+    enabled: false,
   },
 
   /** Seedance 1.0 Pro Fast - 快速生成（APImart） */
@@ -276,7 +276,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     baseCredits: 0,
     perSecond: 3, // 按秒计费
     qualityMultiplier: 2,
-    enabled: true,
+    enabled: false,
   },
 
   /** Seedance 1.0 Pro Quality - 高质量生成（APImart） */
@@ -284,7 +284,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     baseCredits: 0,
     perSecond: 5, // 高质量，每秒积分更高
     qualityMultiplier: 2,
-    enabled: true,
+    enabled: false,
   },
 
   /** Veo 3.1 Fast Lite - Google (暂时隐藏) */
