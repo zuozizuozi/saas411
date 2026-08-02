@@ -22,6 +22,22 @@ describe("AI provider routing", () => {
     ]);
   });
 
+  it("filters fallback providers by their real duration capability", () => {
+    vi.stubEnv("DEFAULT_AI_PROVIDER", "");
+    vi.stubEnv("BAILIAN_API_KEY", "sk-bailian");
+    vi.stubEnv("ZHIPU_API_KEY", "zhipu-key");
+
+    expect(
+      getProviderCandidates("zhipu-video", "text-to-video", 10)
+    ).toEqual(["bailian", "zhipu"]);
+    expect(
+      getProviderCandidates("zhipu-video", "text-to-video", 12)
+    ).toEqual(["bailian"]);
+    expect(
+      getProviderCandidates("zhipu-video", "text-to-video", 30)
+    ).toEqual([]);
+  });
+
   it("keeps authentication errors terminal but retries rate limits", () => {
     expect(
       isRetryableProviderError(

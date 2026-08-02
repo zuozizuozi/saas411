@@ -53,7 +53,7 @@ export const textToVideoConfig: ToolPageConfig = {
       showOutputNumber: false,
       showAudioGeneration: true,
 
-      durations: [5, 10],
+      durations: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
       aspectRatios: ["16:9", "9:16", "1:1", "21:9"],
       qualities: ["speed", "quality"],
     },

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { DEFAULT_VIDEO_MODELS } from "@/components/video-generator";
-import { cn } from "@/components/ui";
+import { DurationSlider } from "@/components/video-generator/duration-slider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { calculateModelCredits, getAvailableModels } from "@/config/credits";
+import { cn } from "@/lib/utils";
 
 interface GeneratorPanelProps {
   toolType: "image-to-video" | "text-to-video";
@@ -61,6 +62,13 @@ export interface GeneratorData {
 
 type RecentImageAsset = { uuid: string; url: string; fileName: string };
 
+function getNearestDuration(value: number, options: number[]) {
+  if (options.length === 0) return 5;
+  return options.reduce((nearest, option) =>
+    Math.abs(option - value) < Math.abs(nearest - value) ? option : nearest
+  );
+}
+
 const copy = {
   en: {
     titleText: "Text to Video",
@@ -78,6 +86,9 @@ const copy = {
     model: "Model",
     ratio: "Aspect ratio",
     duration: "Duration",
+    nativeDuration: "Native",
+    extendedDuration: "Official extension",
+    unavailableDuration: "Unavailable",
     resolution: "Resolution",
     outputs: "Outputs",
     audio: "Generate audio",
@@ -102,6 +113,9 @@ const copy = {
     model: "模型",
     ratio: "比例",
     duration: "时长",
+    nativeDuration: "原生生成",
+    extendedDuration: "官方续写",
+    unavailableDuration: "暂不支持",
     resolution: "分辨率",
     outputs: "生成数量",
     audio: "生成音频",
@@ -203,7 +217,7 @@ export function GeneratorPanel({
   const [prompt, setPrompt] = useState(initialPrompt || "");
   const [promptEnhancement, setPromptEnhancement] = useState(false);
   const [selectedModel, setSelectedModel] = useState(initialModelId || defaultModelId || models[0]?.id || "");
-  const [duration, setDuration] = useState(initialDuration || 4);
+  const [duration, setDuration] = useState(initialDuration || 5);
   const [aspectRatio, setAspectRatio] = useState(initialAspectRatio || "16:9");
   const [quality, setQuality] = useState(initialQuality || "720P");
   const [outputNumber, setOutputNumber] = useState(1);
@@ -225,7 +239,9 @@ export function GeneratorPanel({
 
   useEffect(() => {
     if (!currentModel) return;
-    if (!currentModel.durations.includes(duration)) setDuration(currentModel.durations[0] || 4);
+    if (!currentModel.durations.includes(duration)) {
+      setDuration(getNearestDuration(duration, currentModel.durations));
+    }
     if (!currentModel.aspectRatios.includes(aspectRatio)) setAspectRatio(currentModel.aspectRatios[0] || "16:9");
     if (currentModel.qualities?.length && !currentModel.qualities.includes(quality)) setQuality(currentModel.qualities[0]);
   }, [aspectRatio, currentModel, duration, quality]);
@@ -369,7 +385,23 @@ export function GeneratorPanel({
             </div>
 
             <ChoiceRow label={t.ratio} values={currentModel.aspectRatios} selected={aspectRatio} onSelect={setAspectRatio} disabled={isLoading} />
-            <ChoiceRow label={t.duration} values={currentModel.durations.map((value) => `${value}s`)} selected={`${duration}s`} onSelect={(value) => setDuration(Number.parseInt(value, 10))} disabled={isLoading} />
+            <fieldset>
+              <legend className="mb-2 text-sm text-slate-300">{t.duration}</legend>
+              <DurationSlider
+                min={currentModel.durationDisplayMin ?? 5}
+                max={currentModel.durationDisplayMax ?? 30}
+                nativeOptions={currentModel.nativeDurations ?? currentModel.durations}
+                extendedOptions={currentModel.extendedDurations ?? []}
+                value={duration}
+                onChange={setDuration}
+                disabled={isLoading}
+                nativeLabel={t.nativeDuration}
+                extendedLabel={t.extendedDuration}
+                unavailableLabel={t.unavailableDuration}
+                secondsLabel={isZh ? "秒" : "seconds"}
+                ariaLabel={t.duration}
+              />
+            </fieldset>
             {currentModel.qualities?.length ? <ChoiceRow label={t.resolution} values={currentModel.qualities} selected={quality} onSelect={setQuality} disabled={isLoading} /> : null}
             {maxOutputNumber > 1 && <ChoiceRow label={t.outputs} values={["1", "2"]} selected={String(outputNumber)} onSelect={(value) => setOutputNumber(Number(value))} disabled={isLoading} />}
 

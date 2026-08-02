@@ -41,6 +41,13 @@ export interface ModelConfig {
   /** Whether the provider accepts a per-request watermark removal flag. */
   supportRemoveWatermark?: boolean;
   maxDuration: number;
+  /** Full duration scale rendered by the product UI. */
+  durationDisplayMin?: number;
+  durationDisplayMax?: number;
+  /** Durations completed by one provider generation task. */
+  nativeDurations?: number[];
+  /** Durations completed through a provider's official extend workflow. */
+  extendedDurations?: number[];
   durations: number[];
   aspectRatios: string[];
   qualities?: string[];
@@ -166,8 +173,12 @@ export const CREDITS_CONFIG = {
             supportImageToVideo: true,
             supportAudio: true,
             supportRemoveWatermark: false,
-            maxDuration: 10,
-            durations: [5, 10],
+            maxDuration: 15,
+            durationDisplayMin: 5,
+            durationDisplayMax: 30,
+            nativeDurations: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            extendedDurations: [],
+            durations: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
             aspectRatios: ["16:9", "9:16", "1:1"],
             qualities: ["speed", "quality"],
           },
@@ -360,73 +371,14 @@ export function calculateModelCredits(
   const resolution = parseQualityToResolution(params.quality);
   const isHighQuality = resolution >= 1080 || params.quality?.toLowerCase() === "high";
 
-  let credits = 0;
+  const configuredPerSecond = perExtraSecond > 0 ? perExtraSecond : base;
+  const qualityMultiplier = isHighQuality ? highQualityMultiplier : 1;
+  // Resolve the integer one-second price first. This guarantees that N
+  // seconds always costs exactly N times the one-second price.
+  const creditsPerSecond = Math.max(
+    1,
+    Math.ceil(configuredPerSecond * qualityMultiplier)
+  );
 
-  // 根据模型使用不同的计算逻辑
-  switch (modelId) {
-    case "sora-2": {
-      // Sora 2: 固定价格（10s=2积分, 15s=3积分）
-      credits = params.duration === 15 ? 3 : 2;
-      break;
-    }
-
-    case "wan2.6": {
-      // Wan 2.6: 每秒 5 积分（5s=25, 10s=50）
-      credits = params.duration * 5;
-      if (isHighQuality) {
-        credits = credits * 1.67; // 1080p
-      }
-      break;
-    }
-
-    case "veo-3.1": {
-      // Veo 3.1: 固定 10 积分
-      credits = 10;
-      break;
-    }
-
-    case "seedance-1.5-pro": {
-      // Seedance: 按秒计费，720p 有音频 = 4积分/秒
-      let perSecond = 4; // 720p 有音频
-      if (isHighQuality) {
-        perSecond = 8; // 1080p 有音频
-      }
-      credits = params.duration * perSecond;
-      break;
-    }
-
-    case "seedance-1.0-pro-fast": {
-      // Seedance 1.0 Fast: 按秒计费
-      let perSecondFast = 3;
-      if (isHighQuality) {
-        perSecondFast = 6;
-      }
-      credits = params.duration * perSecondFast;
-      break;
-    }
-
-    case "seedance-1.0-pro-quality": {
-      // Seedance 1.0 Quality: 按秒计费，高质量
-      let perSecondQuality = 5;
-      if (isHighQuality) {
-        perSecondQuality = 10;
-      }
-      credits = params.duration * perSecondQuality;
-      break;
-    }
-
-    default: {
-      // 默认逻辑（兼容旧配置）
-      const extraSeconds = Math.max(0, params.duration - 10);
-      credits = base + extraSeconds * perExtraSecond;
-
-      if (isHighQuality && highQualityMultiplier > 1) {
-        credits = credits * highQualityMultiplier;
-      }
-      break;
-    }
-  }
-
-  // 向上取整
-  return Math.ceil(credits);
+  return Math.max(0, Math.trunc(params.duration)) * creditsPerSecond;
 }

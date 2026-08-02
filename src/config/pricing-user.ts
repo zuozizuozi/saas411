@@ -256,10 +256,10 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
  * - qualityMultiplier: 画质乘数（1080p vs 720p）
  */
 export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
-  /** Zhipu video - one site credit per generation request. */
+  /** AI Video - one site credit per generated second. */
   "zhipu-video": {
-    baseCredits: 1,
-    perSecond: 0,
+    baseCredits: 0,
+    perSecond: 1,
     enabled: true,
   },
 
@@ -289,23 +289,23 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
 
   /** Veo 3.1 Fast Lite - Google (暂时隐藏) */
   "veo-3.1": {
-    baseCredits: 10,
-    perSecond: 0,
+    baseCredits: 0,
+    perSecond: 2,
     enabled: false,
   },
 
   /** Sora 2 Lite - OpenAI (暂时隐藏) */
   "sora-2": {
-    baseCredits: 2,
-    perSecond: 0,
+    baseCredits: 0,
+    perSecond: 1,
     enabled: false,
   },
 
   /** Wan 2.6 (暂时隐藏) */
   "wan2.6": {
-    baseCredits: 25,
+    baseCredits: 0,
     perSecond: 5,
-    qualityMultiplier: 1.67,
+    qualityMultiplier: 2,
     enabled: false,
   },
 };

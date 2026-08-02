@@ -34,6 +34,10 @@ export interface ProviderModelConfig {
   transformResponse?: (response: any) => any;
   /** Whether this provider supports this model */
   supported: boolean;
+  /** Durations this provider can generate in a single native task. */
+  nativeDurations?: number[];
+  /** Final durations supported through the provider's official extend API. */
+  extendedDurations?: number[];
 }
 
 export interface ModelMapping {
@@ -313,6 +317,10 @@ function zhipuParamsTransformer(
   _internalModelId: string,
   params: Record<string, any>
 ): Record<string, any> {
+  const duration = Math.round(Number(params.duration) || 5);
+  if (![5, 10].includes(duration)) {
+    throw new Error(`Zhipu video only supports 5s or 10s, received ${duration}s`);
+  }
   const imageUrls = Array.isArray(params.imageUrls)
     ? params.imageUrls.filter(Boolean)
     : params.imageUrl
@@ -334,7 +342,7 @@ function zhipuParamsTransformer(
     watermark_enabled: process.env.ZHIPU_WATERMARK_ENABLED !== "false",
     size: sizeByAspectRatio[params.aspectRatio || "16:9"] || "1280x720",
     fps: 30,
-    duration: params.duration || 5,
+    duration,
     image_url:
       imageUrls.length > 1 ? imageUrls.slice(0, 2) : imageUrls[0],
   };
@@ -352,10 +360,10 @@ function bailianParamsTransformer(
         ? [params.imageUrl]
         : []
   ).filter(Boolean);
-  const duration = Math.min(
-    15,
-    Math.max(2, Math.round(Number(params.duration) || 5))
-  );
+  const duration = Math.round(Number(params.duration) || 5);
+  if (duration < 2 || duration > 15) {
+    throw new Error(`Bailian Wan video supports 2-15s, received ${duration}s`);
+  }
   const aspectRatio = ["16:9", "9:16", "1:1", "4:3", "3:4"].includes(
     params.aspectRatio
   )
@@ -405,12 +413,14 @@ export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
             : process.env.BAILIAN_T2V_MODEL?.trim() || "wan2.7-t2v";
         },
         supported: true,
+        nativeDurations: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         transformParams: bailianParamsTransformer,
       },
       zhipu: {
         providerModelId: () =>
           process.env.ZHIPU_VIDEO_MODEL?.trim() || "cogvideox-flash",
         supported: true,
+        nativeDurations: [5, 10],
         transformParams: zhipuParamsTransformer,
       },
     },
@@ -681,6 +691,25 @@ export function isModelSupported(
 
   const providerConfig = mapping.providers[provider];
   return providerConfig?.supported || false;
+}
+
+/** Check whether a provider can satisfy the requested final duration. */
+export function isProviderDurationSupported(
+  internalModelId: string,
+  provider: ProviderType,
+  duration: number
+): boolean {
+  const providerConfig = MODEL_MAPPINGS[internalModelId]?.providers[provider];
+  if (!providerConfig?.supported) return false;
+
+  const configuredDurations = [
+    ...(providerConfig.nativeDurations ?? []),
+    ...(providerConfig.extendedDurations ?? []),
+  ];
+
+  // Existing providers without an explicit capability declaration continue to
+  // rely on the model-level validation until their adapter is migrated.
+  return configuredDurations.length === 0 || configuredDurations.includes(duration);
 }
 
 export function normalizeGenerationMode(

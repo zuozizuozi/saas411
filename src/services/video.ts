@@ -115,7 +115,11 @@ export class VideoService {
       );
     }
 
-    let providerCandidates = getProviderCandidates(params.model, resolvedMode);
+    let providerCandidates = getProviderCandidates(
+      params.model,
+      resolvedMode,
+      effectiveDuration
+    );
     if (providerCandidates.length === 0) {
       throw new ApiError(
         `No configured provider can run ${params.model} in ${resolvedMode} mode`,
@@ -563,7 +567,11 @@ export class VideoService {
       });
     }
 
-    let providerCandidates = getProviderCandidates(params.model, validated.mode);
+    let providerCandidates = getProviderCandidates(
+      params.model,
+      validated.mode,
+      validated.duration
+    );
     if (providerCandidates.length === 0) {
       throw new ApiError(
         `No configured provider can run ${params.model} in ${validated.mode} mode`,

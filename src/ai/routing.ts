@@ -2,6 +2,7 @@ import type { ProviderType } from "./types";
 import {
   isModelModeSupported,
   isModelSupported,
+  isProviderDurationSupported,
   type GenerationMode,
 } from "./model-mapping";
 import { getConfiguredAIProvider, getProviderApiKey } from "./provider-config";
@@ -32,7 +33,8 @@ const MODEL_ROUTE_POLICIES: Record<string, ModelRoutePolicy> = {
  */
 export function getProviderCandidates(
   modelId: string,
-  mode: GenerationMode
+  mode: GenerationMode,
+  duration?: number
 ): ProviderType[] {
   const pinnedProvider = getConfiguredAIProvider();
   const requested = pinnedProvider
@@ -46,7 +48,9 @@ export function getProviderCandidates(
     (provider) =>
       Boolean(getProviderApiKey(provider)) &&
       isModelSupported(modelId, provider) &&
-      isModelModeSupported(modelId, provider, mode)
+      isModelModeSupported(modelId, provider, mode) &&
+      (duration === undefined ||
+        isProviderDurationSupported(modelId, provider, duration))
   );
 }
 
