@@ -9,11 +9,59 @@ import {
 } from "../model-mapping";
 import { providerFetch, requireProviderTaskId } from "../provider-http";
 
+type EvolinkError = {
+  code?: string;
+  message?: string;
+  type?: string;
+};
+
+type EvolinkTask = {
+  id?: unknown;
+  status?: unknown;
+  progress?: unknown;
+  results?: unknown;
+  task_info?: { estimated_time?: unknown };
+  data?: { video_url?: unknown; thumbnail_url?: unknown };
+  error?: EvolinkError | string | null;
+};
+
+function normalizeError(error: EvolinkTask["error"], fallback: string) {
+  if (typeof error === "string" && error.trim()) {
+    return { code: "EVOLINK_TASK_FAILED", message: error };
+  }
+  if (error && typeof error === "object") {
+    return {
+      code: error.code || error.type || "EVOLINK_TASK_FAILED",
+      message: error.message || fallback,
+    };
+  }
+  return { code: "EVOLINK_TASK_FAILED", message: fallback };
+}
+
+async function readErrorResponse(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as {
+      error?: EvolinkError | string;
+      message?: string;
+    };
+    if (typeof body.error === "string") return body.error;
+    const error = body.error;
+    const message =
+      (error && typeof error === "object" && error.message) || body.message;
+    const code = error && typeof error === "object" ? error.code : undefined;
+    return [code, message].filter(Boolean).join(": ") || response.statusText;
+  } catch {
+    return (await response.text().catch(() => "")) || response.statusText;
+  }
+}
+
 export class EvolinkProvider implements AIVideoProvider {
   name = "evolink";
   supportImageToVideo = true; // evolink supports image-to-video
   private apiKey: string;
-  private baseUrl = "https://api.evolink.ai/v1";
+  private baseUrl = (
+    process.env.EVOLINK_BASE_URL || "https://api.evolink.ai/v1"
+  ).replace(/\/$/, "");
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -45,27 +93,14 @@ export class EvolinkProvider implements AIVideoProvider {
     });
 
     if (!response.ok) {
-      let errorMessage = `API error: ${response.status}`;
-      try {
-        const error = await response.json();
-        errorMessage = error.error?.message || error.message || errorMessage;
-      } catch {
-        // If parsing fails, use status text
-        errorMessage = response.statusText || errorMessage;
-      }
-      throw new Error(errorMessage);
+      const detail = await readErrorResponse(response);
+      throw new Error(
+        `EvoLink task creation failed (${response.status}): ${detail}`
+      );
     }
 
-    const data = await response.json();
-
-    return {
-      taskId: requireProviderTaskId(data.id, "Evolink"),
-      provider: "evolink",
-      status: this.mapStatus(data.status),
-      progress: data.progress,
-      estimatedTime: data.task_info?.estimated_time,
-      raw: data,
-    };
+    const data = (await response.json()) as EvolinkTask;
+    return this.toTaskResponse(data);
   }
 
   async getTaskStatus(taskId: string): Promise<VideoTaskResponse> {
@@ -77,7 +112,7 @@ export class EvolinkProvider implements AIVideoProvider {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = await readErrorResponse(response);
       // Handle task not found (404) or gone (410)
       if (response.status === 404 || response.status === 410) {
         return {
@@ -108,45 +143,72 @@ export class EvolinkProvider implements AIVideoProvider {
       );
     }
 
-    const data = await response.json();
-
-    // According to Evolink API docs, video URL is in results array
-    const videoUrl = Array.isArray(data.results)
-      ? data.results[0]
-      : data.data?.video_url;
-
-    return {
-      taskId: requireProviderTaskId(data.id || taskId, "Evolink status"),
-      provider: "evolink",
-      status: this.mapStatus(data.status),
-      progress: data.progress,
-      videoUrl: videoUrl,
-      thumbnailUrl: data.data?.thumbnail_url,
-      error: data.error,
-      raw: data,
-    };
+    const data = (await response.json()) as EvolinkTask;
+    return this.toTaskResponse(data, taskId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parseCallback(payload: any): VideoTaskResponse {
-    // According to Evolink API docs, callback format matches task query format
-    const videoUrl = Array.isArray(payload.results)
-      ? payload.results[0]
-      : payload.data?.video_url;
+    // EvoLink documents callbacks as the same shape as task status responses.
+    return this.toTaskResponse(payload as EvolinkTask);
+  }
+
+  private toTaskResponse(
+    data: EvolinkTask,
+    fallbackTaskId?: string
+  ): VideoTaskResponse {
+    const taskId = requireProviderTaskId(
+      typeof data.id === "string" ? data.id : fallbackTaskId,
+      "EvoLink"
+    );
+    const status = this.mapStatus(data.status);
+    const videoUrl = Array.isArray(data.results)
+      ? data.results.find(
+          (result): result is string =>
+            typeof result === "string" && result.length > 0
+        )
+      : typeof data.data?.video_url === "string"
+        ? data.data.video_url
+        : undefined;
+    const thumbnailUrl =
+      typeof data.data?.thumbnail_url === "string"
+        ? data.data.thumbnail_url
+        : undefined;
+
+    if (status === "completed" && !videoUrl) {
+      return {
+        taskId,
+        provider: "evolink",
+        status: "failed",
+        progress: typeof data.progress === "number" ? data.progress : undefined,
+        error: {
+          code: "EVOLINK_RESULT_MISSING",
+          message: "EvoLink completed the task without returning a video URL",
+        },
+        raw: data,
+      };
+    }
 
     return {
-      taskId: requireProviderTaskId(payload.id, "Evolink callback"),
+      taskId,
       provider: "evolink",
-      status: this.mapStatus(payload.status),
-      progress: payload.progress,
-      videoUrl: videoUrl,
-      thumbnailUrl: payload.data?.thumbnail_url,
-      error: payload.error,
-      raw: payload,
+      status,
+      progress: typeof data.progress === "number" ? data.progress : undefined,
+      estimatedTime:
+        typeof data.task_info?.estimated_time === "number"
+          ? data.task_info.estimated_time
+          : undefined,
+      videoUrl,
+      thumbnailUrl,
+      error:
+        status === "failed"
+          ? normalizeError(data.error, "EvoLink video generation failed")
+          : undefined,
+      raw: data,
     };
   }
 
-  private mapStatus(status: string): VideoTaskResponse["status"] {
+  private mapStatus(status: unknown): VideoTaskResponse["status"] {
     const map: Record<string, VideoTaskResponse["status"]> = {
       pending: "pending",
       processing: "processing",
@@ -154,6 +216,6 @@ export class EvolinkProvider implements AIVideoProvider {
       failed: "failed",
       cancelled: "failed",
     };
-    return map[status] || "pending";
+    return typeof status === "string" ? map[status] || "pending" : "pending";
   }
 }

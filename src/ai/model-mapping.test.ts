@@ -45,4 +45,20 @@ describe("EvoLink Seedance model mapping", () => {
     expect(result).not.toHaveProperty("remove_watermark");
     expect(result).not.toHaveProperty("generateAudio");
   });
+
+  it("uses the official five-second default without sending 2.0-only fields to 1.5 Pro", () => {
+    const result = transformParamsForProvider("seedance-1.5-pro", "evolink", {
+      prompt: "A product shot",
+      quality: "720P",
+    });
+
+    expect(result).toMatchObject({
+      prompt: "A product shot",
+      duration: 5,
+      aspect_ratio: "16:9",
+      quality: "720p",
+    });
+    expect(result).not.toHaveProperty("content_filter");
+    expect(result).not.toHaveProperty("remove_watermark");
+  });
 });

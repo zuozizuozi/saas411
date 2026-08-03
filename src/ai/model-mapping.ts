@@ -159,7 +159,7 @@ function evolinkParamsTransformer(
   const result: Record<string, any> = {
     ...passthroughParams,
     aspect_ratio: params.aspectRatio || "16:9",
-    duration: params.duration || 10,
+    duration: params.duration || 5,
     ...(internalModelId.startsWith("seedance-")
       ? {}
       : { remove_watermark: params.removeWatermark ?? true }),
@@ -172,8 +172,9 @@ function evolinkParamsTransformer(
         : undefined,
   };
 
-  // Seedance's unified API does not accept the generic watermark parameter.
-  if (internalModelId.startsWith("seedance-")) {
+  // Seedance 2.0 exposes content_filter. Seedance 1.5 Pro does not document
+  // this field, so do not send it there (unknown fields can be rejected).
+  if (internalModelId.startsWith("seedance-2.0")) {
     result.content_filter = true;
   }
 
