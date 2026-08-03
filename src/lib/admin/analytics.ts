@@ -78,117 +78,93 @@ class AnalyticsService {
     const videoTimeCondition = this.buildVideoTimeCondition(timeFilter);
     const transactionTimeCondition = this.buildTransactionTimeCondition(timeFilter);
 
-    // Parallel queries for better performance
-    const [
-      totalUsersResult,
-      totalOrdersResult,
-      paidOrdersResult,
-      totalVideosResult,
-      completedVideosResult,
-      failedVideosResult,
-      usersWithVideosResult,
-      payingUsersResult,
-    ] = await Promise.all([
-      // 1. Total users
-      db.select({ count: count() }).from(users).where(timeCondition),
-
-      // 2. Total orders (ORDER_PAY + SUBSCRIPTION)
-      db
-        .select({ count: count() })
-        .from(creditTransactions)
-        .where(
-          and(
-            transactionTimeCondition,
-            sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`
-          )
+    // The production client intentionally uses one Supavisor connection.
+    // Execute commands sequentially so a page cannot pipeline multiple
+    // parameterized queries onto that single connection.
+    const totalUsersResult = await db
+      .select({ count: count() })
+      .from(users)
+      .where(timeCondition);
+    const totalOrdersResult = await db
+      .select({ count: count() })
+      .from(creditTransactions)
+      .where(
+        and(
+          transactionTimeCondition,
+          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
         ),
-
-      // 3. Paid orders (unique orderNo)
-      db
-        .select({ count: count() })
-        .from(creditTransactions)
-        .where(
-          and(
-            transactionTimeCondition,
-            sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`
-          )
-        )
-        .then((result) => {
-          // Get unique order numbers
-          return db
-            .selectDistinct({ orderNo: creditTransactions.orderNo })
-            .from(creditTransactions)
-            .where(
-              and(
-                transactionTimeCondition,
-                sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
-                sql`${creditTransactions.orderNo} IS NOT NULL`
-              )
-            )
-            .then((orders) => ({ count: orders.length }));
-        }),
-
-      // 4. Total videos (not deleted)
-      db
-        .select({ count: count() })
-        .from(videos)
-        .where(and(videoTimeCondition, eq(videos.isDeleted, false))),
-
-      // 5. Completed videos
-      db
-        .select({ count: count() })
-        .from(videos)
-        .where(and(videoTimeCondition, eq(videos.status, VideoStatus.COMPLETED), eq(videos.isDeleted, false))),
-
-      // 6. Failed videos
-      db
-        .select({ count: count() })
-        .from(videos)
-        .where(and(videoTimeCondition, eq(videos.status, VideoStatus.FAILED), eq(videos.isDeleted, false))),
-
-      // 7. Users who generated at least one video
-      db
-        .selectDistinct({ userId: videos.userId })
-        .from(videos)
-        .where(and(videoTimeCondition, eq(videos.isDeleted, false)))
-        .then((result) => ({ count: result.length })),
-
-      // 8. Users who made at least one payment
-      db
-        .selectDistinct({ userId: creditTransactions.userId })
-        .from(creditTransactions)
-        .where(
-          and(
-            transactionTimeCondition,
-            sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`
-          )
-        )
-        .then((result) => ({ count: result.length })),
-    ]);
+      );
+    const paidOrders = await db
+      .selectDistinct({ orderNo: creditTransactions.orderNo })
+      .from(creditTransactions)
+      .where(
+        and(
+          transactionTimeCondition,
+          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
+          sql`${creditTransactions.orderNo} IS NOT NULL`,
+        ),
+      );
+    const totalVideosResult = await db
+      .select({ count: count() })
+      .from(videos)
+      .where(and(videoTimeCondition, eq(videos.isDeleted, false)));
+    const completedVideosResult = await db
+      .select({ count: count() })
+      .from(videos)
+      .where(
+        and(
+          videoTimeCondition,
+          eq(videos.status, VideoStatus.COMPLETED),
+          eq(videos.isDeleted, false),
+        ),
+      );
+    const failedVideosResult = await db
+      .select({ count: count() })
+      .from(videos)
+      .where(
+        and(
+          videoTimeCondition,
+          eq(videos.status, VideoStatus.FAILED),
+          eq(videos.isDeleted, false),
+        ),
+      );
+    const usersWithVideos = await db
+      .selectDistinct({ userId: videos.userId })
+      .from(videos)
+      .where(and(videoTimeCondition, eq(videos.isDeleted, false)));
+    const payingUsers = await db
+      .selectDistinct({ userId: creditTransactions.userId })
+      .from(creditTransactions)
+      .where(
+        and(
+          transactionTimeCondition,
+          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
+        ),
+      );
 
     const totalUsers = totalUsersResult[0]?.count || 0;
     const totalOrders = totalOrdersResult[0]?.count || 0;
-    const paidOrders = paidOrdersResult.count || 0;
+    const paidOrderCount = paidOrders.length;
     const totalVideos = totalVideosResult[0]?.count || 0;
     const completedVideos = completedVideosResult[0]?.count || 0;
     const failedVideos = failedVideosResult[0]?.count || 0;
-    const usersWithVideos = usersWithVideosResult.count || 0;
-    const payingUsers = payingUsersResult.count || 0;
+    const usersWithVideoCount = usersWithVideos.length;
+    const payingUserCount = payingUsers.length;
 
     // Calculate rates
-    const firstVideoConversionRate = totalUsers > 0 ? (usersWithVideos / totalUsers) * 100 : 0;
-    const paymentConversionRate = totalUsers > 0 ? (payingUsers / totalUsers) * 100 : 0;
+    const firstVideoConversionRate = totalUsers > 0 ? (usersWithVideoCount / totalUsers) * 100 : 0;
+    const paymentConversionRate = totalUsers > 0 ? (payingUserCount / totalUsers) * 100 : 0;
 
     const totalFinishedVideos = completedVideos + failedVideos;
     const videoSuccessRate = totalFinishedVideos > 0 ? (completedVideos / totalFinishedVideos) * 100 : 0;
 
     // Users who haven't generated any video
-    const usersWithoutVideos = totalUsers - usersWithVideos;
+    const usersWithoutVideos = totalUsers - usersWithVideoCount;
 
     return {
       totalUsers,
       totalOrders,
-      paidOrders,
+      paidOrders: paidOrderCount,
       totalVideos,
       firstVideoConversionRate: Math.round(firstVideoConversionRate * 10) / 10,
       paymentConversionRate: Math.round(paymentConversionRate * 10) / 10,
@@ -203,9 +179,10 @@ class AnalyticsService {
     const videoTimeCondition = this.buildVideoTimeCondition(timeFilter);
 
     // Get total registered users
-    const [totalUsersResult] = await Promise.all([
-      db.select({ count: count() }).from(users).where(timeCondition),
-    ]);
+    const totalUsersResult = await db
+      .select({ count: count() })
+      .from(users)
+      .where(timeCondition);
 
     const registeredUsers = totalUsersResult[0]?.count || 0;
 
@@ -325,11 +302,9 @@ class AnalyticsService {
   }
 
   async getAnalyticsData(range: TimeRange): Promise<AnalyticsData> {
-    const [stats, funnel, trend] = await Promise.all([
-      this.getStats(range),
-      this.getFunnelData(range),
-      this.getTrendData(range),
-    ]);
+    const stats = await this.getStats(range);
+    const funnel = await this.getFunnelData(range);
+    const trend = await this.getTrendData(range);
 
     return {
       stats,

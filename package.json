@@ -21,6 +21,9 @@
     "script:add-credits": "dotenv -e .env.local -- tsx scripts/add-credits.ts",
     "script:check-credits": "dotenv -e .env.local -- tsx scripts/check-user-credits.ts",
     "script:reset-credits": "dotenv -e .env.local -- tsx scripts/reset-user-credits.ts",
+    "script:list-admins": "dotenv -e .env.local -- tsx scripts/manage-admin.ts list",
+    "script:set-admin": "dotenv -e .env.local -- tsx scripts/manage-admin.ts grant",
+    "script:remove-admin": "dotenv -e .env.local -- tsx scripts/manage-admin.ts revoke",
     "script:test-proxy": "node scripts/test-proxy.mjs"
   },
   "dependencies": {

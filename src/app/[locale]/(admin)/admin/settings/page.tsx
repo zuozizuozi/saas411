@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings, FileText, ExternalLink } from "@/components/ui/icons";
+import { requireAdmin } from "@/lib/auth/admin";
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
+  await requireAdmin();
   return (
     <div className="space-y-6">
       <div>
@@ -47,35 +49,34 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Admin Email */}
+        {/* Admin Roles */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              管理员邮箱配置
+              管理员权限
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              在 .env.local 中配置 ADMIN_EMAIL，该邮箱登录后将自动获得管理员权限
+              管理员权限保存在用户数据库中，可在“用户管理”页面直接授予或撤销。
             </p>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">环境变量</span>
+                <span className="text-muted-foreground">权限来源</span>
                 <code className="text-xs bg-muted px-2 py-1 rounded">
-                  ADMIN_EMAIL
+                  user.isAdmin
                 </code>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">自动设置</span>
-                <span className="text-green-600">✓ 支持</span>
+                <span className="text-muted-foreground">立即生效</span>
+                <span className="text-green-600">✓ 实时数据库校验</span>
               </div>
             </div>
             <Button asChild variant="outline" className="w-full">
-              <a href="https://github.com/zuozizuozi/saas411/tree/main/docs" target="_blank" rel="noopener noreferrer">
-                <FileText className="h-4 w-4 mr-2" />
-                查看快速开始
-                <ExternalLink className="h-4 w-4 ml-2" />
+              <a href="./users">
+                <Settings className="h-4 w-4 mr-2" />
+                管理账号权限
               </a>
             </Button>
           </CardContent>
@@ -87,7 +88,7 @@ export default function AdminSettingsPage() {
             <CardTitle>积分管理脚本</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
                 <h3 className="font-medium text-sm">添加积分</h3>
                 <code className="block text-xs bg-muted p-2 rounded">
@@ -104,6 +105,24 @@ export default function AdminSettingsPage() {
                 <h3 className="font-medium text-sm">重置积分</h3>
                 <code className="block text-xs bg-muted p-2 rounded">
                   pnpm script:reset-credits &lt;email&gt;
+                </code>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm">列出管理员</h3>
+                <code className="block text-xs bg-muted p-2 rounded">
+                  pnpm script:list-admins
+                </code>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm">授予管理员</h3>
+                <code className="block text-xs bg-muted p-2 rounded">
+                  pnpm script:set-admin -- &lt;email&gt;
+                </code>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm">撤销管理员</h3>
+                <code className="block text-xs bg-muted p-2 rounded">
+                  pnpm script:remove-admin -- &lt;email&gt;
                 </code>
               </div>
             </div>

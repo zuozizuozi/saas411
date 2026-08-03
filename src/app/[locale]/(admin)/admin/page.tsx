@@ -1,7 +1,8 @@
 import { db } from "@/db";
-import { users, videos, creditPackages, creditTransactions, VideoStatus } from "@/db/schema";
-import { count, eq, and, sql, gt } from "drizzle-orm";
+import { users, videos, creditPackages, VideoStatus } from "@/db/schema";
+import { count, sql } from "drizzle-orm";
 import { connection } from "next/server";
+import { requireAdmin } from "@/lib/auth/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users as UsersIcon,
@@ -17,29 +18,29 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   await connection();
-  // 获取统计数据
-  const [
-    totalUsersResult,
-    totalVideosResult,
-    totalCreditPackagesResult,
-    completedVideosResult,
-    failedVideosResult,
-    pendingVideosResult,
-  ] = await Promise.all([
-    db.select({ count: count() }).from(users),
-    db.select({ count: count() }).from(videos),
-    db.select({ count: count() }).from(creditPackages),
-    db.select({ count: count() }).from(videos).where(eq(videos.status, VideoStatus.COMPLETED)),
-    db.select({ count: count() }).from(videos).where(eq(videos.status, VideoStatus.FAILED)),
-    db.select({ count: count() }).from(videos).where(eq(videos.status, VideoStatus.PENDING)),
-  ]);
+  await requireAdmin();
+
+  // The production database uses one Supavisor connection per serverless
+  // instance. Keep these operations sequential and aggregate video counts in
+  // one query so concurrent commands cannot deadlock that connection.
+  const totalUsersResult = await db.select({ count: count() }).from(users);
+  const totalCreditPackagesResult = await db
+    .select({ count: count() })
+    .from(creditPackages);
+  const videoStatsResult = await db
+    .select({
+      total: count(),
+      completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
+      failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
+      pending: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.PENDING})::int`,
+    })
+    .from(videos);
 
   const totalUsers = totalUsersResult[0]?.count || 0;
-  const totalVideos = totalVideosResult[0]?.count || 0;
-  totalCreditPackagesResult;
-  const completedVideos = completedVideosResult[0]?.count || 0;
-  const failedVideos = failedVideosResult[0]?.count || 0;
-  const pendingVideos = pendingVideosResult[0]?.count || 0;
+  const totalVideos = videoStatsResult[0]?.total || 0;
+  const completedVideos = Number(videoStatsResult[0]?.completed || 0);
+  const failedVideos = Number(videoStatsResult[0]?.failed || 0);
+  const pendingVideos = Number(videoStatsResult[0]?.pending || 0);
 
   // 计算视频成功率
   const totalFinishedVideos = completedVideos + failedVideos;

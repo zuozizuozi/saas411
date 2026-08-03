@@ -9,17 +9,17 @@ This guide covers how to use the seedance.co admin dashboard for managing users,
 
 ## Accessing the Admin Dashboard
 
-### Step 1: Configure Admin Email
+### Step 1: Grant the Admin Role
 
-Add your email to `.env.local`:
+The user must sign in once before a role can be granted. Then run:
 
-```env
-ADMIN_EMAIL="your-email@example.com"
+```bash
+pnpm script:set-admin -- your-email@example.com
 ```
 
 ### Step 2: Login
 
-Login with the email you configured. The system will automatically grant admin permissions.
+Login with the account whose database role was granted.
 
 ### Step 3: Access Dashboard
 
@@ -137,10 +137,10 @@ Access configuration documentation from **Settings** page:
 
 ### Admin Access Not Working
 
-1. Verify `ADMIN_EMAIL` is set in `.env.local`
-2. Restart the development server after changing `.env.local`
+1. Run `pnpm script:list-admins` and verify the account is listed
+2. Ensure the user has signed in at least once before granting the role
 3. Ensure you're logging in with the exact email address
-4. Check browser console for any errors
+4. Check the server logs for authorization or database errors
 
 ### Dashboard Not Loading
 

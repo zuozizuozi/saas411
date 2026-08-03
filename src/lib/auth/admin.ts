@@ -6,24 +6,17 @@
  * 检查用户是否具有管理员权限
  * 用于保护管理后台页面
  *
- * 支持自动设置管理员：
- * 如果用户邮箱匹配 ADMIN_EMAIL 环境变量，
- * 会自动将其设置为管理员
+ * 管理员身份始终从数据库读取，确保授予和撤销能够立即生效。
  */
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { env } from "./env.mjs";
+import { hasAdminRole } from "./admin-role";
 import type { Locale } from "@/config/i18n-config";
 
 /**
  * 要求用户具有管理员权限
- *
- * 如果用户邮箱匹配 ADMIN_EMAIL，会自动设置为管理员
  *
  * @param redirectTo - 未授权时重定向的路径
  * @returns 当前用户信息
@@ -35,34 +28,14 @@ export async function requireAdmin(redirectTo?: string) {
   });
 
   if (!session?.user) {
-    redirect(redirectTo || "/login");
+    redirect(redirectTo || "/login?from=/admin");
   }
 
-  // 自动设置管理员：如果邮箱匹配 ADMIN_EMAIL 且还不是管理员
-  const adminEmail = env.ADMIN_EMAIL;
-  if (
-    adminEmail &&
-    session.user.email?.toLowerCase() === adminEmail.toLowerCase() &&
-    !session.user.isAdmin
-  ) {
-    // 设置为管理员
-    await db
-      .update(users)
-      .set({ isAdmin: true })
-      .where(eq(users.id, session.user.id));
-
-    console.log(`✅ Auto-set admin for: ${session.user.email}`);
-
-    // 直接返回用户，不再调用 getSession()
-    // 因为 cookie cache 有 5 分钟 TTL，重新获取 session 仍会返回旧的 isAdmin: false
-    return { ...session.user, isAdmin: true };
+  if (!(await hasAdminRole(session.user.id))) {
+    redirect("/");
   }
 
-  if (!session.user.isAdmin) {
-    redirect(redirectTo || "/");
-  }
-
-  return session.user;
+  return { ...session.user, isAdmin: true };
 }
 
 /**
@@ -75,7 +48,8 @@ export async function isAdmin(): Promise<boolean> {
     headers: await headers(),
   });
 
-  return !!session?.user?.isAdmin;
+  if (!session?.user) return false;
+  return hasAdminRole(session.user.id);
 }
 
 /**

@@ -2,6 +2,7 @@
 // For client components, import from "@/lib/auth/client" instead
 
 import type { User } from "./auth";
+import { hasAdminRole } from "./admin-role";
 
 // Re-export auth instance (server-only)
 export { auth, type Session, type User } from "./auth";
@@ -59,8 +60,8 @@ export async function requireAuth(redirectTo = "/login"): Promise<User> {
 export async function requireAdmin(redirectTo = "/"): Promise<User> {
   const { redirect } = await import("next/navigation");
   const user = await getCurrentUser();
-  if (!user || !user.isAdmin) {
+  if (!user || !(await hasAdminRole(user.id))) {
     redirect(redirectTo);
   }
-  return user as User;
+  return { ...user, isAdmin: true } as User;
 }

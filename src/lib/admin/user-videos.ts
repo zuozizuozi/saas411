@@ -52,31 +52,31 @@ export async function getUserVideos({
 
   const conditions = and(...whereConditions);
 
-  // 并行查询总数和当前页数据
-  const [totalResult, videosResult] = await Promise.all([
-    db.select({ count: sql<number>`count(*)::int` }).from(videos).where(conditions),
-    db
-      .select({
-        id: videos.id,
-        uuid: videos.uuid,
-        prompt: videos.prompt,
-        model: videos.model,
-        status: videos.status,
-        videoUrl: videos.videoUrl,
-        thumbnailUrl: videos.thumbnailUrl,
-        duration: videos.duration,
-        resolution: videos.resolution,
-        creditsUsed: videos.creditsUsed,
-        createdAt: videos.createdAt,
-        completedAt: videos.completedAt,
-        errorMessage: videos.errorMessage,
-      })
-      .from(videos)
-      .where(conditions)
-      .orderBy(desc(videos.createdAt))
-      .limit(limit)
-      .offset(offset),
-  ]);
+  const totalResult = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(videos)
+    .where(conditions);
+  const videosResult = await db
+    .select({
+      id: videos.id,
+      uuid: videos.uuid,
+      prompt: videos.prompt,
+      model: videos.model,
+      status: videos.status,
+      videoUrl: videos.videoUrl,
+      thumbnailUrl: videos.thumbnailUrl,
+      duration: videos.duration,
+      resolution: videos.resolution,
+      creditsUsed: videos.creditsUsed,
+      createdAt: videos.createdAt,
+      completedAt: videos.completedAt,
+      errorMessage: videos.errorMessage,
+    })
+    .from(videos)
+    .where(conditions)
+    .orderBy(desc(videos.createdAt))
+    .limit(limit)
+    .offset(offset);
 
   const totalVideos = totalResult[0]?.count || 0;
   const totalPages = Math.ceil(totalVideos / limit);
@@ -92,51 +92,20 @@ export async function getUserVideos({
  * 获取用户的视频统计信息
  */
 export async function getUserVideoStats(userId: string) {
-  const [totalResult, completedResult, failedResult, generatingResult] =
-    await Promise.all([
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(videos)
-        .where(and(eq(videos.userId, userId), eq(videos.isDeleted, false))),
+  const [stats] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
+      failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
+      generating: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.GENERATING})::int`,
+    })
+    .from(videos)
+    .where(and(eq(videos.userId, userId), eq(videos.isDeleted, false)));
 
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(videos)
-        .where(
-          and(
-            eq(videos.userId, userId),
-            eq(videos.status, VideoStatus.COMPLETED),
-            eq(videos.isDeleted, false)
-          )
-        ),
-
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(videos)
-        .where(
-          and(
-            eq(videos.userId, userId),
-            eq(videos.status, VideoStatus.FAILED),
-            eq(videos.isDeleted, false)
-          )
-        ),
-
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(videos)
-        .where(
-          and(
-            eq(videos.userId, userId),
-            eq(videos.status, VideoStatus.GENERATING),
-            eq(videos.isDeleted, false)
-          )
-        ),
-    ]);
-
-  const total = totalResult[0]?.count || 0;
-  const completed = completedResult[0]?.count || 0;
-  const failed = failedResult[0]?.count || 0;
-  const generating = generatingResult[0]?.count || 0;
+  const total = Number(stats?.total || 0);
+  const completed = Number(stats?.completed || 0);
+  const failed = Number(stats?.failed || 0);
+  const generating = Number(stats?.generating || 0);
 
   const successRate = total > 0 ? (completed / total) * 100 : 0;
 

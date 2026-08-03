@@ -3,6 +3,7 @@ import { AnalyticsHeader } from "@/components/admin/analytics/analytics-header";
 import { StatsCards } from "@/components/admin/analytics/stats-cards";
 import { FunnelChart } from "@/components/admin/analytics/funnel-chart";
 import { TrendChart } from "@/components/admin/analytics/trend-chart";
+import { requireAdmin } from "@/lib/auth/admin";
 
 interface AdminAnalyticsPageProps {
   searchParams: Promise<{
@@ -11,6 +12,7 @@ interface AdminAnalyticsPageProps {
 }
 
 export default async function AdminAnalyticsPage({ searchParams }: AdminAnalyticsPageProps) {
+  await requireAdmin();
   const params = await searchParams;
   const range = params.range || "30d";
 

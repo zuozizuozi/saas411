@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/api/auth";
 import { getUserVideos, getUserVideoStats } from "@/lib/admin/user-videos";
 
 export async function GET(request: NextRequest) {
   try {
+    await requireAdmin(request);
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get("userId");
     const page = Number.parseInt(searchParams.get("page") || "1");
@@ -12,16 +14,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "缺少用户ID" }, { status: 400 });
     }
 
-    // 并行获取视频列表和统计信息
-    const [videosData, stats] = await Promise.all([
-      getUserVideos({
-        userId,
-        page,
-        limit: 10,
-        status: status && status !== "all" ? (status as any) : undefined,
-      }),
-      getUserVideoStats(userId),
-    ]);
+    const videosData = await getUserVideos({
+      userId,
+      page,
+      limit: 10,
+      status: status && status !== "all" ? (status as any) : undefined,
+    });
+    const stats = await getUserVideoStats(userId);
 
     return NextResponse.json({
       videos: videosData.videos,

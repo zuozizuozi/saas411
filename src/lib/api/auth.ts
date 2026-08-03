@@ -1,4 +1,5 @@
 import { auth, type User } from "@/lib/auth";
+import { hasAdminRole } from "@/lib/auth/admin-role";
 
 import { ApiError } from "./error";
 
@@ -34,8 +35,8 @@ export async function requireAuth(request: Request): Promise<User> {
  */
 export async function requireAdmin(request: Request): Promise<User> {
   const user = await requireAuth(request);
-  if (!user.isAdmin) {
+  if (!(await hasAdminRole(user.id))) {
     throw new ApiError("Forbidden", 403);
   }
-  return user;
+  return { ...user, isAdmin: true };
 }

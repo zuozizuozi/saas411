@@ -15,15 +15,15 @@ All configuration is centralized in `src/config/pricing-user.ts`. You only need 
 
 ## Admin Access Setup
 
-### Setting Up Admin User
+### Setting Up an Admin User
 
-Add your email to `.env.local`:
+The user must sign in once before a role can be granted. Then run:
 
-```env
-ADMIN_EMAIL="your-email@example.com"
+```bash
+pnpm script:set-admin -- your-email@example.com
 ```
 
-After logging in with that email, the system automatically grants admin permissions.
+Admin roles are stored in `user.isAdmin` and take effect immediately.
 
 ### Admin Dashboard
 
@@ -238,12 +238,12 @@ export const NEW_USER_GIFT = {
 
 ### Setting Up Admin
 
-**Step 1:** Add your email to `.env.local`:
-```env
-ADMIN_EMAIL="your-email@example.com"
+**Step 1:** Have the user sign in once, then grant the role:
+```bash
+pnpm script:set-admin -- your-email@example.com
 ```
 
-**Step 2:** Login with that email
+**Step 2:** Login with that account
 
 **Step 3:** Access the admin dashboard at `/[locale]/admin`
 

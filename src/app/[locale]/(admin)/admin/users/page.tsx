@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, creditPackages, videos } from "@/db/schema";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { count, sql, desc, getTableColumns } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -20,6 +20,8 @@ import {
   Shield,
 } from "@/components/ui/icons";
 import { UserVideosButton } from "@/components/admin/users/user-videos-button";
+import { AdminRoleButton } from "@/components/admin/users/admin-role-button";
+import { requireAdmin } from "@/lib/auth/admin";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -29,6 +31,7 @@ interface UsersPageProps {
 }
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
+  await requireAdmin();
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
   const search = params.search || "";
@@ -45,45 +48,39 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   const totalUsers = totalUsersResult[0]?.count || 0;
   const totalPages = Math.ceil(totalUsers / limit);
 
-  // 获取用户列表
-  const usersList = search
+  const userSelection = {
+    ...getTableColumns(users),
+    videoCount: sql<number>`(
+      select count(*)::int from ${videos}
+      where ${videos.userId} = ${users.id}
+    )`,
+    packageCount: sql<number>`(
+      select count(*)::int from ${creditPackages}
+      where ${creditPackages.userId} = ${users.id}
+    )`,
+    totalCredits: sql<number>`(
+      select coalesce(sum(${creditPackages.remainingCredits}), 0)::int
+      from ${creditPackages}
+      where ${creditPackages.userId} = ${users.id}
+    )`,
+  };
+
+  // Fetch the page and its per-user totals in one command. This avoids an N+1
+  // query pattern on the single production database connection.
+  const usersWithStats = search
     ? await db
-      .select()
+      .select(userSelection)
       .from(users)
       .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`)
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset)
     : await db
-      .select()
+      .select(userSelection)
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
-
-  // 获取每个用户的统计信息
-  const usersWithStats = await Promise.all(
-    usersList.map(async (user) => {
-      const [videoCountResult, creditPackagesResult] = await Promise.all([
-        db.select({ count: count() }).from(videos).where(eq(videos.userId, user.id)),
-        db
-          .select({ count: count(), sum: sql<number>`COALESCE(SUM(${creditPackages.remainingCredits}), 0)` })
-          .from(creditPackages)
-          .where(eq(creditPackages.userId, user.id)),
-      ]);
-
-      const videoCount = videoCountResult[0]?.count || 0;
-      const packageCount = creditPackagesResult[0]?.count || 0;
-      const totalCredits = Number(creditPackagesResult[0]?.sum || 0);
-
-      return {
-        ...user,
-        videoCount,
-        packageCount,
-        totalCredits,
-      };
-    }),
-  );
 
   return (
     <div className="space-y-6">
@@ -187,12 +184,19 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                         {new Date(user.createdAt).toLocaleDateString("zh-CN")}
                       </TableCell>
                       <TableCell>
-                        <UserVideosButton
-                          userId={user.id}
-                          userName={user.name}
-                          userEmail={user.email}
-                          videoCount={user.videoCount}
-                        />
+                        <div className="flex flex-wrap gap-2">
+                          <UserVideosButton
+                            userId={user.id}
+                            userName={user.name}
+                            userEmail={user.email}
+                            videoCount={user.videoCount}
+                          />
+                          <AdminRoleButton
+                            userId={user.id}
+                            userEmail={user.email}
+                            isAdmin={user.isAdmin}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
