@@ -38,6 +38,34 @@ describe("AI provider routing", () => {
     ).toEqual([]);
   });
 
+  it("routes all launch Seedance models through EvoLink", () => {
+    vi.stubEnv("DEFAULT_AI_PROVIDER", "");
+    vi.stubEnv("EVOLINK_API_KEY", "evolink-key");
+
+    expect(
+      getProviderCandidates("seedance-2.0-mini", "text-to-video", 15)
+    ).toEqual(["evolink"]);
+    expect(
+      getProviderCandidates("seedance-2.0", "image-to-video", 4)
+    ).toEqual(["evolink"]);
+    expect(
+      getProviderCandidates("seedance-1.5-pro", "text-to-video", 12)
+    ).toEqual(["evolink"]);
+    expect(
+      getProviderCandidates("seedance-1.5-pro", "text-to-video", 13)
+    ).toEqual([]);
+  });
+
+  it("falls back to model routing when a global pin cannot run Seedance", () => {
+    vi.stubEnv("DEFAULT_AI_PROVIDER", "bailian");
+    vi.stubEnv("BAILIAN_API_KEY", "sk-bailian");
+    vi.stubEnv("EVOLINK_API_KEY", "evolink-key");
+
+    expect(
+      getProviderCandidates("seedance-2.0-mini", "text-to-video", 5)
+    ).toEqual(["evolink"]);
+  });
+
   it("keeps authentication errors terminal but retries rate limits", () => {
     expect(
       isRetryableProviderError(

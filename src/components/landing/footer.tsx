@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { LocaleLink } from "@/i18n/navigation";
@@ -9,15 +8,18 @@ import { siteConfig } from "@/config/site";
 
 export function LandingFooter() {
   const t = useTranslations("Footer");
+  const navigation = useTranslations("Navigation");
+  const hero = useTranslations("Hero");
+  const pricing = useTranslations("PricingCards");
   const currentYear = new Date().getFullYear();
 
   const footerSections = [
     {
       title: t("product"),
       links: [
-        { title: "Image to Video", href: "/image-to-video" },
-        { title: "Text to Video", href: "/text-to-video" },
-        { title: "Pricing", href: "/pricing" },
+        { title: navigation("imageToVideo"), href: "/image-to-video" },
+        { title: navigation("textToVideo"), href: "/text-to-video" },
+        { title: pricing("pricing"), href: "/pricing" },
       ],
     },
     {
@@ -42,7 +44,7 @@ export function LandingFooter() {
               seedance.co
             </LocaleLink>
             <p className="max-w-xs text-sm leading-6 text-muted-foreground">
-              Transform your ideas into stunning videos with AI.
+              {hero("description")}
             </p>
           </div>
 
@@ -85,11 +87,7 @@ export function LandingFooter() {
           <p className="text-sm text-muted-foreground">
             {t("copyright", { year: currentYear })}
           </p>
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
-            Made with
-            <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
-            by seedance.co
-          </p>
+          <p className="text-sm text-muted-foreground">seedance.co</p>
         </div>
       </div>
     </footer>

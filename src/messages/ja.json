@@ -1,0 +1,654 @@
+{
+  "Metadata": {
+    "title": "seedance.co - AI動画生成プラットフォーム",
+    "description": "Sora 2、Veo 3.1などを使って、魅力的なAI動画を数分で作成できます"
+  },
+  "Common": {
+    "login": "ログイン",
+    "signup": "新規登録",
+    "logout": "ログアウト",
+    "language": "言語",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "loading": "読み込み中...",
+    "error": "問題が発生しました",
+    "success": "完了"
+  },
+  "Header": {
+    "models": "モデル",
+    "tools": "ツール",
+    "pricing": "料金",
+    "docs": "ドキュメント",
+    "myCreations": "マイ作品",
+    "credits": "クレジット",
+    "settings": "設定"
+  },
+  "Hero": {
+    "badge": "Sora 2、Veo 3.1などを搭載",
+    "title": "アイデアを魅力的な動画に",
+    "subtitle": "AIで実現",
+    "description": "プロ品質のAI動画を数分で作成。テキストや画像からの動画生成、既存映像の強化にも対応します。",
+    "startCreating": "作成を始める",
+    "viewExamples": "作例を見る",
+    "features": {
+      "fast": "高速生成",
+      "easy": "かんたん操作",
+      "ai": "AI搭載"
+    },
+    "stats": {
+      "videos": "本の動画を作成",
+      "users": "人のユーザー",
+      "rating": "ユーザー評価"
+    },
+    "creditsHint": "アカウント作成後、クレジットを購入するかプランに登録してください"
+  },
+  "Notifications": {
+    "generationWillNotify": "生成には時間がかかる場合があります。完了したらお知らせします。",
+    "enableNotifications": "通知を有効にする",
+    "notificationDescription": "動画の生成が完了したときに通知を受け取ります。",
+    "maybeLater": "後で",
+    "allow": "許可",
+    "videoReadyTitle": "{siteName} - 動画の準備ができました",
+    "videoReadyBody": "プロンプト：{prompt}\n生成が完了しました。タップして表示してください。",
+    "videoReadyBodyShort": "生成が完了しました。タップして表示してください。"
+  },
+  "ToolPage": {
+    "generator": "生成",
+    "result": "結果",
+    "queueTitle": "キュー",
+    "queueEmpty": "実行中のタスクはありません",
+    "recentTitle": "最近の生成",
+    "recentEmpty": "結果はまだありません",
+    "resultTitle": "生成結果",
+    "newGeneration": "新しく生成",
+    "exploreTitle": "作例を見る",
+    "exploreSubtitle": "コミュニティはまだありません。最初の作品を作りましょう",
+    "emptyTitle": "ここにプレビューが表示されます",
+    "emptySubtitle": "左側から生成を開始すると、結果がここに表示されます。",
+    "promptIdeas": "プロンプトのアイデア",
+    "promptExample1": "ネオン街に降る雨を映画のようにクローズアップ。スローモーション。",
+    "promptExample2": "夕暮れ時の居心地のよいカフェ。カメラがゆっくり横に移動する。",
+    "promptExample3": "柔らかな霧と光に包まれた未来都市のスカイライン。",
+    "tipsTitle": "ヒント",
+    "tipsLine1": "被写体、照明、動きを具体的に指定しましょう。",
+    "tipsLine2": "パン、ドリー、ズームなどのカメラワークを指定しましょう。",
+    "tipsLine3": "映画的、幻想的、ミニマルなど、雰囲気を表す言葉を加えましょう。",
+    "generatingTag": "生成中",
+    "generatingHint": "この動画を生成しています。待っている間に別のタスクを開始できます。",
+    "modelLabel": "モデル",
+    "download": "ダウンロード"
+  },
+  "Showcase": {
+    "badge": "実際の作例を見る",
+    "title": "seedance.coで作成",
+    "subtitle": "AIが生み出す魅力的な動画",
+    "description": "コミュニティがAIで制作した魅力的な動画をご覧ください。映画のような風景から商品アニメーションまで、多彩な作例を紹介します。",
+    "ctaText": "あなただけの作品を作ってみませんか？",
+    "ctaButton": "今すぐ作成"
+  },
+  "Features": {
+    "badge": "充実した機能",
+    "title": "必要な機能をすべて搭載",
+    "subtitle": "魅力的な動画制作を支える強力な機能",
+    "description": "動画制作を簡単で楽しくするツールと機能をご紹介します",
+    "learnMore": "詳しく見る",
+    "bottomCTA": {
+      "text": "アイデアを動画にしてみませんか？",
+      "button": "今すぐ作成"
+    },
+    "textToVideo": {
+      "title": "テキストから動画",
+      "description": "高度なAIモデルでテキストプロンプトを魅力的な動画に変換します",
+      "stat": "生成速度"
+    },
+    "imageToVideo": {
+      "title": "画像から動画",
+      "description": "AI動画生成で静止画に自然な動きを加えます",
+      "stat": "最大解像度"
+    },
+    "referenceGen": {
+      "title": "参照素材から生成",
+      "description": "画像や動画を参照素材として追加し、カメラワーク、動き、スタイルを正確に制御できます",
+      "stat": "参照入力"
+    },
+    "enhancement": {
+      "title": "動画を強化",
+      "description": "AIで既存動画の高解像度化、品質向上、延長を行います",
+      "stat": "AIモデル"
+    },
+    "fast": {
+      "title": "高速生成",
+      "description": "プロ品質の動画をわずか2〜5分で生成します"
+    },
+    "secure": {
+      "title": "安全・非公開",
+      "description": "データは暗号化され、動画は安全に保存されます"
+    },
+    "realtime": {
+      "title": "リアルタイム更新",
+      "description": "動画生成の進行状況をリアルタイムで確認できます"
+    },
+    "formats": {
+      "title": "多様な形式",
+      "description": "各プラットフォームに合わせたさまざまなアスペクト比で書き出せます"
+    },
+    "ai": {
+      "title": "高度なAI",
+      "description": "最新のAI動画生成モデルを採用しています"
+    }
+  },
+  "HowItWorks": {
+    "badge": "かんたんな手順",
+    "title": "ご利用方法",
+    "subtitle": "4つの簡単なステップで動画を作成",
+    "description": "直感的なワークフローで、数分ですぐに動画制作を始められます",
+    "bottomHint": "ご利用にはアカウントと、有料クレジットまたはサブスクリプションが必要です",
+    "cta": "今すぐ作成",
+    "steps": {
+      "prompt": {
+        "title": "動画を説明",
+        "description": "作成したい動画を具体的なテキストプロンプトで説明してください",
+        "stat": "平均時間"
+      },
+      "upload": {
+        "title": "参照素材をアップロード",
+        "description": "必要に応じて、AIへの参考となる画像を追加できます",
+        "stat": "対応形式"
+      },
+      "generate": {
+        "title": "AIが生成",
+        "description": "AIがリクエストを処理し、オリジナル動画を生成します",
+        "stat": "生成時間"
+      },
+      "download": {
+        "title": "ダウンロードして共有",
+        "description": "HD動画をダウンロードし、好きな場所で共有できます",
+        "stat": "最高品質"
+      }
+    }
+  },
+  "CTA": {
+    "badge": "期間限定オファー",
+    "title": "魅力的な動画を作りませんか？",
+    "subtitle": "すでにseedance.coを利用している多くのクリエイターに加わりましょう",
+    "description": "クレジットの購入またはプランへの登録後、プロ品質の動画を作成できます",
+    "getStarted": "アカウントを作成",
+    "learnMore": "詳しく見る",
+    "benefits": {
+      "free": "生成するにはクレジットの購入またはプランへの登録が必要です",
+      "noCard": "クレジットカード不要",
+      "cancel": "いつでも解約可能",
+      "support": "24時間年中無休のカスタマーサポート"
+    },
+    "generating": "生成中...",
+    "readyIn": "完了まで",
+    "minutes": "分",
+    "from": "から",
+    "reviews": "件のレビュー",
+    "testimonials": {
+      "title": "クリエイターから高評価",
+      "subtitle": "ユーザーの声をご覧ください"
+    }
+  },
+  "FAQ": {
+    "title": "よくある質問",
+    "subtitle": "seedance.coについて知っておきたいこと",
+    "contact": "ご不明な点がございましたら、こちらまでお問い合わせください：",
+    "general": {
+      "question": "seedance.coとは何ですか？",
+      "answer": "seedance.coは、実運用向けSeedanceモデルでテキストや画像を高品質なAI動画に変換します。"
+    },
+    "commercial": {
+      "question": "生成した動画を商用利用できますか？",
+      "answer": "はい。ProおよびTeamプランで生成した動画には商用ライセンスが付属し、マーケティング、SNS、商用プロジェクトで利用できます。"
+    },
+    "aiModels": {
+      "question": "どのAIモデルを使用していますか？",
+      "answer": "現在はSeedance 2.0 Mini、Seedance 2.0、Seedance 1.5 Proに対応しています。追加モデルは検証後に順次導入します。"
+    },
+    "credits": {
+      "question": "クレジットの仕組みを教えてください。",
+      "answer": "動画生成にはクレジットを使用します。必要数はモデルや動画の長さによって異なり、パックの購入または月額プランへの登録が可能です。"
+    },
+    "refund": {
+      "question": "返金は受けられますか？",
+      "answer": "システムエラーで生成に失敗した場合はクレジットを返還します。サブスクリプションについては7日以内にサポートへご連絡ください。"
+    },
+    "support": {
+      "question": "サポートを受けるにはどうすればよいですか？",
+      "answer": "support@seedance.coへメールでお問い合わせください。"
+    }
+  },
+  "Footer": {
+    "product": "製品",
+    "company": "会社情報",
+    "support": "サポート",
+    "legal": "法的情報",
+    "copyright": "© {year} seedance.co. 無断転載を禁じます。",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "cookie": "Cookieポリシー"
+  },
+  "Credits": {
+    "title": "クレジット",
+    "balance": "クレジット残高",
+    "available": "利用可能",
+    "frozen": "保留中",
+    "used": "使用済み",
+    "expiringSoon": "まもなく期限切れ",
+    "lowBalance": "クレジット残高が少なくなっています。追加購入またはプランをご検討ください",
+    "buyCredits": "クレジットを購入",
+    "history": "取引履歴",
+    "packages": {
+      "starter": {
+        "name": "スターターパック",
+        "description": "たまに使う方向けの280クレジット"
+      },
+      "go": {
+        "name": "Go",
+        "description": "軽い制作や初めての利用に"
+      },
+      "plus": {
+        "name": "Plus",
+        "description": "継続的に制作するクリエイター向け"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "大量制作や大規模な用途向け"
+      },
+      "standard": {
+        "name": "スタンダードパック",
+        "description": "買い切り900クレジット"
+      },
+      "premium": {
+        "name": "プレミアムパック",
+        "description": "買い切り2,520クレジット"
+      }
+    },
+    "features": {
+      "all_models": "利用可能なすべてのSeedanceモデル",
+      "text_image_video": "テキスト動画生成と画像動画生成",
+      "model_quality_audio": "対応モデルでは最大1080pとネイティブ音声",
+      "generation_status_history": "リアルタイム進捗、履歴、ダウンロード",
+      "credit_cost_preview": "生成前のクレジット消費表示",
+      "failed_credit_return": "生成失敗時のクレジット自動返還",
+      "no_platform_watermark": "seedance.co独自の透かし追加なし"
+    }
+  },
+  "VideoGenerator": {
+    "selectModel": "Select Model",
+    "uploadImage": "Upload Image",
+    "enterPrompt": "Enter your prompt",
+    "duration": "Duration",
+    "aspectRatio": "Aspect Ratio",
+    "quality": "Quality",
+    "estimateCredits": "Estimated Credits",
+    "generate": "Generate Video",
+    "regenerate": "Regenerate",
+    "download": "Download",
+    "status": {
+      "pending": "Pending",
+      "generating": "Generating...",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "PricingCards": {
+    "pricing": "料金",
+    "slogan": "シンプルで分かりやすい料金体系",
+    "onetime": "買い切り",
+    "monthly": "月払い",
+    "yearly": "年払い",
+    "off_percent": "40%オフ",
+    "no_products": "利用可能な商品がありません",
+    "per_year": "/年",
+    "per_month": "/月",
+    "monthly_bill": "月払い",
+    "annual_bill": "年払い",
+    "mo": "/月",
+    "annual_info": "/年",
+    "monthly_info": "月額",
+    "go_to_dashboard": "ダッシュボードへ",
+    "signup": "新規登録",
+    "contact": "サポートまでお問い合わせください。",
+    "contact_2": "お気軽にご相談ください。",
+    "manage_subscription": "サブスクリプションを管理",
+    "upgrade": "アップグレード",
+    "credits": "クレジット",
+    "popular": "人気",
+    "processing": "処理中...",
+    "subscribers_only": "サブスクリプション会員限定",
+    "subscriber_pack_only": "このパックは、有効なサブスクリプションをご利用中の方のみ購入できます。",
+    "checkout_not_configured": "このプランの決済設定が完了していません。",
+    "checkout_error": "決済エラー",
+    "checkout_failed": "決済セッションを作成できませんでした。"
+  },
+  "PricingFaq": {
+    "faq": "よくある質問",
+    "faq_detail": "料金に関するよくある質問への回答をご覧いただけます"
+  },
+  "Sidebar": {
+    "title": "ナビゲーション",
+    "upgradeTitle": "Proにアップグレード",
+    "upgradeSubtitle": "より高速な生成と追加クレジットを利用できます"
+  },
+  "UpgradeModal": {
+    "default_title": "プランをアップグレード",
+    "default_description": "用途に合ったプランをお選びください",
+    "insufficient_credits_title": "クレジットが不足しています",
+    "insufficient_credits_description": "この生成には{required}クレジットが必要です。現在の残高は{available}です。クレジットパックを購入するか、プランを選択してください。",
+    "expired_title": "クレジットの有効期限が切れています",
+    "expired_description": "クレジットの有効期限が切れています。制作を続けるには、新しいパックを購入するかサブスクリプションに登録してください。"
+  },
+  "UserAccountNav": {
+    "dashboard": "ダッシュボード",
+    "billing": "お支払い",
+    "settings": "設定",
+    "sign_out": "ログアウト"
+  },
+  "NavBar": {
+    "login": "ログイン",
+    "signup": "新規登録"
+  },
+  "Login": {
+    "back": "戻る",
+    "welcome_back": "おかえりなさい",
+    "signin_title": "Googleまたはメールでログイン",
+    "singup_title": "アカウントをお持ちでない場合は、今すぐ登録してください。",
+    "signin_email": "認証コードを送信",
+    "signin_others": "または次の方法で続行",
+    "continue_google": "Googleで続行",
+    "signup": "新規登録",
+    "privacy": "メールアドレスとプロフィール画像のみ保存されます。",
+    "signup_github": "Githubで登録",
+    "create_account": "アカウントを作成",
+    "create_account_desc": "メールアドレスを入力してアカウントを作成してください",
+    "agree_prefix": "続行すると、以下に同意したものとみなされます：",
+    "terms_of_service": "利用規約",
+    "and": "および",
+    "privacy_policy": "プライバシーポリシー"
+  },
+  "SignInModal": {
+    "signin_title": "アカウントにログイン",
+    "signin_subtitle": "seedance.coを今すぐ始めましょう",
+    "privacy": "続行すると、利用規約およびプライバシーポリシーに同意したものとみなされます。",
+    "continue_google": "Googleで続行",
+    "or_continue_with": "または次の方法で続行",
+    "email_placeholder": "name@example.com",
+    "login_failed": "ログインに失敗しました",
+    "google_error": "Googleでログインできませんでした。もう一度お試しください。",
+    "terms_notice": "続行すると、利用規約およびプライバシーポリシーに同意したものとみなされます。"
+  },
+  "EmailOtp": {
+    "email_label": "メールアドレス",
+    "email_placeholder": "name@example.com",
+    "send_code": "認証コードを送信",
+    "sending": "送信中...",
+    "code_label": "認証コード",
+    "code_placeholder": "000000",
+    "sent_to": "{email} にコードを送信しました",
+    "change_email": "変更",
+    "verify": "認証してログイン",
+    "verifying": "認証中...",
+    "resend": "コードを再送信",
+    "resend_in": "{seconds}秒後に再送信",
+    "code_sent": "認証コードを送信しました",
+    "check_inbox": "{email} に届いた6桁のコードをご確認ください。",
+    "invalid_email": "有効なメールアドレスを入力してください。",
+    "invalid_code": "6桁の認証コードを入力してください。",
+    "send_error": "コードを送信できませんでした。もう一度お試しください。",
+    "verify_error": "コードが無効か期限切れです。もう一度お試しください。",
+    "verify_request_error": "コードを確認できませんでした。接続を確認してもう一度お試しください。"
+  },
+  "MainNav": {
+    "introducing": "seedance.coのご紹介"
+  },
+  "SiteFooter": {
+    "copyright": "© {currentYear} seedance.co. All rights reserved."
+  },
+  "Mail": {
+    "common": {
+      "team": "{name}チーム",
+      "copyright": "© {year} All Rights Reserved."
+    },
+    "welcome": {
+      "subject": "seedance.coへようこそ！",
+      "greeting": "{name}さん、こんにちは。",
+      "title": "seedance.coへようこそ！",
+      "body": "seedance.coにご登録いただき、ありがとうございます。ご利用いただけることを心よりうれしく思います。",
+      "features": "seedance.coでは、次のことができます。",
+      "featuresList": {
+        "generate": "魅力的なAI動画を数分で生成",
+        "models": "Sora 2やVeo 3.1など、複数のAIモデルを利用",
+        "share": "作品をダウンロードして自由に共有"
+      },
+      "cta": "動画制作を始める",
+      "footer": "ご不明な点がございましたら、サポートチームまでお気軽にお問い合わせください。"
+    },
+    "resetPassword": {
+      "subject": "パスワードの再設定",
+      "greeting": "{name}さん、こんにちは。",
+      "title": "パスワードを再設定",
+      "body": "seedance.coアカウントのパスワード再設定リクエストを受け付けました。",
+      "instruction": "以下のボタンをクリックして、パスワードを再設定してください。",
+      "button": "パスワードを再設定",
+      "validity": "このリンクの有効期限は30分で、使用できるのは1回限りです。",
+      "security": "セキュリティ保護のため、このリンクは30分後に無効になります。",
+      "ignore": "パスワードの再設定をリクエストしていない場合は、このメールを無視してください。",
+      "footer": "このリクエストに心当たりがない場合は、このメールを無視してください。"
+    },
+    "emailOtp": {
+      "subject": "seedance.coの認証コード",
+      "greeting": "{name}さん、こんにちは。",
+      "title": "seedance.coの認証コード",
+      "body": "seedance.coアカウントへのログインリクエストを受け付けました。",
+      "instruction": "続行するには、次の認証コードを入力してください。",
+      "validity": "このコードの有効期限は5分です。",
+      "security": "セキュリティ保護のため、このコードは1回のみ使用できます。",
+      "footer": "このリクエストに心当たりがない場合は、このメールを無視してください。"
+    }
+  },
+  "Emails": {
+    "welcome": {
+      "subject": "seedance.coへようこそ！",
+      "greeting": "{name}さん、こんにちは。",
+      "title": "seedance.coへようこそ！",
+      "body": "seedance.coにご登録いただき、ありがとうございます。ご利用いただけることを心よりうれしく思います。",
+      "features": "seedance.coでは、次のことができます。",
+      "featuresList": {
+        "generate": "魅力的なAI動画を数分で生成",
+        "models": "Sora 2やVeo 3.1など、複数のAIモデルを利用",
+        "share": "作品をダウンロードして自由に共有"
+      },
+      "cta": "動画制作を始める",
+      "footer": "ご不明な点がございましたら、サポートチームまでお気軽にお問い合わせください。",
+      "copyright": "© {year} seedance.co. All rights reserved."
+    },
+    "resetPassword": {
+      "subject": "パスワードの再設定",
+      "greeting": "{name}さん、こんにちは。",
+      "title": "パスワードを再設定",
+      "body": "seedance.coアカウントのパスワード再設定リクエストを受け付けました。",
+      "instruction": "以下のボタンをクリックして、パスワードを再設定してください。",
+      "button": "パスワードを再設定",
+      "validity": "このリンクの有効期限は30分で、使用できるのは1回限りです。",
+      "ignore": "パスワードの再設定をリクエストしていない場合は、このメールを無視してください。",
+      "security": "セキュリティ保護のため、このリンクは30分後に無効になります。",
+      "footer": "このリクエストに心当たりがない場合は、このメールを無視してください。",
+      "copyright": "© {year} seedance.co. All rights reserved."
+    }
+  },
+  "dashboard": {
+    "myCreations": {
+      "title": "マイ作品",
+      "filter": {
+        "allStatus": "すべてのステータス",
+        "all": "すべて",
+        "completed": "完了",
+        "processing": "処理中",
+        "generating": "生成中",
+        "failed": "失敗",
+        "allModels": "すべてのモデル",
+        "newest": "新しい順",
+        "oldest": "古い順"
+      },
+      "status": {
+        "pending": "待機中",
+        "generating": "生成中...",
+        "uploading": "アップロード中...",
+        "completed": "完了",
+        "processing": "処理中...",
+        "failed": "失敗"
+      },
+      "actions": {
+        "play": "再生",
+        "download": "ダウンロード",
+        "delete": "削除",
+        "retry": "再試行",
+        "viewDetails": "詳細を見る",
+        "downloadSuccess": "ダウンロードを開始しました",
+        "downloadError": "動画をダウンロードできませんでした",
+        "deleteSuccess": "動画を削除しました",
+        "deleteError": "動画を削除できませんでした",
+        "retrySuccess": "再試行を開始しました",
+        "retryError": "再試行できませんでした"
+      },
+      "empty": {
+        "title": "作品はまだありません",
+        "description": "生成した動画がここに表示されます"
+      },
+      "deleteConfirm": {
+        "title": "動画を削除しますか？",
+        "message": "この操作は取り消せません。",
+        "confirm": "削除",
+        "cancel": "キャンセル"
+      },
+      "detail": {
+        "model": "モデル",
+        "duration": "長さ",
+        "aspectRatio": "アスペクト比",
+        "prompt": "プロンプト",
+        "createdAt": "作成日時",
+        "creditsUsed": "使用クレジット"
+      }
+    },
+    "credits": {
+      "title": "クレジット",
+      "available": "利用可能なクレジット",
+      "frozen": "保留中",
+      "used": "使用済み",
+      "buyCredits": "クレジットを購入",
+      "history": "クレジット履歴",
+      "loadMore": "さらに表示",
+      "types": {
+        "new_user": "登録ボーナス",
+        "order_pay": "クレジットパック",
+        "subscription": "サブスクリプション",
+        "video_consume": "動画生成",
+        "refund": "払い戻し",
+        "expired": "期限切れ",
+        "system_adjust": "管理者による調整"
+      }
+    },
+    "settings": {
+      "title": "請求情報",
+      "account": "アカウント",
+      "email": "メールアドレス",
+      "userId": "ユーザーID",
+      "joined": "登録日",
+      "billingHistory": "購入履歴",
+      "status": {
+        "paid": "支払い済み",
+        "pending": "処理待ち",
+        "failed": "失敗"
+      }
+    }
+  },
+  "VideoHistory": {
+    "title": "最近の生成",
+    "demoTitle": "サンプル動画",
+    "generating": "動画を生成しています...",
+    "download": "ダウンロード",
+    "copyLink": "リンクをコピー",
+    "removeFromHistory": "履歴から削除",
+    "generationFailed": "生成に失敗しました",
+    "promptCopied": "プロンプトをクリップボードにコピーしました",
+    "copyPrompt": "プロンプトをコピー",
+    "moreCreations": "他の作品を見る"
+  },
+  "Navigation": {
+    "home": "ホーム",
+    "videoTools": "動画ツール",
+    "textToVideo": "テキストから動画",
+    "imageToVideo": "画像から動画",
+    "account": "アカウント",
+    "openMenu": "メニューを開く",
+    "createAccount": "アカウントを作成",
+    "studio": "スタジオ"
+  },
+  "GeneratorPanel": {
+    "titleText": "テキストから動画",
+    "titleImage": "画像から動画",
+    "prompt": "プロンプト",
+    "enhance": "プロンプトを強化",
+    "placeholder": "作成したい動画を説明してください。例：自然光の中、カメラがゆっくり前進する映画的なクローズアップ...",
+    "aiPrompt": "AIプロンプト",
+    "images": "画像",
+    "firstFrame": "開始フレーム",
+    "lastFrame": "終了フレーム",
+    "upload": "クリックしてアップロード",
+    "recent": "マイ作品",
+    "settings": "設定",
+    "model": "モデル",
+    "ratio": "アスペクト比",
+    "duration": "長さ",
+    "nativeDuration": "ネイティブ",
+    "extendedDuration": "公式延長",
+    "unavailableDuration": "利用不可",
+    "resolution": "解像度",
+    "outputs": "生成数",
+    "audio": "音声を生成",
+    "watermark": "透かしを削除",
+    "credits": "推定コスト",
+    "generate": "生成",
+    "generating": "生成中...",
+    "fileError": "10MB以下のJPG、PNG、WEBP、GIF画像をアップロードしてください。",
+    "enhancementSuffix": "、映画的な構図、自然な照明、一貫した被写体の動き、ゆっくりとしたカメラの前進、鮮明なディテール、安定した動き",
+    "seconds": "秒",
+    "noModels": "このツールで有効な動画モデルがありません。",
+    "videoModels": "動画モデル"
+  },
+  "Legal": {
+    "Privacy": {
+      "title": "プライバシーポリシー",
+      "lastUpdated": "最終更新：{year}年",
+      "introductionTitle": "1. はじめに",
+      "introductionBody": "seedance.coへようこそ。当社はお客様のプライバシーを尊重し、個人データの保護に努めます。",
+      "collectionTitle": "2. 収集するデータ",
+      "collectionBody": "アカウント作成、動画生成、支払い、またはサポートへのお問い合わせ時に提供された情報を収集します。",
+      "usageTitle": "3. データの利用目的",
+      "usageBody": "サービスの提供と改善、取引処理、AI動画生成、不正利用防止、アカウントおよび取引履歴の管理にデータを使用します。",
+      "securityTitle": "4. データセキュリティ",
+      "securityBody": "個人情報を保護するため適切な技術的・組織的対策を講じますが、インターネットサービスの絶対的な安全性は保証できません。",
+      "contactTitle": "5. お問い合わせ",
+      "contactBody": "プライバシーに関するご質問は <email>{address}</email> までご連絡ください。"
+    },
+    "Terms": {
+      "title": "利用規約",
+      "lastUpdated": "最終更新：{year}年",
+      "acceptanceTitle": "1. 規約への同意",
+      "acceptanceBody": "seedance.coにアクセスまたは利用することで、本利用規約に同意したものとみなされます。同意しない場合はサービスを利用しないでください。",
+      "licenseTitle": "2. サービスの利用",
+      "licenseBody": "適用法および第三者の権利を守ってサービスを利用してください。プロンプト、アップロード、生成コンテンツについてはお客様が責任を負います。",
+      "disclaimerTitle": "3. 免責事項",
+      "disclaimerBody": "サービスは「現状有姿」かつ「提供可能な範囲」で提供されます。AI生成結果は不正確、利用不能、または期待と異なる場合があります。",
+      "limitationsTitle": "4. 責任の制限",
+      "limitationsBody": "法令で認められる最大限の範囲で、seedance.coおよびその提供者は、サービス利用に起因する間接的、偶発的、特別、結果的または懲罰的損害について責任を負いません。",
+      "contactTitle": "5. お問い合わせ",
+      "contactBody": "本規約に関するご質問は <email>{address}</email> までご連絡ください。"
+    }
+  }
+}

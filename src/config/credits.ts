@@ -21,7 +21,7 @@ export interface CreditPackageConfig {
   credits: number;           // 积分数量
   price: CreditPackagePrice;
   type: ProductType;
-  billingPeriod?: "month" | "year";
+  billingPeriod?: "month" | "quarter" | "year";
   popular?: boolean;
   disabled?: boolean;
   expireDays?: number;       // 覆盖默认过期天数
@@ -55,7 +55,9 @@ export interface ModelConfig {
     base: number;            // 基础积分（10s）
     perExtraSecond?: number; // 每额外秒积分
     highQualityMultiplier?: number; // 高质量乘数
+    perQuality?: Record<string, number>;
   };
+  availability: "active" | "coming_soon" | "hidden";
   /** Whether the model is enabled (default: true). Disabled models can still be shown with a badge */
   enabled?: boolean;
   /** Optional badge text for disabled/upcoming models (e.g., "Coming Soon") */
@@ -109,13 +111,12 @@ export const CREDITS_CONFIG = {
   // ========== 订阅产品（从 pricing-user.ts 生成）==========
   subscriptions: Object.fromEntries(
     SUBSCRIPTION_PRODUCTS.filter((p) => p.enabled).map((product) => {
-      const isYearly = product.period === "year";
-      const planType = product.id.includes("basic")
-        ? "BASIC"
-        : product.id.includes("pro")
-          ? "PRO"
-          : "TEAM";
-      const envKey = isYearly ? "YEARLY" : "MONTHLY";
+      const expireDays =
+        product.period === "year"
+          ? 366
+          : product.period === "quarter"
+            ? 93
+            : 31;
 
       return [
         product.id,
@@ -130,7 +131,7 @@ export const CREDITS_CONFIG = {
           type: "subscription" as const,
           billingPeriod: product.period,
           popular: product.popular,
-          expireDays: isYearly ? 365 : undefined,
+          expireDays,
           features: product.features || [],
         },
       ];
@@ -164,7 +165,10 @@ export const CREDITS_CONFIG = {
     Object.entries(VIDEO_MODEL_PRICING)
       .map(([modelId, pricing]) => {
         // 模型基础配置（从 defaults.ts 获取）
-        const baseConfigs: Record<string, Omit<ModelConfig, "creditCost">> = {
+        const baseConfigs: Record<
+          string,
+          Omit<ModelConfig, "creditCost" | "availability">
+        > = {
           "zhipu-video": {
             id: "zhipu-video",
             name: "AI Video",
@@ -181,6 +185,40 @@ export const CREDITS_CONFIG = {
             durations: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
             aspectRatios: ["16:9", "9:16", "1:1"],
             qualities: ["speed", "quality"],
+          },
+          "seedance-2.0-mini": {
+            id: "seedance-2.0-mini",
+            name: "Seedance 2.0 Mini",
+            provider: "evolink" as const,
+            description: "Fast, cost-efficient Seedance 2.0 generation",
+            supportImageToVideo: true,
+            supportAudio: true,
+            supportRemoveWatermark: false,
+            maxDuration: 15,
+            durationDisplayMin: 4,
+            durationDisplayMax: 15,
+            nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            extendedDurations: [],
+            durations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "adaptive"],
+            qualities: ["480P", "720P"],
+          },
+          "seedance-2.0": {
+            id: "seedance-2.0",
+            name: "Seedance 2.0",
+            provider: "evolink" as const,
+            description: "Premium Seedance 2.0 generation with 1080p output",
+            supportImageToVideo: true,
+            supportAudio: true,
+            supportRemoveWatermark: false,
+            maxDuration: 15,
+            durationDisplayMin: 4,
+            durationDisplayMax: 15,
+            nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            extendedDurations: [],
+            durations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "adaptive"],
+            qualities: ["480P", "720P", "1080P"],
           },
           "sora-2": {
             id: "sora-2",
@@ -216,14 +254,31 @@ export const CREDITS_CONFIG = {
           "seedance-1.5-pro": {
             id: "seedance-1.5-pro",
             name: "Seedance 1.5 Pro",
-            provider: "apimart" as const,
+            provider: "evolink" as const,
             description: "models.seedance.description",
             supportImageToVideo: true,
             supportAudio: true,
             maxDuration: 12,
-            durations: [4, 5, 6, 8, 10, 12],
+            durationDisplayMin: 4,
+            durationDisplayMax: 12,
+            nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12],
+            extendedDurations: [],
+            durations: [4, 5, 6, 7, 8, 9, 10, 11, 12],
             aspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9"],
             qualities: ["480P", "720P", "1080P"],
+          },
+          "seedance-2.5": {
+            id: "seedance-2.5",
+            name: "Seedance 2.5",
+            provider: "evolink" as const,
+            description: "Next-generation Seedance model",
+            supportImageToVideo: true,
+            supportAudio: true,
+            supportRemoveWatermark: false,
+            maxDuration: 15,
+            durations: [5],
+            aspectRatios: ["16:9", "9:16"],
+            qualities: ["720P"],
           },
           "seedance-1.0-pro-fast": {
             id: "seedance-1.0-pro-fast",
@@ -258,6 +313,7 @@ export const CREDITS_CONFIG = {
           base: number;
           perExtraSecond: number;
           highQualityMultiplier?: number;
+          perQuality?: Record<string, number>;
         } = {
           base: pricing.baseCredits,
           perExtraSecond: pricing.perSecond,
@@ -266,14 +322,23 @@ export const CREDITS_CONFIG = {
         if (pricing.qualityMultiplier !== undefined) {
           creditCost.highQualityMultiplier = pricing.qualityMultiplier;
         }
+        if (pricing.creditsPerSecondByQuality) {
+          creditCost.perQuality = pricing.creditsPerSecondByQuality;
+        }
+
+        const availability =
+          pricing.availability ?? (pricing.enabled ? "active" : "hidden");
 
         return [
           modelId,
           {
             ...baseConfig,
             creditCost,
-            enabled: pricing.enabled,
-            badge: pricing.enabled ? undefined : "Coming Soon",
+            availability,
+            enabled: pricing.enabled && availability === "active",
+            badge:
+              pricing.badge ??
+              (availability === "coming_soon" ? "Coming Soon" : undefined),
           },
         ];
       })
@@ -330,7 +395,11 @@ export function getAvailableModels(options?: {
   const displayOrder = Object.keys(VIDEO_MODEL_PRICING);
   const orderMap = new Map(displayOrder.map((id, index) => [id, index]));
   return Object.values(CREDITS_CONFIG.models)
-    .filter((model) => !enabledOnly || model.enabled !== false)
+    .filter(
+      (model) =>
+        (!enabledOnly || model.enabled !== false) &&
+        model.availability === "active"
+    )
     .filter((model) => {
       const effectiveProvider = provider || model.provider;
       if (!isModelSupported(model.id, effectiveProvider)) return false;
@@ -342,6 +411,28 @@ export function getAvailableModels(options?: {
     const bOrder = orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER;
     return aOrder - bOrder;
   });
+}
+
+/** Product model catalog, including disabled Coming Soon entries. */
+export function getModelCatalog(options?: {
+  mode?: GenerationMode;
+}): ModelConfig[] {
+  const displayOrder = Object.keys(VIDEO_MODEL_PRICING);
+  const orderMap = new Map(displayOrder.map((id, index) => [id, index]));
+
+  return Object.values(CREDITS_CONFIG.models)
+    .filter((model) => model.availability !== "hidden")
+    .filter(
+      (model) =>
+        !options?.mode ||
+        options.mode === "text-to-video" ||
+        model.supportImageToVideo
+    )
+    .sort(
+      (a, b) =>
+        (orderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+        (orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+    );
 }
 
 /** 根据模型 ID 获取配置 */
@@ -357,7 +448,12 @@ export function calculateModelCredits(
   const config = getModelConfig(modelId);
   if (!config) return 0;
 
-  const { base, perExtraSecond = 0, highQualityMultiplier = 1 } = config.creditCost;
+  const {
+    base,
+    perExtraSecond = 0,
+    highQualityMultiplier = 1,
+    perQuality,
+  } = config.creditCost;
 
   const parseQualityToResolution = (quality?: string): number => {
     if (!quality) return 720;
@@ -371,7 +467,10 @@ export function calculateModelCredits(
   const resolution = parseQualityToResolution(params.quality);
   const isHighQuality = resolution >= 1080 || params.quality?.toLowerCase() === "high";
 
-  const configuredPerSecond = perExtraSecond > 0 ? perExtraSecond : base;
+  const normalizedQuality = params.quality?.toLowerCase();
+  const configuredPerSecond =
+    (normalizedQuality ? perQuality?.[normalizedQuality] : undefined) ??
+    (perExtraSecond > 0 ? perExtraSecond : base);
   const qualityMultiplier = isHighQuality ? highQualityMultiplier : 1;
   // Resolve the integer one-second price first. This guarantees that N
   // seconds always costs exactly N times the one-second price.

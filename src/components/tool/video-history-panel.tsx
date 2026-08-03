@@ -76,7 +76,7 @@ export function VideoHistoryPanel({
             onClick={() => router.push("my-creations")}
             className="h-7 text-xs text-zinc-400 hover:text-white hover:bg-zinc-800"
           >
-            More Creations
+            {t("moreCreations")}
             <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
         )}

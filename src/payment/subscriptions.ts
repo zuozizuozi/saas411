@@ -1,21 +1,24 @@
-import { priceDataMap } from "@/config/price/price-data";
+import {
+  priceDataMap,
+  type BillingPeriod,
+} from "@/config/price/price-data";
 
 export interface SubscriptionPlan {
   title: string;
   description: string;
   benefits: string[];
   limitations: string[];
-  prices: { monthly: number; yearly: number };
-  stripeIds: { monthly: string | null; yearly: string | null };
+  prices: Record<BillingPeriod, number>;
+  stripeIds: Record<BillingPeriod, string | null>;
 }
 
 const freePlan: SubscriptionPlan = {
   title: "Free",
-  description: "Try seedance.co",
-  benefits: ["Free starter credits", "Standard queue"],
-  limitations: ["One concurrent generation", "No batch output"],
-  prices: { monthly: 0, yearly: 0 },
-  stripeIds: { monthly: null, yearly: null },
+  description: "Create an account, then subscribe or purchase credits",
+  benefits: ["Account access", "Pricing and model cost preview"],
+  limitations: ["Video generation requires paid credits"],
+  prices: { month: 0, quarter: 0, year: 0 },
+  stripeIds: { month: null, quarter: null, year: null },
 };
 
 /** Billing and UI now share the same product catalogue and Stripe price IDs. */

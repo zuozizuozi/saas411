@@ -7,6 +7,8 @@ node_modules
 
 # testing
 coverage
+.tmp/
+outputs/
 
 # next.js
 .next/

@@ -41,8 +41,12 @@
 export interface VideoModelPricing {
   baseCredits: number;
   perSecond: number;
+  /** Optional exact site-credit rate per generated second by output quality. */
+  creditsPerSecondByQuality?: Record<string, number>;
   qualityMultiplier?: number;
   enabled: boolean;
+  availability?: "active" | "coming_soon" | "hidden";
+  badge?: string;
 }
 
 /** 订阅产品配置 */
@@ -51,11 +55,13 @@ export interface SubscriptionProductConfig {
   name: string;
   priceUsd: number;
   credits: number;
-  period: "month" | "year";
+  period: "month" | "quarter" | "year";
   popular?: boolean;
   enabled: boolean;
   features?: string[];
 }
+
+export type SubscriptionPeriod = SubscriptionProductConfig["period"];
 
 /** 积分包配置 */
 export interface CreditPackageConfig {
@@ -79,9 +85,9 @@ export interface CreditPackageConfig {
  */
 export const NEW_USER_GIFT = {
   /** 是否启用赠送 */
-  enabled: true,
+  enabled: false,
   /** 赠送积分数量 */
-  credits: 2,  // 1 个 Sora 2 视频
+  credits: 0,
   /** 积分有效期（天）*/
   validDays: 30,
 };
@@ -117,69 +123,111 @@ export const CREDIT_EXPIRATION = {
  * ⚠️ 重要：id 字段必须是 Creem 后台的 Product ID（格式：prod_xxx）
  * 在 Creem 后台创建产品后，复制 Product ID 到下方对应的 id 字段
  */
-export const SUBSCRIPTION_PRODUCTS = [
+const PAID_PLAN_FEATURES = [
+  "all_models",
+  "text_image_video",
+  "model_quality_audio",
+  "generation_status_history",
+  "credit_cost_preview",
+  "failed_credit_return",
+  "no_platform_watermark",
+];
+
+export const SUBSCRIPTION_PRODUCTS: SubscriptionProductConfig[] = [
   // ===== 月付订阅 =====
   {
     id: "sub_basic_monthly",
-    name: "Basic Plan",
+    name: "Go Plan",
     priceUsd: 9.9,
-    credits: 280, // ~28 Veo 3.1 视频 (60% 毛利率)
-    period: "month" as const,
+    credits: 280,
+    period: "month",
     popular: false,
     enabled: true,
-    features: ["hd_videos", "fast_generation"],
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "sub_pro_monthly",
-    name: "Pro Plan",
+    name: "Plus Plan",
     priceUsd: 29.9,
-    credits: 960, // ~96 Veo 3.1 视频 (55% 毛利率，比 Basic 便宜 12%)
-    period: "month" as const,
-    popular: true, // 推荐
+    credits: 900,
+    period: "month",
+    popular: true,
     enabled: true,
-    features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use"],
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "sub_business_monthly",
-    name: "Ultimate Plan",
+    name: "Pro Plan",
     priceUsd: 79.9,
-    credits: 2850, // ~285 Veo 3.1 视频 (50% 毛利率，比 Basic 便宜 21%)
-    period: "month" as const,
+    credits: 2520,
+    period: "month",
     popular: false,
     enabled: true,
-    features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use", "priority_support", "api_access"],
+    features: PAID_PLAN_FEATURES,
   },
 
-  // ===== 年付订阅（月付 × 10，买 10 送 2） =====
+  // ===== 季付订阅（5% OFF） =====
   {
-    id: "sub_basic_yearly",
-    name: "Basic Plan (Yearly)",
-    priceUsd: 99, // 月付 × 10 (省 2 个月)
-    credits: 3360, // 280 × 12
-    period: "year" as const,
+    id: "sub_basic_quarterly",
+    name: "Go Plan (Quarterly)",
+    priceUsd: 28.22,
+    credits: 840,
+    period: "quarter",
     popular: false,
     enabled: true,
-    features: ["hd_videos", "fast_generation"],
+    features: PAID_PLAN_FEATURES,
+  },
+  {
+    id: "sub_pro_quarterly",
+    name: "Plus Plan (Quarterly)",
+    priceUsd: 85.22,
+    credits: 2700,
+    period: "quarter",
+    popular: true,
+    enabled: true,
+    features: PAID_PLAN_FEATURES,
+  },
+  {
+    id: "sub_business_quarterly",
+    name: "Pro Plan (Quarterly)",
+    priceUsd: 227.72,
+    credits: 7560,
+    period: "quarter",
+    popular: false,
+    enabled: true,
+    features: PAID_PLAN_FEATURES,
+  },
+
+  // ===== 年付订阅（10% OFF） =====
+  {
+    id: "sub_basic_yearly",
+    name: "Go Plan (Yearly)",
+    priceUsd: 106.92,
+    credits: 3360,
+    period: "year",
+    popular: false,
+    enabled: true,
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "sub_pro_yearly",
-    name: "Pro Plan (Yearly)",
-    priceUsd: 299, // 月付 × 10 (省 2 个月)
-    credits: 11520, // 960 × 12
-    period: "year" as const,
+    name: "Plus Plan (Yearly)",
+    priceUsd: 322.92,
+    credits: 10800,
+    period: "year",
     popular: true,
     enabled: true,
-    features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use"],
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "sub_business_yearly",
-    name: "Ultimate Plan (Yearly)",
-    priceUsd: 799, // 月付 × 10 (省 2 个月)
-    credits: 34200, // 2850 × 12
-    period: "year" as const,
+    name: "Pro Plan (Yearly)",
+    priceUsd: 862.92,
+    credits: 30240,
+    period: "year",
     popular: false,
     enabled: true,
-    features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use", "priority_support", "api_access"],
+    features: PAID_PLAN_FEATURES,
   },
 ];
 
@@ -204,31 +252,31 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
     id: "pack_starter",
     name: "Starter Pack",
     priceUsd: 14.9,
-    credits: 280, // 和 Basic 月付积分相同
-    popular: true, // 推荐
+    credits: 280,
+    popular: true,
     enabled: true,
-    allowFreeUser: true, // 所有用户可购买
-    features: ["hd_videos", "fast_generation"],
+    allowFreeUser: true,
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "pack_standard",
     name: "Standard Pack",
-    priceUsd: 39.9, // 比月付 Pro 贵 33%
-    credits: 960, // 和 Pro 月付积分相同
+    priceUsd: 39.9,
+    credits: 900,
     popular: false,
     enabled: true,
-    allowFreeUser: false, // 仅订阅用户
-    features: ["hd_videos", "fast_generation", "no_watermark"],
+    allowFreeUser: true,
+    features: PAID_PLAN_FEATURES,
   },
   {
     id: "pack_pro",
-    name: "Pro Pack",
-    priceUsd: 99.9, // 比月付 Ultimate 贵 25%
-    credits: 2850, // 和 Ultimate 月付积分相同
+    name: "Premium Pack",
+    priceUsd: 99.9,
+    credits: 2520,
     popular: false,
     enabled: true,
-    allowFreeUser: false, // 仅订阅用户
-    features: ["hd_videos", "fast_generation", "no_watermark", "commercial_use"],
+    allowFreeUser: true,
+    features: PAID_PLAN_FEATURES,
   },
 ];
 
@@ -256,19 +304,61 @@ export const CREDIT_PACKAGES: CreditPackageConfig[] = [
  * - qualityMultiplier: 画质乘数（1080p vs 720p）
  */
 export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
-  /** AI Video - one site credit per generated second. */
+  /** Legacy provider route retained for rollback, but hidden from the product. */
   "zhipu-video": {
     baseCredits: 0,
     perSecond: 1,
-    enabled: true,
+    enabled: false,
+    availability: "hidden",
   },
 
-  /** Seedance 1.5 Pro - 按秒计费（默认有音频） */
+  /** Seedance 2.0 Mini - recommended launch model. */
+  "seedance-2.0-mini": {
+    baseCredits: 0,
+    perSecond: 14,
+    creditsPerSecondByQuality: {
+      "480p": 7,
+      "720p": 14,
+    },
+    enabled: true,
+    availability: "active",
+    badge: "Recommended",
+  },
+
+  /** Seedance 2.0 - premium launch model. */
+  "seedance-2.0": {
+    baseCredits: 0,
+    perSecond: 28,
+    creditsPerSecondByQuality: {
+      "480p": 14,
+      "720p": 28,
+      "1080p": 56,
+    },
+    enabled: true,
+    availability: "active",
+    badge: "Pro",
+  },
+
+  /** Seedance 1.5 Pro - observed provider rates doubled and rounded up. */
   "seedance-1.5-pro": {
     baseCredits: 0,
-    perSecond: 4, // 720p 有音频: 3.557 Credits/秒 → 4 积分/秒
-    qualityMultiplier: 2, // 1080p = 720p × 2
+    perSecond: 8,
+    creditsPerSecondByQuality: {
+      "480p": 4,
+      "720p": 8,
+      "1080p": 16,
+    },
+    enabled: true,
+    availability: "active",
+  },
+
+  /** Catalog placeholder only; no provider route is enabled. */
+  "seedance-2.5": {
+    baseCredits: 0,
+    perSecond: 0,
     enabled: false,
+    availability: "coming_soon",
+    badge: "Coming Soon",
   },
 
   /** Seedance 1.0 Pro Fast - 快速生成（APImart） */
@@ -277,6 +367,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     perSecond: 3, // 按秒计费
     qualityMultiplier: 2,
     enabled: false,
+    availability: "hidden",
   },
 
   /** Seedance 1.0 Pro Quality - 高质量生成（APImart） */
@@ -285,6 +376,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     perSecond: 5, // 高质量，每秒积分更高
     qualityMultiplier: 2,
     enabled: false,
+    availability: "hidden",
   },
 
   /** Veo 3.1 Fast Lite - Google (暂时隐藏) */
@@ -292,6 +384,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     baseCredits: 0,
     perSecond: 2,
     enabled: false,
+    availability: "hidden",
   },
 
   /** Sora 2 Lite - OpenAI (暂时隐藏) */
@@ -299,6 +392,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     baseCredits: 0,
     perSecond: 1,
     enabled: false,
+    availability: "hidden",
   },
 
   /** Wan 2.6 (暂时隐藏) */
@@ -307,6 +401,7 @@ export const VIDEO_MODEL_PRICING: Record<string, VideoModelPricing> = {
     perSecond: 5,
     qualityMultiplier: 2,
     enabled: false,
+    availability: "hidden",
   },
 };
 

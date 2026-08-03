@@ -1,76 +1,146 @@
+import { SUBSCRIPTION_PRODUCTS, type SubscriptionPeriod } from "@/config/pricing-user";
 import { SubscriptionPlan } from "@/db";
-import { SUBSCRIPTION_PRODUCTS } from "@/config/pricing-user";
 
 import { env } from "./env.mjs";
 
 type PlanType = (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];
+type PlanName = "Go Plan" | "Plus Plan" | "Pro Plan";
 
-const planMap: Record<string, PlanType> = {};
-const registerPlan = (priceId: string | undefined, plan: PlanType) => {
-  if (priceId) {
-    planMap[priceId] = plan;
-  }
+type Registration = {
+  priceId?: string;
+  plan: PlanType;
+  name: PlanName;
+  period: SubscriptionPeriod;
 };
 
-registerPlan(env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID, SubscriptionPlan.PRO);
-registerPlan(env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID, SubscriptionPlan.PRO);
-registerPlan(env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID, SubscriptionPlan.BASIC);
-registerPlan(env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID, SubscriptionPlan.BASIC);
-registerPlan(
-  env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID,
-  SubscriptionPlan.BUSINESS
-);
-registerPlan(
-  env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID,
-  SubscriptionPlan.BUSINESS
-);
+export type SubscriptionPriceDetails = SubscriptionCreditGrant & {
+  priceId: string;
+  plan: PlanType;
+  period: SubscriptionPeriod;
+  rank: number;
+};
 
-export const PLANS = planMap;
+const registrations: Registration[] = [
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID,
+    plan: SubscriptionPlan.BASIC,
+    name: "Go Plan",
+    period: "month",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BASIC_QUARTERLY_PRICE_ID,
+    plan: SubscriptionPlan.BASIC,
+    name: "Go Plan",
+    period: "quarter",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID,
+    plan: SubscriptionPlan.BASIC,
+    name: "Go Plan",
+    period: "year",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
+    plan: SubscriptionPlan.PRO,
+    name: "Plus Plan",
+    period: "month",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_PRO_QUARTERLY_PRICE_ID,
+    plan: SubscriptionPlan.PRO,
+    name: "Plus Plan",
+    period: "quarter",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
+    plan: SubscriptionPlan.PRO,
+    name: "Plus Plan",
+    period: "year",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID,
+    plan: SubscriptionPlan.BUSINESS,
+    name: "Pro Plan",
+    period: "month",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BUSINESS_QUARTERLY_PRICE_ID,
+    plan: SubscriptionPlan.BUSINESS,
+    name: "Pro Plan",
+    period: "quarter",
+  },
+  {
+    priceId: env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID,
+    plan: SubscriptionPlan.BUSINESS,
+    name: "Pro Plan",
+    period: "year",
+  },
+];
 
-export function isSubscriptionCreditInvoiceReason(reason: string | null) {
-  return reason === "subscription_create" || reason === "subscription_cycle";
-}
+const planMap: Record<string, PlanType> = {};
 
-type SubscriptionCreditGrant = {
+export type SubscriptionCreditGrant = {
   credits: number;
   expiryDays: number;
   name: string;
 };
 
 const subscriptionCreditMap: Record<string, SubscriptionCreditGrant> = {};
+const subscriptionPriceDetailsMap: Record<string, SubscriptionPriceDetails> = {};
 
-function registerCreditGrant(
-  priceId: string | undefined,
-  planName: "Basic Plan" | "Pro Plan" | "Ultimate Plan",
-  period: "month" | "year"
-) {
-  if (!priceId) return;
+const planRank: Record<PlanType, number> = {
+  [SubscriptionPlan.FREE]: 0,
+  [SubscriptionPlan.BASIC]: 1,
+  [SubscriptionPlan.PRO]: 2,
+  [SubscriptionPlan.BUSINESS]: 3,
+};
+
+function getProductName(name: PlanName, period: SubscriptionPeriod): string {
+  return period === "year"
+    ? `${name} (Yearly)`
+    : period === "quarter"
+      ? `${name} (Quarterly)`
+      : name;
+}
+
+function getExpiryDays(period: SubscriptionPeriod): number {
+  return period === "year" ? 366 : period === "quarter" ? 93 : 31;
+}
+
+for (const registration of registrations) {
+  if (!registration.priceId) continue;
+
+  planMap[registration.priceId] = registration.plan;
   const product = SUBSCRIPTION_PRODUCTS.find(
-    (item) => item.name === `${planName}${period === "year" ? " (Yearly)" : ""}`
+    (item) => item.name === getProductName(registration.name, registration.period)
   );
-  if (!product) return;
+  if (!product) continue;
 
-  subscriptionCreditMap[priceId] = {
+  subscriptionCreditMap[registration.priceId] = {
     credits: product.credits,
-    expiryDays: period === "year" ? 366 : 31,
+    expiryDays: getExpiryDays(registration.period),
+    name: product.name,
+  };
+  subscriptionPriceDetailsMap[registration.priceId] = {
+    priceId: registration.priceId,
+    plan: registration.plan,
+    period: registration.period,
+    rank: planRank[registration.plan],
+    credits: product.credits,
+    expiryDays: getExpiryDays(registration.period),
     name: product.name,
   };
 }
 
-registerCreditGrant(env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID, "Basic Plan", "month");
-registerCreditGrant(env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID, "Basic Plan", "year");
-registerCreditGrant(env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID, "Pro Plan", "month");
-registerCreditGrant(env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID, "Pro Plan", "year");
-registerCreditGrant(
-  env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID,
-  "Ultimate Plan",
-  "month"
-);
-registerCreditGrant(
-  env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID,
-  "Ultimate Plan",
-  "year"
-);
+export const PLANS = planMap;
+
+export function isSubscriptionCreditInvoiceReason(reason: string | null) {
+  return (
+    reason === "subscription_create" ||
+    reason === "subscription_cycle" ||
+    reason === "subscription_update"
+  );
+}
 
 export function getSubscriptionPlan(priceId: string | undefined): PlanType {
   return priceId && PLANS[priceId] ? PLANS[priceId]! : SubscriptionPlan.FREE;
@@ -80,4 +150,10 @@ export function getSubscriptionCreditGrant(
   priceId: string | undefined
 ): SubscriptionCreditGrant | undefined {
   return priceId ? subscriptionCreditMap[priceId] : undefined;
+}
+
+export function getSubscriptionPriceDetails(
+  priceId: string | undefined
+): SubscriptionPriceDetails | undefined {
+  return priceId ? subscriptionPriceDetailsMap[priceId] : undefined;
 }

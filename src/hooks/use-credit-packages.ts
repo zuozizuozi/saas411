@@ -30,20 +30,23 @@ function getPackageKey(productId: string, productName: string): string {
   const match = productId.match(/prod_(?:sub|pack)_([a-zA-Z0-9]+)/);
   if (match) {
     const rawKey = match[1];
-    return rawKey.replace(/_(monthly|yearly)$/, "");
+    return rawKey.replace(/_(monthly|quarterly|yearly)$/, "");
   }
 
   // Fall back to the display name for products without a legacy identifier.
   const nameToKeyMap: Record<string, string> = {
-    "Basic Plan": "basic",
+    "Go Plan": "go",
+    "Plus Plan": "plus",
     "Pro Plan": "pro",
-    "Ultimate Plan": "team", // Use team for Ultimate
-    "Basic Plan (Yearly)": "basic",
+    "Go Plan (Quarterly)": "go",
+    "Plus Plan (Quarterly)": "plus",
+    "Pro Plan (Quarterly)": "pro",
+    "Go Plan (Yearly)": "go",
+    "Plus Plan (Yearly)": "plus",
     "Pro Plan (Yearly)": "pro",
-    "Ultimate Plan (Yearly)": "team",
     "Starter Pack": "starter",
     "Standard Pack": "standard",
-    "Pro Pack": "pro",
+    "Premium Pack": "premium",
   };
 
   return nameToKeyMap[productName] || productId;

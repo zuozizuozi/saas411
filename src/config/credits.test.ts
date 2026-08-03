@@ -3,11 +3,19 @@ import { describe, expect, it } from "vitest";
 import { calculateModelCredits } from "./credits";
 
 describe("linear video credit pricing", () => {
-  it("charges AI Video exactly one credit per generated second", () => {
-    expect(calculateModelCredits("zhipu-video", { duration: 1 })).toBe(1);
-    expect(calculateModelCredits("zhipu-video", { duration: 5 })).toBe(5);
-    expect(calculateModelCredits("zhipu-video", { duration: 15 })).toBe(15);
-    expect(calculateModelCredits("zhipu-video", { duration: 30 })).toBe(30);
+  it("uses the configured Seedance 2.0 Mini quality rates", () => {
+    expect(
+      calculateModelCredits("seedance-2.0-mini", {
+        duration: 5,
+        quality: "480P",
+      })
+    ).toBe(35);
+    expect(
+      calculateModelCredits("seedance-2.0-mini", {
+        duration: 5,
+        quality: "720P",
+      })
+    ).toBe(70);
   });
 
   it("keeps every model price strictly proportional to duration", () => {
@@ -15,11 +23,11 @@ describe("linear video credit pricing", () => {
       duration: 1,
       quality: "1080P",
     });
-    const thirtySeconds = calculateModelCredits("seedance-1.5-pro", {
-      duration: 30,
+    const twelveSeconds = calculateModelCredits("seedance-1.5-pro", {
+      duration: 12,
       quality: "1080P",
     });
 
-    expect(thirtySeconds).toBe(oneSecond * 30);
+    expect(twelveSeconds).toBe(oneSecond * 12);
   });
 });

@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 import { PricingCards } from "@/components/price/pricing-cards";
 import { StripeCreditPacks } from "@/components/price/stripe-credit-packs";
@@ -8,14 +8,12 @@ import type { UserSubscriptionPlan } from "@/types";
 
 export async function PricingSection() {
   const user = await getCurrentUser();
-  const locale = await getLocale();
   let subscriptionPlan: UserSubscriptionPlan | undefined;
   if (user) {
     subscriptionPlan = await getUserPlans(user.id);
   }
 
   const t = await getTranslations("PricingCards");
-  const isZh = locale === "zh";
 
   return (
     <section id="pricing" className="relative py-24 md:py-28">
@@ -25,12 +23,10 @@ export async function PricingSection() {
             {t("pricing")}
           </span>
           <h2 className="mt-6 text-4xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
-            {isZh ? "选择适合你的套餐" : "Choose Your Plan"}
+            {t("slogan")}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            {isZh
-              ? `${t("slogan")} 可按月、按年订阅，也可以先购买一次性积分。`
-              : `${t("slogan")} Pay monthly, yearly, or start with one-time credits.`}
+            {`${t("monthly")} · ${t("quarterly")} · ${t("yearly")} · ${t("onetime")}`}
           </p>
         </div>
 

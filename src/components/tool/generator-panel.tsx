@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Check,
   ChevronDown,
@@ -24,7 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { calculateModelCredits, getAvailableModels } from "@/config/credits";
+import { calculateModelCredits, getModelCatalog } from "@/config/credits";
 import { cn } from "@/lib/utils";
 
 interface GeneratorPanelProps {
@@ -211,12 +212,51 @@ export function GeneratorPanel({
   initialImageUrl,
   maxOutputNumber = 1,
 }: GeneratorPanelProps) {
-  const isZh = locale === "zh";
-  const t = isZh ? copy.zh : copy.en;
-  const models = getAvailableModels();
+  const translate = useTranslations("GeneratorPanel");
+  const creditTranslate = useTranslations("Credits");
+  const translatedCopy = {
+    titleText: translate("titleText"),
+    titleImage: translate("titleImage"),
+    prompt: translate("prompt"),
+    enhance: translate("enhance"),
+    placeholder: translate("placeholder"),
+    aiPrompt: translate("aiPrompt"),
+    images: translate("images"),
+    firstFrame: translate("firstFrame"),
+    lastFrame: translate("lastFrame"),
+    upload: translate("upload"),
+    recent: translate("recent"),
+    settings: translate("settings"),
+    model: translate("model"),
+    ratio: translate("ratio"),
+    duration: translate("duration"),
+    nativeDuration: translate("nativeDuration"),
+    extendedDuration: translate("extendedDuration"),
+    unavailableDuration: translate("unavailableDuration"),
+    resolution: translate("resolution"),
+    outputs: translate("outputs"),
+    audio: translate("audio"),
+    watermark: translate("watermark"),
+    credits: translate("credits"),
+    generate: translate("generate"),
+    generating: translate("generating"),
+    fileError: translate("fileError"),
+    enhancementSuffix: translate("enhancementSuffix"),
+    seconds: translate("seconds"),
+    noModels: translate("noModels"),
+    videoModels: translate("videoModels"),
+  };
+  const t = {
+    ...(locale === "zh" ? copy.zh : copy.en),
+    ...translatedCopy,
+  };
+  const models = useMemo(() => getModelCatalog(), []);
   const [prompt, setPrompt] = useState(initialPrompt || "");
   const [promptEnhancement, setPromptEnhancement] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(initialModelId || defaultModelId || models[0]?.id || "");
+  const firstActiveModel = models.find((model) => model.availability === "active");
+  const [selectedModel, setSelectedModel] = useState(
+    initialModelId || defaultModelId || firstActiveModel?.id || ""
+  );
   const [duration, setDuration] = useState(initialDuration || 5);
   const [aspectRatio, setAspectRatio] = useState(initialAspectRatio || "16:9");
   const [quality, setQuality] = useState(initialQuality || "720P");
@@ -234,7 +274,13 @@ export function GeneratorPanel({
     const allowed = availableModelIds?.length ? new Set(availableModelIds) : null;
     return models.filter((model) => (!allowed || allowed.has(model.id)) && (toolType === "text-to-video" || model.supportImageToVideo));
   }, [availableModelIds, models, toolType]);
-  const currentModel = availableModels.find((model) => model.id === selectedModel) || availableModels[0];
+  const activeModels = useMemo(
+    () =>
+      availableModels.filter((model) => model.availability === "active"),
+    [availableModels]
+  );
+  const currentModel =
+    activeModels.find((model) => model.id === selectedModel) || activeModels[0];
   const modelMetadata = useMemo(() => new Map(DEFAULT_VIDEO_MODELS.map((model) => [model.id, model])), []);
 
   useEffect(() => {
@@ -247,9 +293,9 @@ export function GeneratorPanel({
   }, [aspectRatio, currentModel, duration, quality]);
 
   useEffect(() => {
-    if (!availableModels.length || availableModels.some((model) => model.id === selectedModel)) return;
-    setSelectedModel(availableModels[0]?.id || "");
-  }, [availableModels, selectedModel]);
+    if (!activeModels.length || activeModels.some((model) => model.id === selectedModel)) return;
+    setSelectedModel(activeModels[0]?.id || "");
+  }, [activeModels, selectedModel]);
 
   useEffect(() => {
     if (toolType !== "image-to-video") return;
@@ -267,7 +313,7 @@ export function GeneratorPanel({
   const validateFile = (file: File, setFile: (value: File) => void) => {
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!allowed.includes(file.type) || file.size > 10 * 1024 * 1024) {
-      setImageError(isZh ? "请上传 10MB 以内的 JPG、PNG、WEBP 或 GIF 图片。" : "Upload a JPG, PNG, WEBP or GIF image up to 10MB.");
+      setImageError(t.fileError);
       return;
     }
     setImageError(null);
@@ -277,9 +323,7 @@ export function GeneratorPanel({
   const enhancePrompt = () => {
     const base = prompt.trim();
     if (!base) return;
-    const suffix = isZh
-      ? "，电影级构图，自然光影，主体动作连贯，镜头缓慢推进，细节清晰，运动稳定"
-      : ", cinematic composition, natural lighting, coherent subject motion, slow camera push-in, crisp detail, stable movement";
+    const suffix = t.enhancementSuffix;
     if (!base.includes(suffix)) setPrompt(`${base}${suffix}`.slice(0, 20000));
     setPromptEnhancement(true);
   };
@@ -319,7 +363,7 @@ export function GeneratorPanel({
       <div className="mx-4 border-t border-slate-700/80 sm:mx-5" />
 
       <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-4 py-4 sm:px-5">
-        {!availableModels.length && <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-200">No video model is enabled for this tool.</div>}
+        {!activeModels.length && <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-200">{t.noModels}</div>}
 
         <div>
           <div className="mb-2 flex items-center justify-between gap-3">
@@ -348,7 +392,7 @@ export function GeneratorPanel({
 
         {toolType === "image-to-video" && (
           <div>
-            <div className="mb-3 text-sm font-semibold">{t.images} <span className="font-normal text-slate-400">(1-2 images)</span></div>
+            <div className="mb-3 text-sm font-semibold">{t.images} <span className="font-normal text-slate-400">(1–2)</span></div>
             <div className="grid grid-cols-2 gap-3">
               <FrameUpload label={t.firstFrame} file={imageFile} imageUrl={imageUrl} disabled={isLoading} uploadLabel={t.upload} recentLabel={t.recent} onChange={(file) => validateFile(file, (value) => { setImageFile(value); setImageUrl(null); })} onRemove={() => { setImageFile(null); setImageUrl(null); }} />
               <FrameUpload label={t.lastFrame} file={endImageFile} imageUrl={endImageUrl} disabled={isLoading} uploadLabel={t.upload} recentLabel={t.recent} onChange={(file) => validateFile(file, (value) => { setEndImageFile(value); setEndImageUrl(null); })} onRemove={() => { setEndImageFile(null); setEndImageUrl(null); }} />
@@ -374,10 +418,27 @@ export function GeneratorPanel({
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] border-slate-700 bg-slate-900 text-white">
-                  <DropdownMenuLabel>Video models</DropdownMenuLabel><DropdownMenuSeparator className="bg-slate-700" />
+                  <DropdownMenuLabel>{t.videoModels}</DropdownMenuLabel><DropdownMenuSeparator className="bg-slate-700" />
                   {availableModels.map((model) => (
-                    <DropdownMenuItem key={model.id} onSelect={() => setSelectedModel(model.id)} className="gap-2 py-2.5 focus:bg-slate-800 focus:text-white">
-                      {renderModelIcon(model.id, model.name)}<span className="flex-1">{model.name}</span>{selectedModel === model.id && <Check className="h-4 w-4 text-blue-400" />}
+                    <DropdownMenuItem
+                      key={model.id}
+                      disabled={model.availability !== "active"}
+                      onSelect={() => {
+                        if (model.availability === "active") setSelectedModel(model.id);
+                      }}
+                      className="gap-2 py-2.5 focus:bg-slate-800 focus:text-white data-[disabled]:opacity-55"
+                    >
+                      {renderModelIcon(model.id, model.name)}
+                      <span className="flex-1">{model.name}</span>
+                      {model.badge ? (
+                        <span className={cn(
+                          "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          model.availability === "coming_soon"
+                            ? "bg-slate-700 text-slate-300"
+                            : "bg-blue-500/15 text-blue-300"
+                        )}>{model.badge}</span>
+                      ) : null}
+                      {selectedModel === model.id && <Check className="h-4 w-4 text-blue-400" />}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -388,8 +449,8 @@ export function GeneratorPanel({
             <fieldset>
               <legend className="mb-2 text-sm text-slate-300">{t.duration}</legend>
               <DurationSlider
-                min={currentModel.durationDisplayMin ?? 5}
-                max={currentModel.durationDisplayMax ?? 30}
+                min={currentModel.durationDisplayMin ?? Math.min(...currentModel.durations)}
+                max={currentModel.durationDisplayMax ?? currentModel.maxDuration}
                 nativeOptions={currentModel.nativeDurations ?? currentModel.durations}
                 extendedOptions={currentModel.extendedDurations ?? []}
                 value={duration}
@@ -398,7 +459,7 @@ export function GeneratorPanel({
                 nativeLabel={t.nativeDuration}
                 extendedLabel={t.extendedDuration}
                 unavailableLabel={t.unavailableDuration}
-                secondsLabel={isZh ? "秒" : "seconds"}
+                secondsLabel={t.seconds}
                 ariaLabel={t.duration}
               />
             </fieldset>
@@ -413,7 +474,7 @@ export function GeneratorPanel({
 
       <div className="shrink-0 border-t border-slate-700/80 bg-slate-950/35 p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2 text-sm">
-          <span className="text-slate-400">{t.credits}</span><span className="flex items-center gap-1.5 font-semibold"><Gem className="h-4 w-4 text-amber-400" />{estimatedCredits} credits</span>
+          <span className="text-slate-400">{t.credits}</span><span className="flex items-center gap-1.5 font-semibold"><Gem className="h-4 w-4 text-amber-400" />{estimatedCredits} {creditTranslate("title")}</span>
         </div>
         <button type="button" onClick={handleSubmit} disabled={!canSubmit} className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-950/30 transition-colors hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-400 disabled:shadow-none">
           <Sparkles className="h-4 w-4" /> {isLoading ? t.generating : t.generate}

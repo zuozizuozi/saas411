@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type * as z from "zod";
@@ -34,6 +35,8 @@ type FormData = z.infer<typeof userNameSchema>;
 
 export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
   const router = useRouter();
+  const t = useTranslations("AccountProfile");
+  const common = useTranslations("Common");
   const {
     handleSubmit,
     register,
@@ -51,12 +54,10 @@ export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
     const result = await executeAsync({ name: data.name });
 
     if (!result?.data?.success) {
-      return toast.error("Something went wrong.", {
-        description: "Your name was not updated. Please try again.",
-      });
+      return toast.error(common("error"), { description: t("updateError") });
     }
 
-    toast.success("Your name has been updated.");
+    toast.success(t("updateSuccess"));
 
     router.refresh();
   }
@@ -69,16 +70,13 @@ export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Your Name</CardTitle>
-          <CardDescription>
-            Please enter your full name or a display name you are comfortable
-            with.
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="name">
-              Name
+              {t("name")}
             </Label>
             <Input
               id="name"
@@ -100,7 +98,7 @@ export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
             {isSaving && (
               <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            <span>Save</span>
+            <span>{common("save")}</span>
           </button>
         </CardFooter>
       </Card>

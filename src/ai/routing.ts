@@ -19,7 +19,9 @@ export interface ModelRoutePolicy {
 
 const MODEL_ROUTE_POLICIES: Record<string, ModelRoutePolicy> = {
   "zhipu-video": { primary: "bailian", fallbacks: ["zhipu"] },
-  "seedance-1.5-pro": { primary: "apimart", fallbacks: ["evolink", "kie"] },
+  "seedance-2.0-mini": { primary: "evolink", fallbacks: [] },
+  "seedance-2.0": { primary: "evolink", fallbacks: [] },
+  "seedance-1.5-pro": { primary: "evolink", fallbacks: ["apimart", "kie"] },
   "seedance-1.0-pro-fast": { primary: "apimart", fallbacks: [] },
   "seedance-1.0-pro-quality": { primary: "apimart", fallbacks: [] },
   "sora-2": { primary: "evolink", fallbacks: ["kie"] },
@@ -28,8 +30,8 @@ const MODEL_ROUTE_POLICIES: Record<string, ModelRoutePolicy> = {
 };
 
 /**
- * Returns candidates in deterministic order. DEFAULT_AI_PROVIDER remains a
- * deployment pin: when configured, no automatic fallback is attempted.
+ * Returns candidates in deterministic order. DEFAULT_AI_PROVIDER is honored
+ * when it supports the requested model; otherwise the model policy is used.
  */
 export function getProviderCandidates(
   modelId: string,
@@ -37,14 +39,13 @@ export function getProviderCandidates(
   duration?: number
 ): ProviderType[] {
   const pinnedProvider = getConfiguredAIProvider();
-  const requested = pinnedProvider
-    ? [pinnedProvider]
-    : [
-        MODEL_ROUTE_POLICIES[modelId]?.primary,
-        ...(MODEL_ROUTE_POLICIES[modelId]?.fallbacks ?? []),
-      ].filter((provider): provider is ProviderType => Boolean(provider));
+  const policyCandidates = [
+    MODEL_ROUTE_POLICIES[modelId]?.primary,
+    ...(MODEL_ROUTE_POLICIES[modelId]?.fallbacks ?? []),
+  ].filter((provider): provider is ProviderType => Boolean(provider));
 
-  return [...new Set(requested)].filter(
+  const filterEligible = (requested: ProviderType[]) =>
+    [...new Set(requested)].filter(
     (provider) =>
       Boolean(getProviderApiKey(provider)) &&
       isModelSupported(modelId, provider) &&
@@ -52,6 +53,15 @@ export function getProviderCandidates(
       (duration === undefined ||
         isProviderDurationSupported(modelId, provider, duration))
   );
+
+  // Keep an explicit deployment pin when it can actually run the model. If it
+  // cannot, fall back to the model-owned policy instead of hiding the model.
+  if (pinnedProvider) {
+    const pinnedCandidates = filterEligible([pinnedProvider]);
+    if (pinnedCandidates.length > 0) return pinnedCandidates;
+  }
+
+  return filterEligible(policyCandidates);
 }
 
 export function getModelRoutePolicy(modelId: string): ModelRoutePolicy | null {

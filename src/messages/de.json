@@ -1,0 +1,654 @@
+{
+  "Metadata": {
+    "title": "seedance.co – Plattform zur KI-Videogenerierung",
+    "description": "Erstellen Sie mit Sora 2, Veo 3.1 und weiteren Modellen in wenigen Minuten beeindruckende KI-Videos"
+  },
+  "Common": {
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "logout": "Abmelden",
+    "language": "Sprache",
+    "submit": "Absenden",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen",
+    "success": "Erfolgreich"
+  },
+  "Navigation": {
+    "home": "Startseite",
+    "videoTools": "Video-Tools",
+    "textToVideo": "Text zu Video",
+    "imageToVideo": "Bild zu Video",
+    "account": "Konto",
+    "openMenu": "Menü öffnen",
+    "createAccount": "Konto erstellen",
+    "studio": "Studio"
+  },
+  "GeneratorPanel": {
+    "titleText": "Text zu Video",
+    "titleImage": "Bild zu Video",
+    "prompt": "Prompt",
+    "enhance": "Prompt optimieren",
+    "placeholder": "Beschreiben Sie das gewünschte Video, z. B. eine filmische Nahaufnahme mit natürlichem Licht und sanfter Kamerabewegung...",
+    "aiPrompt": "KI-Prompt",
+    "images": "Bilder",
+    "firstFrame": "Erstes Bild",
+    "lastFrame": "Letztes Bild",
+    "upload": "Zum Hochladen klicken",
+    "recent": "Meine Kreationen",
+    "settings": "Einstellungen",
+    "model": "Modell",
+    "ratio": "Seitenverhältnis",
+    "duration": "Dauer",
+    "nativeDuration": "Nativ",
+    "extendedDuration": "Offizielle Verlängerung",
+    "unavailableDuration": "Nicht verfügbar",
+    "resolution": "Auflösung",
+    "outputs": "Ausgaben",
+    "audio": "Audio generieren",
+    "watermark": "Wasserzeichen entfernen",
+    "credits": "Geschätzte Kosten",
+    "generate": "Generieren",
+    "generating": "Wird generiert...",
+    "fileError": "Laden Sie ein JPG-, PNG-, WEBP- oder GIF-Bild mit einer Größe von bis zu 10 MB hoch.",
+    "enhancementSuffix": ", filmische Bildkomposition, natürliche Beleuchtung, stimmige Bewegung des Motivs, langsame Kamerafahrt nach vorn, klare Details, stabile Bewegung",
+    "seconds": "Sekunden",
+    "noModels": "Für dieses Werkzeug ist kein Videomodell aktiviert.",
+    "videoModels": "Videomodelle"
+  },
+  "Legal": {
+    "Privacy": {
+      "title": "Datenschutzerklärung",
+      "lastUpdated": "Zuletzt aktualisiert: {year}",
+      "introductionTitle": "1. Einleitung",
+      "introductionBody": "Willkommen bei seedance.co. Wir respektieren Ihre Privatsphäre und schützen Ihre personenbezogenen Daten.",
+      "collectionTitle": "2. Erhobene Daten",
+      "collectionBody": "Wir erfassen Informationen, die Sie bei der Kontoerstellung, Videogenerierung, Zahlung oder Kontaktaufnahme mit dem Support angeben.",
+      "usageTitle": "3. Verwendung Ihrer Daten",
+      "usageBody": "Wir verwenden Ihre Daten, um den Dienst bereitzustellen und zu verbessern, Zahlungen abzuwickeln, KI-Videos zu generieren, Missbrauch zu verhindern sowie Konto- und Transaktionsverläufe zu führen.",
+      "securityTitle": "4. Datensicherheit",
+      "securityBody": "Wir setzen angemessene technische und organisatorische Schutzmaßnahmen ein. Kein Internetdienst kann jedoch absolute Sicherheit garantieren.",
+      "contactTitle": "5. Kontakt",
+      "contactBody": "Bei Fragen zum Datenschutz schreiben Sie uns an <email>{address}</email>."
+    },
+    "Terms": {
+      "title": "Nutzungsbedingungen",
+      "lastUpdated": "Zuletzt aktualisiert: {year}",
+      "acceptanceTitle": "1. Annahme der Bedingungen",
+      "acceptanceBody": "Mit dem Zugriff auf seedance.co oder dessen Nutzung stimmen Sie diesen Nutzungsbedingungen zu. Wenn Sie nicht zustimmen, nutzen Sie den Dienst nicht.",
+      "licenseTitle": "2. Nutzung des Dienstes",
+      "licenseBody": "Sie dürfen den Dienst nur im Einklang mit geltendem Recht und den Rechten Dritter nutzen. Für Ihre Prompts, Uploads und generierten Inhalte bleiben Sie verantwortlich.",
+      "disclaimerTitle": "3. Haftungsausschluss",
+      "disclaimerBody": "Der Dienst wird „wie besehen“ und „wie verfügbar“ bereitgestellt. KI-generierte Ergebnisse können ungenau, nicht verfügbar oder anders als erwartet sein.",
+      "limitationsTitle": "4. Haftungsbeschränkung",
+      "limitationsBody": "Soweit gesetzlich zulässig, haften seedance.co und seine Anbieter nicht für indirekte, beiläufige, besondere, Folge- oder Strafschäden aus der Nutzung des Dienstes.",
+      "contactTitle": "5. Kontakt",
+      "contactBody": "Bei Fragen zu diesen Bedingungen schreiben Sie uns an <email>{address}</email>."
+    }
+  },
+  "Header": {
+    "models": "Modelle",
+    "tools": "Tools",
+    "pricing": "Preise",
+    "docs": "Dokumentation",
+    "myCreations": "Meine Kreationen",
+    "credits": "Credits",
+    "settings": "Einstellungen"
+  },
+  "Hero": {
+    "badge": "Unterstützt von Sora 2, Veo 3.1 und weiteren Modellen",
+    "title": "Verwandeln Sie Ihre Ideen in beeindruckende Videos",
+    "subtitle": "mit KI",
+    "description": "Erstellen Sie in wenigen Minuten professionelle KI-Videos – aus Text oder Bildern oder durch die Optimierung vorhandener Aufnahmen.",
+    "startCreating": "Jetzt erstellen",
+    "viewExamples": "Beispiele ansehen",
+    "features": {
+      "fast": "Blitzschnell",
+      "easy": "Einfache Bedienung",
+      "ai": "KI-gestützt"
+    },
+    "stats": {
+      "videos": "erstellte Videos",
+      "users": "zufriedene Nutzer",
+      "rating": "Nutzerbewertung"
+    },
+    "creditsHint": "Erstellen Sie ein Konto und kaufen Sie anschließend Credits oder schließen Sie ein Abonnement ab"
+  },
+  "Notifications": {
+    "generationWillNotify": "Die Generierung kann etwas dauern. Wir benachrichtigen Sie, sobald sie abgeschlossen ist.",
+    "enableNotifications": "Benachrichtigungen aktivieren",
+    "notificationDescription": "Lassen Sie sich benachrichtigen, wenn Ihr Video fertig generiert wurde.",
+    "maybeLater": "Vielleicht später",
+    "allow": "Zulassen",
+    "videoReadyTitle": "{siteName} – Ihr Video ist fertig",
+    "videoReadyBody": "Prompt: {prompt}\nIhre Generierung ist abgeschlossen. Tippen Sie hier, um sie anzusehen.",
+    "videoReadyBodyShort": "Ihre Generierung ist abgeschlossen. Tippen Sie hier, um sie anzusehen."
+  },
+  "ToolPage": {
+    "generator": "Generator",
+    "result": "Ergebnis",
+    "queueTitle": "Warteschlange",
+    "queueEmpty": "Keine aktiven Aufgaben",
+    "recentTitle": "Zuletzt verwendet",
+    "recentEmpty": "Noch keine Ergebnisse",
+    "resultTitle": "Ergebnisse",
+    "newGeneration": "Neue Generierung",
+    "exploreTitle": "Beispiele entdecken",
+    "exploreSubtitle": "Noch keine Community – machen Sie den Anfang",
+    "emptyTitle": "Ihre Vorschau erscheint hier",
+    "emptySubtitle": "Starten Sie links eine Generierung, um das Ergebnis hier zu sehen.",
+    "promptIdeas": "Prompt-Ideen",
+    "promptExample1": "Eine filmische Nahaufnahme von Regen auf neonbeleuchteten Straßen in Zeitlupe.",
+    "promptExample2": "Ein gemütliches Café zur goldenen Stunde mit sanftem Kameraschwenk.",
+    "promptExample3": "Eine futuristische Skyline mit weichem Nebel und leuchtenden Lichtern.",
+    "tipsTitle": "Tipps",
+    "tipsLine1": "Beschreiben Sie Motiv, Beleuchtung und Bewegung möglichst genau.",
+    "tipsLine2": "Geben Sie die Kamerabewegung an (Schwenk, Kamerafahrt, Zoom).",
+    "tipsLine3": "Ergänzen Sie Stimmungen wie filmisch, verträumt oder minimalistisch.",
+    "generatingTag": "Wird generiert",
+    "generatingHint": "Dieses Video wird gerade generiert. In der Zwischenzeit können Sie eine weitere Aufgabe starten.",
+    "modelLabel": "Modell",
+    "download": "Herunterladen"
+  },
+  "Showcase": {
+    "badge": "In Aktion erleben",
+    "title": "Erstellt mit seedance.co",
+    "subtitle": "Beeindruckende, KI-generierte Videos",
+    "description": "Entdecken Sie beeindruckende Videos, die unsere Community mit KI erstellt hat – von filmischen Landschaften bis zu Produktanimationen.",
+    "ctaText": "Bereit für Ihr eigenes Meisterwerk?",
+    "ctaButton": "Jetzt loslegen"
+  },
+  "Features": {
+    "badge": "Leistungsstarke Funktionen",
+    "title": "Alles, was Sie brauchen",
+    "subtitle": "Leistungsstarke Funktionen für beeindruckende Videos",
+    "description": "Entdecken Sie die Tools und Funktionen, mit denen Videoproduktion einfach und unterhaltsam wird",
+    "learnMore": "Mehr erfahren",
+    "bottomCTA": {
+      "text": "Bereit, Ihre Ideen in Videos zu verwandeln?",
+      "button": "Jetzt loslegen"
+    },
+    "textToVideo": {
+      "title": "Text zu Video",
+      "description": "Verwandeln Sie Ihre Text-Prompts mit fortschrittlichen KI-Modellen in beeindruckende Videos",
+      "stat": "Generierungsgeschwindigkeit"
+    },
+    "imageToVideo": {
+      "title": "Bild zu Video",
+      "description": "Animieren Sie Ihre Bilder und erwecken Sie sie mit KI-Videogenerierung zum Leben",
+      "stat": "Maximale Auflösung"
+    },
+    "referenceGen": {
+      "title": "Referenzbasierte Generierung",
+      "description": "Laden Sie Bilder oder Videos als Referenzen hoch, um die KI zu steuern. Übernehmen Sie Kamerapfade, Bewegungsmuster und Stile für eine präzise Kontrolle",
+      "stat": "Referenzeingaben"
+    },
+    "enhancement": {
+      "title": "Videooptimierung",
+      "description": "Skalieren, optimieren und verlängern Sie Ihre vorhandenen Videos mit KI",
+      "stat": "KI-Modelle"
+    },
+    "fast": {
+      "title": "Blitzschnell",
+      "description": "Erstellen Sie professionelle Videos in nur 2–5 Minuten"
+    },
+    "secure": {
+      "title": "Sicher und privat",
+      "description": "Ihre Daten werden verschlüsselt und Ihre Videos sicher gespeichert"
+    },
+    "realtime": {
+      "title": "Echtzeit-Updates",
+      "description": "Verfolgen Sie den Fortschritt Ihrer Videogenerierung in Echtzeit"
+    },
+    "formats": {
+      "title": "Mehrere Formate",
+      "description": "Exportieren Sie Videos in verschiedenen Seitenverhältnissen für jede Plattform"
+    },
+    "ai": {
+      "title": "Fortschrittliche KI",
+      "description": "Unterstützt von den neuesten KI-Modellen zur Videogenerierung"
+    }
+  },
+  "HowItWorks": {
+    "badge": "Einfacher Ablauf",
+    "title": "So funktioniert es",
+    "subtitle": "Erstellen Sie Ihr Video in 4 einfachen Schritten",
+    "description": "Starten Sie in wenigen Minuten mit unserem intuitiven Workflow zur Videoerstellung",
+    "bottomHint": "Ein Konto sowie gekaufte Credits oder ein Abonnement sind erforderlich",
+    "cta": "Jetzt loslegen",
+    "steps": {
+      "prompt": {
+        "title": "Video beschreiben",
+        "description": "Geben Sie einen detaillierten Text-Prompt ein, der Ihr gewünschtes Video beschreibt",
+        "stat": "Durchschnittliche Dauer"
+      },
+      "upload": {
+        "title": "Referenz hochladen",
+        "description": "Fügen Sie optional ein Referenzbild hinzu, um die KI zu steuern",
+        "stat": "Unterstützte Formate"
+      },
+      "generate": {
+        "title": "KI generiert",
+        "description": "Unsere KI verarbeitet Ihre Anfrage und erstellt ein einzigartiges Video",
+        "stat": "Generierungsdauer"
+      },
+      "download": {
+        "title": "Herunterladen und teilen",
+        "description": "Laden Sie Ihr HD-Video herunter und teilen Sie es, wo immer Sie möchten",
+        "stat": "Maximale Qualität"
+      }
+    }
+  },
+  "CTA": {
+    "badge": "Zeitlich begrenztes Angebot",
+    "title": "Bereit für beeindruckende Videos?",
+    "subtitle": "Schließen Sie sich Tausenden Kreativen an, die seedance.co bereits nutzen",
+    "description": "Erstellen Sie professionelle Videos, nachdem Sie Credits gekauft oder ein Abonnement abgeschlossen haben",
+    "getStarted": "Konto erstellen",
+    "learnMore": "Mehr erfahren",
+    "benefits": {
+      "free": "Kaufen Sie Credits oder schließen Sie ein Abonnement ab, um Videos zu generieren",
+      "noCard": "Keine Kreditkarte erforderlich",
+      "cancel": "Jederzeit kündbar",
+      "support": "Kundensupport rund um die Uhr"
+    },
+    "generating": "Wird generiert...",
+    "readyIn": "Fertig in",
+    "minutes": "Minuten",
+    "from": "ab",
+    "reviews": "Bewertungen",
+    "testimonials": {
+      "title": "Von Kreativen geschätzt",
+      "subtitle": "Das sagen unsere Nutzer"
+    }
+  },
+  "FAQ": {
+    "title": "Häufig gestellte Fragen",
+    "subtitle": "Alles, was Sie über seedance.co wissen müssen",
+    "contact": "Noch Fragen? Kontaktieren Sie uns unter",
+    "general": {
+      "question": "Was ist seedance.co?",
+      "answer": "seedance.co ist eine moderne Plattform zur KI-Videogenerierung, mit der Sie Texte und Bilder in wenigen Minuten in hochwertige Videos verwandeln können. Fortschrittliche Modelle wie Sora 2 und Veo 3.1 ermöglichen es Kreativen, ihre Ideen ohne teure Ausrüstung umzusetzen."
+    },
+    "commercial": {
+      "question": "Darf ich die Videos kommerziell nutzen?",
+      "answer": "Ja. Videos, die mit unseren Pro- und Team-Tarifen erstellt werden, beinhalten eine vollständige kommerzielle Lizenz. Sie können sie für Marketing, soziale Medien und kommerzielle Projekte verwenden."
+    },
+    "aiModels": {
+      "question": "Welche KI-Modelle verwenden Sie?",
+      "answer": "Wir integrieren führende Modelle zur Videogenerierung, darunter Sora 2, Veo 3.1 und weitere. Unsere Plattform wird kontinuierlich um die neuesten und leistungsfähigsten verfügbaren Modelle erweitert."
+    },
+    "credits": {
+      "question": "Wie funktioniert das Credit-System?",
+      "answer": "Für die Videogenerierung werden Credits verbraucht. Je nach Modell und Videolänge ist der Verbrauch unterschiedlich. Sie können Credit-Pakete kaufen oder einen Monatstarif abonnieren, um regelmäßig Credits zu einem günstigeren Preis zu erhalten."
+    },
+    "refund": {
+      "question": "Bieten Sie Erstattungen an?",
+      "answer": "Wir bieten eine Zufriedenheitsgarantie. Schlägt eine Videogenerierung aufgrund eines Systemfehlers fehl, erstatten wir die Credits. Wenn Sie mit einer Abonnementzahlung nicht zufrieden sind, wenden Sie sich bitte innerhalb von 7 Tagen an unser Support-Team."
+    },
+    "support": {
+      "question": "Wie erhalte ich Unterstützung?",
+      "answer": "Schreiben Sie an support@seedance.co. Unser Support-Team hilft Ihnen gerne weiter."
+    }
+  },
+  "Footer": {
+    "product": "Produkt",
+    "company": "Unternehmen",
+    "support": "Support",
+    "legal": "Rechtliches",
+    "copyright": "© {year} seedance.co. Alle Rechte vorbehalten.",
+    "privacy": "Datenschutzerklärung",
+    "terms": "Nutzungsbedingungen",
+    "cookie": "Cookie-Richtlinie"
+  },
+  "Credits": {
+    "title": "Credits",
+    "balance": "Credit-Guthaben",
+    "available": "Verfügbar",
+    "frozen": "Reserviert",
+    "used": "Verbraucht",
+    "expiringSoon": "Läuft bald ab",
+    "lowBalance": "Niedriges Credit-Guthaben – Credits kaufen oder Tarif wählen",
+    "buyCredits": "Credits kaufen",
+    "history": "Transaktionsverlauf",
+    "packages": {
+      "starter": {
+        "name": "Starter-Paket",
+        "description": "280 Credits für gelegentliche Nutzung"
+      },
+      "go": {
+        "name": "Go",
+        "description": "Für den Einstieg und gelegentliche Erstellung"
+      },
+      "plus": {
+        "name": "Plus",
+        "description": "Für regelmäßige Creator und laufende Projekte"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Für hohe Produktionsmengen und größere Aufgaben"
+      },
+      "standard": {
+        "name": "Standard-Paket",
+        "description": "900 Credits als Einmalkauf"
+      },
+      "premium": {
+        "name": "Premium-Paket",
+        "description": "2.520 Credits als Einmalkauf"
+      }
+    },
+    "features": {
+      "all_models": "Zugriff auf alle verfügbaren Seedance-Modelle",
+      "text_image_video": "Text-zu-Video und Bild-zu-Video",
+      "model_quality_audio": "Bis zu 1080p und natives Audio, sofern unterstützt",
+      "generation_status_history": "Echtzeitstatus, Verlauf und Downloads",
+      "credit_cost_preview": "Credit-Kostenvorschau vor der Generierung",
+      "failed_credit_return": "Automatische Credit-Rückgabe bei fehlgeschlagener Generierung",
+      "no_platform_watermark": "Kein zusätzliches Wasserzeichen von seedance.co"
+    }
+  },
+  "VideoGenerator": {
+    "selectModel": "Modell auswählen",
+    "uploadImage": "Bild hochladen",
+    "enterPrompt": "Prompt eingeben",
+    "duration": "Dauer",
+    "aspectRatio": "Seitenverhältnis",
+    "quality": "Qualität",
+    "estimateCredits": "Geschätzte Credits",
+    "generate": "Video generieren",
+    "regenerate": "Erneut generieren",
+    "download": "Herunterladen",
+    "status": {
+      "pending": "Ausstehend",
+      "generating": "Wird generiert...",
+      "completed": "Abgeschlossen",
+      "failed": "Fehlgeschlagen"
+    }
+  },
+  "PricingCards": {
+    "pricing": "Preise",
+    "slogan": "Einfache, transparente Preise",
+    "onetime": "Einmalig",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "off_percent": "40 % RABATT",
+    "no_products": "Keine Produkte verfügbar",
+    "per_year": "/Jahr",
+    "per_month": "/Monat",
+    "monthly_bill": "Monatlich",
+    "annual_bill": "Jährlich",
+    "mo": "/Monat",
+    "annual_info": "/Jahr",
+    "monthly_info": "pro Monat",
+    "go_to_dashboard": "Zum Dashboard",
+    "signup": "Registrieren",
+    "contact": "für Unterstützung.",
+    "contact_2": "Wir helfen Ihnen gerne.",
+    "manage_subscription": "Abonnement verwalten",
+    "upgrade": "Upgrade",
+    "credits": "Credits",
+    "popular": "Beliebt",
+    "processing": "Wird verarbeitet...",
+    "subscribers_only": "Nur für Abonnenten",
+    "subscriber_pack_only": "Dieses Paket ist nur für aktive Abonnenten verfügbar.",
+    "checkout_not_configured": "Der Checkout ist für diesen Tarif noch nicht eingerichtet.",
+    "checkout_error": "Checkout-Fehler",
+    "checkout_failed": "Die Checkout-Sitzung konnte nicht erstellt werden."
+  },
+  "PricingFaq": {
+    "faq": "Häufig gestellte Fragen",
+    "faq_detail": "Antworten auf häufige Fragen zu unseren Preisen"
+  },
+  "Sidebar": {
+    "title": "Navigation",
+    "upgradeTitle": "Auf Pro upgraden",
+    "upgradeSubtitle": "Schnellere Generierung und mehr Credits freischalten"
+  },
+  "UpgradeModal": {
+    "default_title": "Tarif upgraden",
+    "default_description": "Wählen Sie den passenden Tarif für Ihre Anforderungen",
+    "insufficient_credits_title": "Nicht genügend Credits",
+    "insufficient_credits_description": "Diese Generierung benötigt {required} Credits. Sie haben derzeit {available}. Kaufen Sie ein Credit-Paket oder wählen Sie einen Tarif, um fortzufahren.",
+    "expired_title": "Credits abgelaufen",
+    "expired_description": "Ihre Credits sind abgelaufen. Kaufen Sie ein neues Paket oder schließen Sie ein Abonnement ab, um weiter Videos zu erstellen."
+  },
+  "UserAccountNav": {
+    "dashboard": "Dashboard",
+    "billing": "Abrechnung",
+    "settings": "Einstellungen",
+    "sign_out": "Abmelden"
+  },
+  "NavBar": {
+    "login": "Anmelden",
+    "signup": "Registrieren"
+  },
+  "Login": {
+    "back": "Zurück",
+    "welcome_back": "Willkommen zurück",
+    "signin_title": "Mit Google oder E-Mail anmelden",
+    "singup_title": "Noch kein Konto? Jetzt registrieren.",
+    "signin_email": "Bestätigungscode senden",
+    "signin_others": "Oder fortfahren mit",
+    "continue_google": "Mit Google fortfahren",
+    "signup": "Registrieren",
+    "privacy": "Es werden nur Ihre E-Mail-Adresse und Ihr Profilbild gespeichert.",
+    "signup_github": "Mit GitHub registrieren",
+    "create_account": "Konto erstellen",
+    "create_account_desc": "Geben Sie unten Ihre E-Mail-Adresse ein, um ein Konto zu erstellen",
+    "agree_prefix": "Wenn Sie fortfahren, stimmen Sie unseren",
+    "terms_of_service": "Nutzungsbedingungen",
+    "and": "und unserer",
+    "privacy_policy": "Datenschutzerklärung zu"
+  },
+  "SignInModal": {
+    "signin_title": "Bei Ihrem Konto anmelden",
+    "signin_subtitle": "Starten Sie noch heute mit seedance.co",
+    "privacy": "Wenn Sie fortfahren, stimmen Sie unseren Nutzungsbedingungen und unserer Datenschutzerklärung zu.",
+    "continue_google": "Mit Google fortfahren",
+    "or_continue_with": "oder fortfahren mit",
+    "email_placeholder": "name@example.com",
+    "login_failed": "Anmeldung fehlgeschlagen",
+    "google_error": "Die Anmeldung mit Google ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "terms_notice": "Wenn Sie fortfahren, stimmen Sie unseren Nutzungsbedingungen und unserer Datenschutzerklärung zu."
+  },
+  "EmailOtp": {
+    "email_label": "E-Mail-Adresse",
+    "email_placeholder": "name@example.com",
+    "send_code": "Bestätigungscode senden",
+    "sending": "Code wird gesendet...",
+    "code_label": "Bestätigungscode",
+    "code_placeholder": "000000",
+    "sent_to": "Code gesendet an {email}",
+    "change_email": "Ändern",
+    "verify": "Bestätigen und anmelden",
+    "verifying": "Wird bestätigt...",
+    "resend": "Code erneut senden",
+    "resend_in": "Erneut senden in {seconds} s",
+    "code_sent": "Bestätigungscode gesendet",
+    "check_inbox": "Prüfen Sie {email} auf Ihren 6-stelligen Code.",
+    "invalid_email": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "invalid_code": "Geben Sie den 6-stelligen Bestätigungscode ein.",
+    "send_error": "Der Code konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "verify_error": "Der Code ist ungültig oder abgelaufen. Bitte versuchen Sie es erneut.",
+    "verify_request_error": "Der Code konnte nicht bestätigt werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+  },
+  "MainNav": {
+    "introducing": "Neu: seedance.co"
+  },
+  "SiteFooter": {
+    "copyright": "© {currentYear} seedance.co. Alle Rechte vorbehalten."
+  },
+  "Mail": {
+    "common": {
+      "team": "{name}-Team",
+      "copyright": "© {year} Alle Rechte vorbehalten."
+    },
+    "welcome": {
+      "subject": "Willkommen bei seedance.co!",
+      "greeting": "Hallo {name},",
+      "title": "Willkommen bei seedance.co!",
+      "body": "Vielen Dank, dass Sie sich seedance.co angeschlossen haben. Wir freuen uns, Sie an Bord zu haben.",
+      "features": "Mit seedance.co können Sie:",
+      "featuresList": {
+        "generate": "In wenigen Minuten beeindruckende KI-Videos generieren",
+        "models": "Mehrere KI-Modelle wie Sora 2, Veo 3.1 und weitere nutzen",
+        "share": "Ihre Kreationen herunterladen und überall teilen"
+      },
+      "cta": "Videos erstellen",
+      "footer": "Bei Fragen können Sie sich jederzeit an unser Support-Team wenden."
+    },
+    "resetPassword": {
+      "subject": "Passwort zurücksetzen",
+      "greeting": "Hallo {name},",
+      "title": "Passwort zurücksetzen",
+      "body": "Wir haben eine Anfrage zum Zurücksetzen des Passworts für Ihr seedance.co-Konto erhalten.",
+      "instruction": "Klicken Sie auf die folgende Schaltfläche, um Ihr Passwort zurückzusetzen:",
+      "button": "Passwort zurücksetzen",
+      "validity": "Dieser Link läuft in 30 Minuten ab und kann nur einmal verwendet werden.",
+      "security": "Aus Sicherheitsgründen läuft dieser Link nach 30 Minuten ab.",
+      "ignore": "Wenn Sie das Zurücksetzen des Passworts nicht angefordert haben, können Sie diese E-Mail ignorieren.",
+      "footer": "Wenn Sie dies nicht angefordert haben, ignorieren Sie bitte diese E-Mail."
+    },
+    "emailOtp": {
+      "subject": "Ihr Bestätigungscode für seedance.co",
+      "greeting": "Hallo {name},",
+      "title": "Ihr Bestätigungscode für seedance.co",
+      "body": "Wir haben eine Anfrage zur Anmeldung bei Ihrem seedance.co-Konto erhalten.",
+      "instruction": "Geben Sie diesen Bestätigungscode ein, um fortzufahren:",
+      "validity": "Dieser Code läuft in 5 Minuten ab.",
+      "security": "Zu Ihrer Sicherheit kann der Code nur einmal verwendet werden.",
+      "footer": "Wenn Sie dies nicht angefordert haben, ignorieren Sie bitte diese E-Mail."
+    }
+  },
+  "Emails": {
+    "welcome": {
+      "subject": "Willkommen bei seedance.co!",
+      "greeting": "Hallo {name},",
+      "title": "Willkommen bei seedance.co!",
+      "body": "Vielen Dank, dass Sie sich seedance.co angeschlossen haben. Wir freuen uns, Sie an Bord zu haben.",
+      "features": "Mit seedance.co können Sie:",
+      "featuresList": {
+        "generate": "In wenigen Minuten beeindruckende KI-Videos generieren",
+        "models": "Mehrere KI-Modelle wie Sora 2, Veo 3.1 und weitere nutzen",
+        "share": "Ihre Kreationen herunterladen und überall teilen"
+      },
+      "cta": "Videos erstellen",
+      "footer": "Bei Fragen können Sie sich jederzeit an unser Support-Team wenden.",
+      "copyright": "© {year} seedance.co. Alle Rechte vorbehalten."
+    },
+    "resetPassword": {
+      "subject": "Passwort zurücksetzen",
+      "greeting": "Hallo {name},",
+      "title": "Passwort zurücksetzen",
+      "body": "Wir haben eine Anfrage zum Zurücksetzen des Passworts für Ihr seedance.co-Konto erhalten.",
+      "instruction": "Klicken Sie auf die folgende Schaltfläche, um Ihr Passwort zurückzusetzen:",
+      "button": "Passwort zurücksetzen",
+      "validity": "Dieser Link läuft in 30 Minuten ab und kann nur einmal verwendet werden.",
+      "ignore": "Wenn Sie das Zurücksetzen des Passworts nicht angefordert haben, können Sie diese E-Mail ignorieren.",
+      "security": "Aus Sicherheitsgründen läuft dieser Link nach 30 Minuten ab.",
+      "footer": "Wenn Sie dies nicht angefordert haben, ignorieren Sie bitte diese E-Mail.",
+      "copyright": "© {year} seedance.co. Alle Rechte vorbehalten."
+    }
+  },
+  "dashboard": {
+    "myCreations": {
+      "title": "Meine Kreationen",
+      "filter": {
+        "allStatus": "Alle Status",
+        "all": "Alle",
+        "completed": "Abgeschlossen",
+        "processing": "In Bearbeitung",
+        "generating": "Wird generiert",
+        "failed": "Fehlgeschlagen",
+        "allModels": "Alle Modelle",
+        "newest": "Neueste zuerst",
+        "oldest": "Älteste zuerst"
+      },
+      "status": {
+        "pending": "Ausstehend",
+        "generating": "Wird generiert...",
+        "uploading": "Wird hochgeladen...",
+        "completed": "Abgeschlossen",
+        "processing": "In Bearbeitung...",
+        "failed": "Fehlgeschlagen"
+      },
+      "actions": {
+        "play": "Abspielen",
+        "download": "Herunterladen",
+        "delete": "Löschen",
+        "retry": "Erneut versuchen",
+        "viewDetails": "Details anzeigen",
+        "downloadSuccess": "Download gestartet",
+        "downloadError": "Video konnte nicht heruntergeladen werden",
+        "deleteSuccess": "Video erfolgreich gelöscht",
+        "deleteError": "Video konnte nicht gelöscht werden",
+        "retrySuccess": "Erneuter Versuch gestartet",
+        "retryError": "Erneuter Versuch fehlgeschlagen"
+      },
+      "empty": {
+        "title": "Noch keine Kreationen",
+        "description": "Ihre generierten Videos werden hier angezeigt"
+      },
+      "deleteConfirm": {
+        "title": "Video löschen?",
+        "message": "Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      },
+      "detail": {
+        "model": "Modell",
+        "duration": "Dauer",
+        "aspectRatio": "Seitenverhältnis",
+        "prompt": "Prompt",
+        "createdAt": "Erstellt",
+        "creditsUsed": "Verbrauchte Credits"
+      }
+    },
+    "credits": {
+      "title": "Credits",
+      "available": "Verfügbare Credits",
+      "frozen": "reserviert",
+      "used": "verbraucht",
+      "buyCredits": "Credits kaufen",
+      "history": "Credit-Verlauf",
+      "loadMore": "Mehr laden",
+      "types": {
+        "new_user": "Willkommensbonus",
+        "order_pay": "Credit-Paket",
+        "subscription": "Abonnement",
+        "video_consume": "Videogenerierung",
+        "refund": "Erstattung",
+        "expired": "Abgelaufen",
+        "system_adjust": "Admin-Anpassung"
+      }
+    },
+    "settings": {
+      "title": "Abrechnung",
+      "account": "Konto",
+      "email": "E-Mail",
+      "userId": "Nutzer-ID",
+      "joined": "Beigetreten",
+      "billingHistory": "Kaufverlauf",
+      "status": {
+        "paid": "Bezahlt",
+        "pending": "Ausstehend",
+        "failed": "Fehlgeschlagen"
+      }
+    }
+  },
+  "VideoHistory": {
+    "title": "Letzte Generierungen",
+    "demoTitle": "Beispielvideos",
+    "generating": "Ihr Video wird generiert...",
+    "download": "Herunterladen",
+    "copyLink": "Link kopieren",
+    "removeFromHistory": "Aus dem Verlauf entfernen",
+    "generationFailed": "Generierung fehlgeschlagen",
+    "promptCopied": "Prompt in die Zwischenablage kopiert",
+    "copyPrompt": "Prompt kopieren",
+    "moreCreations": "Weitere Kreationen"
+  }
+}

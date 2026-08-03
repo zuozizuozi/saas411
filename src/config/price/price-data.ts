@@ -1,219 +1,125 @@
-import { SUBSCRIPTION_PRODUCTS } from "@/config/pricing-user";
+import {
+  SUBSCRIPTION_PRODUCTS,
+  type SubscriptionPeriod,
+} from "@/config/pricing-user";
+
+export type BillingPeriod = SubscriptionPeriod;
 
 export interface SubscriptionPlanTranslation {
-  id: string;
+  id: "go" | "plus" | "pro";
   title: string;
   description: string;
   benefits: string[];
   limitations: string[];
-  prices: {
-    monthly: number;
-    yearly: number;
-  };
-  stripeIds: {
-    monthly: string | null;
-    yearly: string | null;
-  };
-  credits?: {
-    monthly: number;
-    yearly: number;
-  };
+  prices: Record<BillingPeriod, number>;
+  stripeIds: Record<BillingPeriod, string | null>;
+  credits: Record<BillingPeriod, number>;
+  popular?: boolean;
 }
 
-/**
- * 定价数据配置
- *
- * 基于 PRICING_REFERENCE.md 文档：
- * - Basic: $9.90/月, $99/年, 280积分/月 (3360积分/年)
- * - Pro: $29.90/月, $299/年, 960积分/月 (11520积分/年)
- * - Ultimate: $79.90/月, $799/年, 2850积分/月 (34200积分/年)
- *
- * 年付 = 月付 × 10（买 10 送 2，省 2 个月）
- *
- * 数据来源：从 SUBSCRIPTION_PRODUCTS (pricing-user.ts) 自动生成
- */
+const planIds = ["go", "plus", "pro"] as const;
+type PlanId = (typeof planIds)[number];
 
-/**
- * 根据 SUBSCRIPTION_PRODUCTS 生成前端展示数据
- */
-function generatePriceData() {
-  // 按 period 和 name 分组产品
-  const monthlyProducts = SUBSCRIPTION_PRODUCTS.filter(p => p.period === "month");
-  const yearlyProducts = SUBSCRIPTION_PRODUCTS.filter(p => p.period === "year");
+const productPlanMap: Record<string, PlanId> = {
+  "Go Plan": "go",
+  "Plus Plan": "plus",
+  "Pro Plan": "pro",
+};
 
-  // 映射计划名称到展示 ID
-  const planIdMap: Record<string, string> = {
-    "Basic Plan": "basic",
-    "Pro Plan": "pro",
-    "Ultimate Plan": "ultimate",
-  };
+const copy = {
+  go: {
+    zh: { title: "Go", description: "适合轻量创作和初次使用" },
+    en: { title: "Go", description: "For light creation and getting started" },
+  },
+  plus: {
+    zh: { title: "Plus", description: "适合持续创作的个人和创作者" },
+    en: { title: "Plus", description: "For regular creators and ongoing projects" },
+  },
+  pro: {
+    zh: { title: "Pro", description: "适合高频创作和更大的内容需求" },
+    en: { title: "Pro", description: "For high-volume creation and larger workloads" },
+  },
+} as const;
 
-  // 生成价格映射
-  const pricesMap: Record<string, { monthly: number; yearly: number }> = {};
-  const creditsMap: Record<string, { monthly: number; yearly: number }> = {};
-  const popularMap: Record<string, boolean> = {};
+const benefits = {
+  zh: [
+    "使用全部已上线的 Seedance 模型",
+    "支持文生视频和图生视频",
+    "按模型支持最高 1080p 与原生音频",
+    "实时生成状态、历史记录与视频下载",
+    "生成前显示预计积分消耗",
+    "生成失败自动返还冻结积分",
+    "seedance.co 不额外添加平台水印",
+  ],
+  en: [
+    "Access every available Seedance model",
+    "Text-to-video and image-to-video",
+    "Up to 1080p and native audio where supported",
+    "Real-time status, generation history, and downloads",
+    "Credit cost preview before generation",
+    "Automatic credit return when generation fails",
+    "No seedance.co platform watermark added",
+  ],
+} as const;
 
-  for (const product of SUBSCRIPTION_PRODUCTS) {
-    const planId = planIdMap[product.name.replace(" (Yearly)", "")];
-    if (!planId) continue;
+const stripeIds: Record<PlanId, Record<BillingPeriod, string | null>> = {
+  go: {
+    month: process.env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID ?? null,
+    quarter: process.env.NEXT_PUBLIC_STRIPE_BASIC_QUARTERLY_PRICE_ID ?? null,
+    year: process.env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID ?? null,
+  },
+  plus: {
+    month: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? null,
+    quarter: process.env.NEXT_PUBLIC_STRIPE_PRO_QUARTERLY_PRICE_ID ?? null,
+    year: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID ?? null,
+  },
+  pro: {
+    month: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID ?? null,
+    quarter: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_QUARTERLY_PRICE_ID ?? null,
+    year: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID ?? null,
+  },
+};
 
-    if (!pricesMap[planId]) {
-      pricesMap[planId] = { monthly: 0, yearly: 0 };
-      creditsMap[planId] = { monthly: 0, yearly: 0 };
-      popularMap[planId] = product.popular || false;
-    }
-
-    if (product.period === "month") {
-      pricesMap[planId].monthly = product.priceUsd;
-      creditsMap[planId].monthly = product.credits;
-    } else {
-      pricesMap[planId].yearly = product.priceUsd;
-      creditsMap[planId].yearly = product.credits;
-    }
-  }
-
-  // 定义计划特性
-  const planFeatures: Record<string, { benefits: Record<string, string[]>; limitations: Record<string, string[]>; description: Record<string, string> }> = {
-    basic: {
-      description: {
-        zh: "适合初学者和个人用户",
-        en: "For beginners and individuals",
-      },
-      benefits: {
-        zh: [
-          "每月 280 积分（约 28 个视频）",
-          "高清视频生成（720P/1080P）",
-          "快速生成通道",
-          "商业使用权",
-        ],
-        en: [
-          "280 credits/month (~28 videos)",
-          "HD video generation (720P/1080P)",
-          "Fast generation",
-          "Commercial license",
-        ],
-      },
-      limitations: {
-        zh: [
-          "无水印功能",
-          "无优先支持",
-          "无 API 访问权限",
-        ],
-        en: [
-          "No watermark-free videos",
-          "No priority support",
-          "No API access",
-        ],
-      },
-    },
-    pro: {
-      description: {
-        zh: "推荐给专业用户和创作者",
-        en: "Recommended for professionals and creators",
-      },
-      benefits: {
-        zh: [
-          "每月 960 积分（约 96 个视频）",
-          "高清视频生成（720P/1080P）",
-          "快速生成通道",
-          "无水印",
-          "商业使用权",
-          "优先客户支持",
-        ],
-        en: [
-          "960 credits/month (~96 videos)",
-          "HD video generation (720P/1080P)",
-          "Fast generation",
-          "No watermark",
-          "Commercial license",
-          "Priority support",
-        ],
-      },
-      limitations: {
-        zh: ["无 API 访问权限"],
-        en: ["No API access"],
-      },
-    },
-    ultimate: {
-      description: {
-        zh: "适合团队和企业用户",
-        en: "For teams and enterprises",
-      },
-      benefits: {
-        zh: [
-          "每月 2,850 积分（约 285 个视频）",
-          "高清视频生成（720P/1080P）",
-          "快速生成通道",
-          "无水印",
-          "商业使用权",
-          "优先客户支持",
-          "API 访问权限",
-        ],
-        en: [
-          "2,850 credits/month (~285 videos)",
-          "HD video generation (720P/1080P)",
-          "Fast generation",
-          "No watermark",
-          "Commercial license",
-          "Priority support",
-          "API access",
-        ],
-      },
-      limitations: {
-        zh: [],
-        en: [],
-      },
-    },
-  };
-
-  const plans: ("basic" | "pro" | "ultimate")[] = ["basic", "pro", "ultimate"];
-  const stripeIds: Record<string, { monthly: string | null; yearly: string | null }> = {
-    basic: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_BASIC_MONTHLY_PRICE_ID ?? null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_BASIC_YEARLY_PRICE_ID ?? null,
-    },
-    pro: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID ?? null,
-    },
-    ultimate: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID ?? null,
-      yearly: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID ?? null,
-    },
-  };
-
-  // 生成中文数据
-  const zhData = plans.map((planId) => ({
-    id: planId,
-    title: planId.charAt(0).toUpperCase() + planId.slice(1),
-    description: planFeatures[planId].description.zh,
-    benefits: planFeatures[planId].benefits.zh,
-    limitations: planFeatures[planId].limitations.zh,
-    prices: pricesMap[planId],
-    stripeIds: stripeIds[planId],
-    credits: creditsMap[planId],
-    popular: popularMap[planId],
-  }));
-
-  // 生成英文数据
-  const enData = plans.map((planId) => ({
-    id: planId,
-    title: planId.charAt(0).toUpperCase() + planId.slice(1),
-    description: planFeatures[planId].description.en,
-    benefits: planFeatures[planId].benefits.en,
-    limitations: planFeatures[planId].limitations.en,
-    prices: pricesMap[planId],
-    stripeIds: stripeIds[planId],
-    credits: creditsMap[planId],
-    popular: popularMap[planId],
-  }));
-
-  return { zh: zhData, en: enData };
+function emptyPeriodRecord(): Record<BillingPeriod, number> {
+  return { month: 0, quarter: 0, year: 0 };
 }
 
-const generatedData = generatePriceData();
+function getBaseProductName(name: string): string {
+  return name.replace(/ \((Quarterly|Yearly)\)$/, "");
+}
+
+function generatePriceData(locale: "zh" | "en"): SubscriptionPlanTranslation[] {
+  return planIds.map((planId) => {
+    const prices = emptyPeriodRecord();
+    const credits = emptyPeriodRecord();
+    let popular = false;
+
+    for (const product of SUBSCRIPTION_PRODUCTS) {
+      if (productPlanMap[getBaseProductName(product.name)] !== planId) continue;
+      prices[product.period] = product.priceUsd;
+      credits[product.period] = product.credits;
+      popular ||= product.popular === true;
+    }
+
+    return {
+      id: planId,
+      title: copy[planId][locale].title,
+      description: copy[planId][locale].description,
+      benefits: [...benefits[locale]],
+      limitations: [],
+      prices,
+      stripeIds: stripeIds[planId],
+      credits,
+      popular,
+    };
+  });
+}
 
 export const priceDataMap: Record<string, SubscriptionPlanTranslation[]> = {
-  zh: generatedData.zh,
-  en: generatedData.en,
+  zh: generatePriceData("zh"),
+  en: generatePriceData("en"),
 };
+
+export function getPeriodMonths(period: BillingPeriod): number {
+  return period === "year" ? 12 : period === "quarter" ? 3 : 1;
+}

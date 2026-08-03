@@ -8,7 +8,7 @@ import type { ToolPageConfig, ToolLandingConfig, GeneratorConfig, PageSEOConfig 
 import { imageToVideoConfig } from "./image-to-video.config";
 import { textToVideoConfig } from "./text-to-video.config";
 import { adaptToolPageConfigToGeneratorConfig } from "./adapter";
-import { getAvailableModels } from "@/config/credits";
+import { getModelCatalog } from "@/config/credits";
 import type { ProviderType } from "@/ai";
 
 // Export types
@@ -54,14 +54,11 @@ export function getToolPageConfig(route: ToolPageRoute): ToolPageConfig {
 
 export function getToolPageConfigForProvider(
   route: ToolPageRoute,
-  provider?: ProviderType
+  _provider?: ProviderType
 ): ToolPageConfig {
   const config = getToolPageConfig(route);
   const providerModels = new Set(
-    getAvailableModels({
-      provider,
-      mode: route,
-    }).map((model) => model.id)
+    getModelCatalog({ mode: route }).map((model) => model.id)
   );
   const available = config.generator.models.available.filter((modelId) =>
     providerModels.has(modelId)

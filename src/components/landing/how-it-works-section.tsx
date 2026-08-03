@@ -1,43 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Download, ImagePlus, SlidersHorizontal, Type } from "lucide-react";
 
 const icons = [Type, ImagePlus, SlidersHorizontal, Download];
 
 export function HowItWorks() {
-  const locale = useLocale();
-  const isZh = locale === "zh";
+  const t = useTranslations("HowItWorks");
 
   const steps = [
     {
       step: "01",
-      title: isZh ? "输入视频想法" : "Describe the scene",
-      description: isZh
-        ? "写下主体、动作、镜头、光线和氛围，让首页工作台直接成为真实生成入口。"
-        : "Start with the subject, action, camera, and lighting so the homepage doubles as a real generation workspace.",
+      title: t("steps.prompt.title"),
+      description: t("steps.prompt.description"),
     },
     {
       step: "02",
-      title: isZh ? "添加参考素材" : "Add reference media",
-      description: isZh
-        ? "需要时上传图片或关键视觉，帮助模型锁定风格、主体和运动方向。"
-        : "Upload an image when you need tighter control over style, subject identity, or movement direction.",
+      title: t("steps.upload.title"),
+      description: t("steps.upload.description"),
     },
     {
       step: "03",
-      title: isZh ? "选择模型与参数" : "Pick model and settings",
-      description: isZh
-        ? "在一个面板里处理模型、比例、时长与分辨率，减少跳转和理解成本。"
-        : "Keep model, ratio, duration, and quality in one clear panel so users can decide fast and confidently.",
+      title: t("steps.generate.title"),
+      description: t("steps.generate.description"),
     },
     {
       step: "04",
-      title: isZh ? "生成、查看与下载" : "Generate, review, download",
-      description: isZh
-        ? "任务发起后继续走你现有的鉴权、积分、任务状态和回调链路，结果页也保持闭环。"
-        : "Generation continues through your existing auth, credits, task tracking, and callback flow until the result is ready.",
+      title: t("steps.download.title"),
+      description: t("steps.download.description"),
     },
   ];
 
@@ -46,15 +37,13 @@ export function HowItWorks() {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/65">
-            {isZh ? "工作流程" : "Workflow"}
+            {t("badge")}
           </span>
           <h2 className="mt-6 text-balance text-4xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
-            {isZh ? "从第一句提示词，到最终视频交付" : "From first prompt to finished video"}
+            {t("title")}
           </h2>
           <p className="mt-5 text-lg leading-8 text-muted-foreground">
-            {isZh
-              ? "对标站点最有说服力的地方，在于流程清楚、入口直接、付费路径自然，而不是把功能藏得很深。"
-              : "The best competitor flows feel direct: users understand the product fast, start fast, and see where pricing fits."}
+            {t("description")}
           </p>
         </div>
 
@@ -87,16 +76,14 @@ export function HowItWorks() {
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.22em] text-white/45">
-                {isZh ? "适合视频 SaaS 的落地页结构" : "Landing page logic"}
+                {t("subtitle")}
               </p>
               <h3 className="mt-3 text-2xl font-semibold text-white md:text-3xl">
-                {isZh ? "先讲输入与结果，再讲能力与定价，转化路径会自然很多" : "Lead with input and output, then explain capabilities and pricing"}
+                {t("bottomHint")}
               </h3>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm leading-7 text-muted-foreground md:max-w-sm">
-              {isZh
-                ? "这次保留你已有的鉴权、支付、积分和 provider 接法，只把前端营销结构调整到更接近成熟竞品的状态。"
-                : "This pass keeps auth, billing, credits, and provider plumbing intact while moving the frontend closer to a polished competitor layout."}
+              {t("bottomHint")}
             </div>
           </div>
         </div>

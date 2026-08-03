@@ -87,6 +87,7 @@ export function DurationSlider({
   );
   const nativeSegments = useMemo(() => buildSegments(native), [native]);
   const extendedSegments = useMemo(() => buildSegments(extended), [extended]);
+  const hasUnavailableDurations = selectable.length < max - min + 1;
 
   if (selectable.length === 0) {
     return (
@@ -161,7 +162,9 @@ export function DurationSlider({
         {extended.length > 0 ? (
           <span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-violet-400/75" />{extendedLabel}</span>
         ) : null}
-        <span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-700" />{unavailableLabel}</span>
+        {hasUnavailableDurations ? (
+          <span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full bg-slate-700" />{unavailableLabel}</span>
+        ) : null}
       </div>
     </div>
   );

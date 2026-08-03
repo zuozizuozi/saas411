@@ -10,7 +10,11 @@ describe("isSubscriptionCreditInvoiceReason", () => {
     }
   );
 
-  it.each([null, "subscription_update", "manual", "upcoming"])(
+  it("grants only prorated incremental credits for subscription_update", () => {
+    expect(isSubscriptionCreditInvoiceReason("subscription_update")).toBe(true);
+  });
+
+  it.each([null, "manual", "upcoming"])(
     "does not grant credits for %s",
     (reason) => {
       expect(isSubscriptionCreditInvoiceReason(reason)).toBe(false);

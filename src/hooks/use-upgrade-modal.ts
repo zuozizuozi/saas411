@@ -12,7 +12,12 @@ interface UpgradeModalState {
   isOpen: boolean;
   reason?: "upgrade" | "insufficient_credits" | "expired";
   requiredCredits?: number;
-  openModal: (options?: { reason?: UpgradeModalState["reason"]; requiredCredits?: number }) => void;
+  availableCredits?: number;
+  openModal: (options?: {
+    reason?: UpgradeModalState["reason"];
+    requiredCredits?: number;
+    availableCredits?: number;
+  }) => void;
   closeModal: () => void;
 }
 
@@ -20,11 +25,19 @@ export const useUpgradeModal = create<UpgradeModalState>((set) => ({
   isOpen: false,
   reason: undefined,
   requiredCredits: undefined,
+  availableCredits: undefined,
   openModal: (options) =>
     set({
       isOpen: true,
       reason: options?.reason || "upgrade",
       requiredCredits: options?.requiredCredits,
+      availableCredits: options?.availableCredits,
     }),
-  closeModal: () => set({ isOpen: false, reason: undefined, requiredCredits: undefined }),
+  closeModal: () =>
+    set({
+      isOpen: false,
+      reason: undefined,
+      requiredCredits: undefined,
+      availableCredits: undefined,
+    }),
 }));

@@ -4,162 +4,157 @@ interface FAQItem {
   answer: string;
 }
 
-/**
- * 定价页面 FAQ 数据
- *
- * 基于 PRICING_REFERENCE.md 文档更新
- */
 export const priceFaqDataMap: Record<string, FAQItem[]> = {
   zh: [
     {
       id: "item-1",
-      question: "积分是如何工作的？",
+      question: "积分如何计费？",
       answer:
-        "每次生成视频时会消耗积分。不同模型和不同分辨率消耗的积分不同。例如，Veo 3.1 生成一个视频消耗 10 积分。您可以随时在账户中查看积分余额。",
+        "每次生成前都会显示预计积分消耗。实际消耗由所选 Seedance 模型、时长、分辨率和生成数量决定；生成失败时，已冻结的积分会自动返还。",
     },
     {
       id: "item-2",
-      question: "Basic 计划的费用是多少？",
+      question: "Go、Plus 和 Pro 有什么区别？",
       answer:
-        "Basic 月付计划每月 9.90 美元，提供 280 积分（约 28 个视频）。年付计划 99 美元，提供 3,360 积分（约 336 个视频），相当于省了 2 个月的费用。",
+        "三个套餐可使用的功能相同，区别仅在每个账期获得的积分数量。Go 每月 280 积分，Plus 每月 900 积分，Pro 每月 2,520 积分。",
     },
     {
       id: "item-3",
-      question: "Pro 计划包含哪些功能？",
+      question: "月付、季付和年付如何扣款？",
       answer:
-        "Pro 计划每月提供 960 积分（约 96 个视频），每月 29.90 美元。年付 299 美元，提供 11,520 积分。Pro 计划包含无水印、优先支持和商业使用权，是最受欢迎的选择。",
+        "月付每月扣款；季付享 5% 优惠，每 3 个月一次性扣款并发放 3 个月积分；年付享 10% 优惠，每年一次性扣款并发放 12 个月积分。",
     },
     {
       id: "item-4",
-      question: "我可以一次性购买积分吗？",
+      question: "可以一次性购买积分吗？",
       answer:
-        "是的！我们提供一次性积分包：Starter Pack（280 积分，14.90 美元）、Standard Pack（960 积分，39.90 美元）和 Pro Pack（2,850 积分，99.90 美元）。积分包有效期为 1 年。",
+        "可以。Starter Pack 为 14.90 美元/280 积分，Standard Pack 为 39.90 美元/900 积分，Premium Pack 为 99.90 美元/2,520 积分。无需先订阅即可购买。",
     },
     {
       id: "item-5",
-      question: "订阅和一次性购买有什么区别？",
+      question: "订阅具体包含哪些功能？",
       answer:
-        "订阅每月自动为您充值积分，月付积分有效期为 30 天。一次性购买积分包只需支付一次，积分有效期为 1 年。订阅用户享受更优惠的单价，年付订阅可省 17%。",
+        "所有付费套餐均可使用已上线的 Seedance 模型、文生视频、图生视频、模型支持的分辨率与原生音频、实时状态、历史记录和下载。seedance.co 不会额外添加平台水印。",
     },
     {
       id: "item-6",
-      question: "我可以随时取消订阅吗？",
+      question: "可以随时取消订阅吗？",
       answer:
-        "是的，您可以随时取消订阅。取消后，您将在当前计费周期结束后停止续费，已经充值的积分不会受到影响。",
+        "可以。取消后不会继续自动续费，订阅权益保留到当前账期结束；已经发放的积分仍按其原有效期使用。",
     },
   ],
   en: [
     {
       id: "item-1",
-      question: "How do credits work?",
+      question: "How are credits charged?",
       answer:
-        "Each video generation consumes credits. Different models and resolutions consume different amounts. For example, Veo 3.1 consumes 10 credits per video. You can check your credit balance anytime in your account.",
+        "The estimated credit cost is shown before every generation. Cost depends on the selected Seedance model, duration, resolution, and number of outputs. Frozen credits are automatically returned if generation fails.",
     },
     {
       id: "item-2",
-      question: "How much does the Basic plan cost?",
+      question: "What is the difference between Go, Plus, and Pro?",
       answer:
-        "The Basic monthly plan is $9.90/month with 280 credits (~28 videos). The yearly plan is $99 with 3,360 credits (~336 videos), saving you 2 months of payments.",
+        "All three plans include the same product capabilities. They differ only in credits per billing period: Go includes 280 credits per month, Plus 900, and Pro 2,520.",
     },
     {
       id: "item-3",
-      question: "What's included in the Pro plan?",
+      question: "How do monthly, quarterly, and yearly billing work?",
       answer:
-        "The Pro plan provides 960 credits per month (~96 videos) at $29.90/month. The yearly plan is $299 with 11,520 credits. The Pro plan includes watermark-free videos, priority support, and commercial license. It's our most popular choice.",
+        "Monthly plans renew each month. Quarterly plans are billed every 3 months with 5% off and grant 3 months of credits. Yearly plans are billed once per year with 10% off and grant 12 months of credits.",
     },
     {
       id: "item-4",
-      question: "Can I purchase credits one-time?",
+      question: "Can I buy credits without a subscription?",
       answer:
-        "Yes! We offer one-time credit packages: Starter Pack (280 credits, $14.90), Standard Pack (960 credits, $39.90), and Pro Pack (2,850 credits, $99.90). Credit packages are valid for 1 year.",
+        "Yes. Starter Pack is $14.90 for 280 credits, Standard Pack is $39.90 for 900 credits, and Premium Pack is $99.90 for 2,520 credits. No subscription is required.",
     },
     {
       id: "item-5",
-      question: "What's the difference between subscription and one-time purchase?",
+      question: "What capabilities are included?",
       answer:
-        "Subscriptions automatically recharge your credits monthly. Monthly subscription credits are valid for 30 days. One-time credit packages require a single payment and credits are valid for 1 year. Subscribers enjoy better per-credit rates, and yearly plans save 17%.",
+        "Every paid plan includes available Seedance models, text-to-video, image-to-video, supported resolutions and native audio, real-time status, generation history, and downloads. seedance.co does not add a platform watermark.",
     },
     {
       id: "item-6",
-      question: "Can I cancel my subscription anytime?",
+      question: "Can I cancel anytime?",
       answer:
-        "Yes, you can cancel your subscription anytime. After cancellation, you'll stop being charged at the end of your current billing period, and your existing credits will not be affected.",
+        "Yes. Cancellation stops the next renewal while access continues through the current billing period. Credits already granted keep their original expiration date.",
     },
   ],
   ja: [
     {
       id: "item-1",
-      question: "クレジットはどのように機能しますか？",
+      question: "クレジットはどのように請求されますか？",
       answer:
-        "動画を生成するたびにクレジットが消費されます。モデルや解像度によって消費量が異なります。例えば、Veo 3.1 は動画あたり 10 クレジットを消費します。アカウントでいつでもクレジット残高を確認できます。",
+        "生成前に予想クレジットが表示されます。消費量は Seedance モデル、動画時間、解像度、出力数によって決まり、生成に失敗した場合は凍結クレジットが自動返還されます。",
     },
     {
       id: "item-2",
-      question: "Basic プランの費用はいくらですか？",
+      question: "Go、Plus、Pro の違いは何ですか？",
       answer:
-        "Basic 月額プランは月額 9.90 ドルで 280 クレジット（約 28 本の動画）。年額プランは 99 ドルで 3,360 クレジット（約 336 本の動画）で、2 ヶ月分の支払いを節約できます。",
+        "利用できる機能は同じで、請求期間ごとのクレジット数のみ異なります。月あたり Go は 280、Plus は 900、Pro は 2,520 クレジットです。",
     },
     {
       id: "item-3",
-      question: "Pro プランには何が含まれていますか？",
+      question: "月払い・四半期払い・年払いの仕組みは？",
       answer:
-        "Pro プランは月額 29.90 ドルで 960 クレジット（約 96 本の動画）。年額プランは 299 ドルで 11,520 クレジット。Pro プランにはウォーターマークなし、優先サポート、商用利用権が含まれ、最も人気のある選択肢です。",
+        "月払いは毎月更新、四半期払いは 5% 割引で 3 か月ごとに請求、年払いは 10% 割引で年 1 回請求され、それぞれ期間分のクレジットが付与されます。",
     },
     {
       id: "item-4",
-      question: "クレジットを一回限りの購入でできますか？",
+      question: "サブスクリプションなしでクレジットを購入できますか？",
       answer:
-        "はい！Starter Pack（280 クレジット、14.90 ドル）、Standard Pack（960 クレジット、39.90 ドル）、Pro Pack（2,850 クレジット、99.90 ドル）の一回限りのクレジットパッケージをご用意しています。有効期間は 1 年です。",
+        "はい。Starter は $14.90/280、Standard は $39.90/900、Premium は $99.90/2,520 クレジットです。",
     },
     {
       id: "item-5",
-      question: "サブスクリプションと一回限りの購入の違いは何ですか？",
+      question: "どの機能が含まれますか？",
       answer:
-        "サブスクリプションは毎月自動的にクレジットをチャージします。月額サブスクリプションのクレジットは 30 日間有効です。一回限りのクレジットパッケージは一度の支払いで、クレジットは 1 年間有効です。サブスクライバーはよりお得なレートを享受でき、年額プランは 17% 節約できます。",
+        "公開中の Seedance モデル、テキスト・画像からの動画生成、対応解像度と音声、進行状況、履歴、ダウンロードを利用できます。seedance.co の透かしは追加されません。",
     },
     {
       id: "item-6",
-      question: "サブスクリプションをいつでもキャンセルできますか？",
+      question: "いつでも解約できますか？",
       answer:
-        "はい、いつでもサブスクリプションをキャンセルできます。キャンセル後、現在の請求期間の終了時に課金が停止され、既存のクレジットには影響しません。",
+        "はい。解約後は次回更新が停止し、現在の請求期間終了までは利用できます。付与済みクレジットの有効期限は変わりません。",
     },
   ],
   ko: [
     {
       id: "item-1",
-      question: "크레딧은 어떻게 작동하나요?",
+      question: "크레딧은 어떻게 차감되나요?",
       answer:
-        "비디오를 생성할 때마다 크레딧이 소비됩니다. 모델과 해상도에 따라 소비량이 다릅니다. 예를 들어, Veo 3.1은 비디오당 10 크레딧을 소비합니다. 계정에서 언제든지 크레딧 잔액을 확인할 수 있습니다.",
+        "생성 전에 예상 크레딧이 표시됩니다. 사용량은 Seedance 모델, 길이, 해상도, 출력 수에 따라 달라지며 생성 실패 시 동결된 크레딧이 자동 반환됩니다.",
     },
     {
       id: "item-2",
-      question: "Basic 플랜의 비용은 얼마인가요?",
+      question: "Go, Plus, Pro의 차이는 무엇인가요?",
       answer:
-        "Basic 월간 플랜은 월 $9.90에 280 크레딧(약 28개 비디오)을 제공합니다. 연간 플랜은 $99에 3,360 크레딧(약 336개 비디오)을 제공하며 2개월치 요금을 절약할 수 있습니다.",
+        "사용 가능한 기능은 동일하며 결제 기간당 크레딧만 다릅니다. 월 기준 Go 280, Plus 900, Pro 2,520 크레딧입니다.",
     },
     {
       id: "item-3",
-      question: "Pro 플랜에는 무엇이 포함되어 있나요?",
+      question: "월간, 분기, 연간 결제는 어떻게 작동하나요?",
       answer:
-        "Pro 플랜은 월 $29.90에 월 960 크레딧(약 96개 비디오)을 제공합니다. 연간 플랜은 $299에 11,520 크레딧을 제공합니다. Pro 플랜에는 워터마크 제거, 우선 지원, 상업용 라이선스가 포함되어 있으며 가장 인기 있는 선택입니다.",
+        "월간은 매월 갱신됩니다. 분기 결제는 5% 할인으로 3개월마다 청구되고, 연간 결제는 10% 할인으로 매년 한 번 청구되며 각 기간의 크레딧이 지급됩니다.",
     },
     {
       id: "item-4",
-      question: "일회성 크레딧을 구매할 수 있나요?",
+      question: "구독 없이 크레딧을 구매할 수 있나요?",
       answer:
-        "네! Starter Pack(280 크레딧, $14.90), Standard Pack(960 크레딧, $39.90), Pro Pack(2,850 크레딧, $99.90)의 일회성 크레딧 패키지를 제공합니다. 크레딧 패키지는 1년 동안 유효합니다.",
+        "네. Starter는 $14.90/280, Standard는 $39.90/900, Premium은 $99.90/2,520 크레딧입니다.",
     },
     {
       id: "item-5",
-      question: "구독과 일회성 구매의 차이점은 무엇인가요?",
+      question: "어떤 기능이 포함되나요?",
       answer:
-        "구독은 매월 자동으로 크레딧을 충전합니다. 월간 구독 크레딧은 30일 동안 유효합니다. 일회성 크레딧 패키지는 한 번의 결제로 되며 크레딧은 1년 동안 유효합니다. 구독자는 더 저렴한 크레딧 단가를 누릴 수 있으며 연간 플랜은 17% 절약됩니다.",
+        "사용 가능한 Seedance 모델, 텍스트·이미지 영상 생성, 지원 해상도와 오디오, 실시간 상태, 생성 기록과 다운로드가 포함됩니다. seedance.co 워터마크는 추가되지 않습니다.",
     },
     {
       id: "item-6",
       question: "언제든지 구독을 취소할 수 있나요?",
       answer:
-        "네, 언제든지 구독을 취소할 수 있습니다. 취소 후 현재 청구 기간이 끝날 때 요금 청구가 중지되며 기존 크레딧에는 영향을 받지 않습니다.",
+        "네. 취소하면 다음 갱신이 중지되고 현재 결제 기간까지 이용할 수 있습니다. 이미 지급된 크레딧의 만료일은 유지됩니다.",
     },
   ],
 };

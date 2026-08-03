@@ -59,7 +59,7 @@ export function VideoHistoryCard({
   const handleCopyPrompt = () => {
     if (video.prompt) {
       navigator.clipboard.writeText(video.prompt);
-      toast.success("Prompt copied to clipboard");
+      toast.success(t("promptCopied"));
     }
   };
 
@@ -152,7 +152,7 @@ export function VideoHistoryCard({
                   type="button"
                   onClick={handleCopyPrompt}
                   className="p-1 hover:text-zinc-300 transition-colors"
-                  title="Copy prompt"
+                  title={t("copyPrompt")}
                 >
                   <Copy className="w-4 h-4" />
                 </button>

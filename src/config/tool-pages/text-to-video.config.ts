@@ -1,5 +1,4 @@
 import { ToolPageConfig } from "./types";
-import { NEW_USER_GIFT } from "@/config/pricing-user";
 
 /**
  * Text to Video 工具页面配置
@@ -27,15 +26,15 @@ export const textToVideoConfig: ToolPageConfig = {
     uiMode: "compact",
 
     defaults: {
-      model: "zhipu-video",
+      model: "seedance-2.0-mini",
       duration: 5,
       aspectRatio: "16:9",
       outputNumber: 1,
     },
 
     models: {
-      available: ["zhipu-video", "seedance-1.5-pro", "seedance-1.0-pro-fast", "seedance-1.0-pro-quality"],
-      default: "zhipu-video",
+      available: ["seedance-2.0-mini", "seedance-2.0", "seedance-1.5-pro", "seedance-2.5"],
+      default: "seedance-2.0-mini",
     },
 
     features: {
@@ -65,7 +64,7 @@ export const textToVideoConfig: ToolPageConfig = {
       title: "Create Stunning Videos from Text",
       description: "Describe your vision in plain text and let AI bring it to life. From cinematic scenes to product showcases, the possibilities are endless.",
       ctaText: "Start Creating",
-      ctaSubtext: `${NEW_USER_GIFT.credits} free credits to try`,
+      ctaSubtext: "Create an account, then purchase credits or subscribe to generate",
     },
 
     examples: [
@@ -88,17 +87,17 @@ export const textToVideoConfig: ToolPageConfig = {
 
     features: [
       "Simply describe what you want to see",
-      "Access to Seedance AI models (1.5 Pro, 1.0 Fast, 1.0 Quality)",
+      "Choose Seedance 2.0 Mini, Seedance 2.0, or Seedance 1.5 Pro",
       "Cinematic quality up to 1080p",
       "Generate audio and sound effects automatically",
       "Multiple aspect ratios for any platform",
     ],
 
     supportedModels: [
-      { name: "CogVideoX Flash", provider: "Zhipu AI", color: "#2563eb" },
+      { name: "Seedance 2.0 Mini", provider: "ByteDance", color: "#2563eb" },
+      { name: "Seedance 2.0", provider: "ByteDance", color: "#7c3aed" },
       { name: "Seedance 1.5 Pro", provider: "ByteDance", color: "#10b981" },
-      { name: "Seedance 1.0 Fast", provider: "ByteDance", color: "#34d399" },
-      { name: "Seedance 1.0 Quality", provider: "ByteDance", color: "#059669" },
+      { name: "Seedance 2.5 (Coming Soon)", provider: "ByteDance", color: "#64748b" },
     ],
 
     stats: {

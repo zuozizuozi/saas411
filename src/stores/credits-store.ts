@@ -10,7 +10,7 @@ export interface CreditBalance {
   frozenCredits: number;
   availableCredits: number;
   expiringSoon: number;
-  plan?: "FREE" | "PRO" | "BUSINESS" | null;
+  plan?: "FREE" | "BASIC" | "PRO" | "BUSINESS" | null;
 }
 
 interface CreditsState {

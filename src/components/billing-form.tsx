@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/components/ui";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,6 +31,8 @@ export function BillingForm({
   ...props
 }: BillingFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const pricing = useTranslations("PricingCards");
+  const common = useTranslations("Common");
 
   async function onSubmit(event: { preventDefault: () => void }) {
     event.preventDefault();
@@ -39,9 +42,7 @@ export function BillingForm({
     const response = await fetch("/api/users/stripe");
 
     if (!response?.ok) {
-      return toast.error("Something went wrong.", {
-        description: "Please refresh the page and try again.",
-      });
+      return toast.error(common("error"));
     }
 
     // Redirect to the Stripe session.
@@ -57,10 +58,9 @@ export function BillingForm({
     <form className={cn(className)} onSubmit={onSubmit} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Subscription Plan</CardTitle>
+          <CardTitle>{pricing("pricing")}</CardTitle>
           <CardDescription>
-            You are currently on the <strong>{subscriptionPlan?.title}</strong>{" "}
-            plan.
+            {pricing("slogan")}: <strong>{subscriptionPlan?.title}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent>{subscriptionPlan?.description}</CardContent>
@@ -74,15 +74,12 @@ export function BillingForm({
               <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
             {subscriptionPlan?.isPaid
-              ? "Manage Subscription"
-              : "Upgrade to PRO"}
+              ? pricing("manage_subscription")
+              : pricing("upgrade")}
           </button>
           {subscriptionPlan?.isPaid ? (
             <p className="rounded-full text-xs font-medium">
-              {subscriptionPlan?.isCanceled
-                ? "Your plan will be canceled on "
-                : "Your plan renews on "}
-              {formatDate(subscriptionPlan?.stripeCurrentPeriodEnd)}.
+              {formatDate(subscriptionPlan?.stripeCurrentPeriodEnd)}
             </p>
           ) : null}
         </CardFooter>

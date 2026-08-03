@@ -2,7 +2,17 @@ import { customers, db } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
 import { stripe } from "@/payment";
 import { pricingData } from "@/payment/subscriptions";
+import type { BillingPeriod } from "@/config/price/price-data";
 import { getOnetimeProducts } from "@/config/credits";
+import {
+  getSubscriptionPriceDetails,
+  type SubscriptionPriceDetails,
+} from "@/payment/plans";
+import {
+  calculateProratedUpgradeCredits,
+  calculateProrationCharge,
+  type ProrationLine,
+} from "@/payment/subscription-proration";
 import { eq } from "drizzle-orm";
 import { ensureCustomer } from "./customer";
 
@@ -11,30 +21,204 @@ export type UserSubscriptionPlan = {
   description: string;
   benefits: string[];
   limitations: string[];
-  prices: {
-    monthly: number;
-    yearly: number;
-  };
-  stripeIds: {
-    monthly: string | null;
-    yearly: string | null;
-  };
+  prices: Record<BillingPeriod, number>;
+  stripeIds: Record<BillingPeriod, string | null>;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
   stripePriceId: string | null;
   stripeCurrentPeriodEnd: number;
   isPaid: boolean;
-  interval: "month" | "year" | null;
+  interval: BillingPeriod | null;
   isCanceled?: boolean;
 };
 
-export async function createStripeSession(userId: string, planId: string) {
-  const requestedPlan = pricingData.some(
-    (plan) => plan.stripeIds.monthly === planId || plan.stripeIds.yearly === planId
-  );
-  if (!requestedPlan) {
-    throw new Error("Unknown Stripe price ID");
+export type StripeSubscriptionChangePreview =
+  | { kind: "checkout" }
+  | { kind: "portal"; url: string }
+  | {
+      kind: "upgrade";
+      targetPriceId: string;
+      prorationDate: number;
+      amount: number;
+      currency: string;
+      credits: number;
+      currentPlan: string;
+      targetPlan: string;
+    };
+
+function assertSupportedPrice(priceId: string): SubscriptionPriceDetails {
+  const details = getSubscriptionPriceDetails(priceId);
+  if (!details) throw new Error("Unknown Stripe price ID");
+  return details;
+}
+
+function getSubscriptionItem(subscription: Awaited<ReturnType<typeof stripe.subscriptions.retrieve>>) {
+  const item = subscription.items.data[0];
+  if (!item || subscription.items.data.length !== 1) {
+    throw new Error("Subscription must contain exactly one plan");
   }
+  return item;
+}
+
+async function getOwnedSubscription(userId: string, targetPriceId: string) {
+  const target = assertSupportedPrice(targetPriceId);
+  const customer = await ensureCustomer(userId);
+  if (!customer?.stripeSubscriptionId || !customer.stripeCustomerId) {
+    return { customer, target, subscription: null, item: null, current: null };
+  }
+
+  const subscription = await stripe.subscriptions.retrieve(
+    customer.stripeSubscriptionId
+  );
+  const stripeCustomerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+  if (stripeCustomerId !== customer.stripeCustomerId) {
+    throw new Error("Stripe subscription ownership mismatch");
+  }
+  if (subscription.metadata.userId !== userId) {
+    throw new Error("Stripe subscription user mismatch");
+  }
+
+  const item = getSubscriptionItem(subscription);
+  const current = assertSupportedPrice(item.price.id);
+  return { customer, target, subscription, item, current };
+}
+
+function isImmediateUpgrade(
+  current: SubscriptionPriceDetails,
+  target: SubscriptionPriceDetails
+) {
+  return current.period === target.period && target.rank > current.rank;
+}
+
+async function previewUpgradeInvoice(
+  subscriptionId: string,
+  itemId: string,
+  targetPriceId: string,
+  prorationDate: number
+) {
+  return stripe.invoices.retrieveUpcoming({
+    subscription: subscriptionId,
+    subscription_items: [{ id: itemId, price: targetPriceId }],
+    subscription_proration_behavior: "always_invoice",
+    subscription_proration_date: prorationDate,
+  });
+}
+
+function toProrationLines(lines: { data: unknown[] }): ProrationLine[] {
+  return lines.data as ProrationLine[];
+}
+
+export async function previewStripeSubscriptionChange(
+  userId: string,
+  targetPriceId: string
+): Promise<StripeSubscriptionChangePreview> {
+  const { customer, target, subscription, item, current } =
+    await getOwnedSubscription(userId, targetPriceId);
+
+  if (!subscription || !item || !current || !customer?.stripeCustomerId) {
+    return { kind: "checkout" };
+  }
+
+  if (!isImmediateUpgrade(current, target)) {
+    const returnUrl = process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+      : "/dashboard";
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customer.stripeCustomerId,
+      return_url: returnUrl,
+    });
+    return { kind: "portal", url: session.url };
+  }
+
+  const prorationDate = Math.floor(Date.now() / 1000);
+  const invoice = await previewUpgradeInvoice(
+    subscription.id,
+    item.id,
+    targetPriceId,
+    prorationDate
+  );
+  const lines = toProrationLines(invoice.lines);
+  const credits = calculateProratedUpgradeCredits(lines, prorationDate);
+
+  return {
+    kind: "upgrade",
+    targetPriceId,
+    prorationDate,
+    amount: calculateProrationCharge(lines, prorationDate),
+    currency: invoice.currency,
+    credits,
+    currentPlan: current.name,
+    targetPlan: target.name,
+  };
+}
+
+export async function confirmStripeSubscriptionUpgrade(
+  userId: string,
+  targetPriceId: string,
+  prorationDate: number
+) {
+  const now = Math.floor(Date.now() / 1000);
+  if (prorationDate > now + 30 || now - prorationDate > 10 * 60) {
+    throw new Error("Upgrade quote expired. Please request a new quote.");
+  }
+
+  const { target, subscription, item, current } = await getOwnedSubscription(
+    userId,
+    targetPriceId
+  );
+  if (!subscription || !item || !current || !isImmediateUpgrade(current, target)) {
+    throw new Error("This subscription is no longer eligible for that upgrade");
+  }
+
+  // Re-preview with the exact timestamp shown to the user so both the charge
+  // and the incremental credits remain aligned with Stripe's calculation.
+  const preview = await previewUpgradeInvoice(
+    subscription.id,
+    item.id,
+    targetPriceId,
+    prorationDate
+  );
+  const credits = calculateProratedUpgradeCredits(
+    toProrationLines(preview.lines),
+    prorationDate
+  );
+  if (credits <= 0) throw new Error("Upgrade has no incremental credits");
+
+  const updated = await stripe.subscriptions.update(
+    subscription.id,
+    {
+      items: [{ id: item.id, price: targetPriceId }],
+      payment_behavior: "pending_if_incomplete",
+      proration_behavior: "always_invoice",
+      proration_date: prorationDate,
+    },
+    { idempotencyKey: `subscription-upgrade:${subscription.id}:${targetPriceId}:${prorationDate}` }
+  );
+
+  const latestInvoiceId =
+    typeof updated.latest_invoice === "string"
+      ? updated.latest_invoice
+      : updated.latest_invoice?.id;
+  const invoice = latestInvoiceId
+    ? await stripe.invoices.retrieve(latestInvoiceId)
+    : null;
+
+  return {
+    success: true as const,
+    credits,
+    paymentPending: Boolean(updated.pending_update),
+    url:
+      invoice && invoice.status !== "paid"
+        ? invoice.hosted_invoice_url ?? null
+        : null,
+  };
+}
+
+export async function createStripeSession(userId: string, planId: string) {
+  assertSupportedPrice(planId);
 
   // Every Stripe flow needs a local customer row before the webhook arrives.
   // This also makes a first purchase work for users who never opened settings.
@@ -146,9 +330,11 @@ export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan
     custom.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now();
   const isPaid = entitlementPlan !== "FREE" && periodIsCurrent;
 
-  const stripePlan =
-    pricingData.find((plan) => plan.stripeIds.monthly === custom.stripePriceId) ??
-    pricingData.find((plan) => plan.stripeIds.yearly === custom.stripePriceId);
+  const stripePlan = custom.stripePriceId
+    ? pricingData.find((plan) =>
+        Object.values(plan.stripeIds).includes(custom.stripePriceId)
+      )
+    : undefined;
   const entitlementPlanIndex = {
     FREE: 0,
     BASIC: 1,
@@ -158,12 +344,10 @@ export async function getUserPlans(userId: string): Promise<UserSubscriptionPlan
   const customPlan = stripePlan ?? pricingData[entitlementPlanIndex];
   const plan = isPaid && customPlan ? customPlan : pricingData[0]!;
 
-  const interval = isPaid
-      ? stripePlan?.stripeIds.monthly === custom.stripePriceId
-        ? "month"
-      : stripePlan?.stripeIds.yearly === custom.stripePriceId
-        ? "year"
-        : null
+  const interval = isPaid && stripePlan
+    ? (Object.entries(stripePlan.stripeIds).find(
+        ([, priceId]) => priceId === custom.stripePriceId
+      )?.[0] as BillingPeriod | undefined) ?? null
     : null;
 
   let isCanceled = false;

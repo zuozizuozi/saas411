@@ -62,12 +62,14 @@ export interface SubscriptionPlan {
   benefits?: string[];
   limitations?: string[];
   prices?: {
-    monthly: number;
-    yearly: number;
+    month: number;
+    quarter: number;
+    year: number;
   };
   stripeIds?: {
-    monthly: string | null;
-    yearly: string | null;
+    month: string | null;
+    quarter: string | null;
+    year: string | null;
   };
 }
 

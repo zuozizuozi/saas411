@@ -11,6 +11,7 @@ import {
   getSubscriptionPlan,
   isSubscriptionCreditInvoiceReason,
 } from "./plans";
+import { calculateProratedUpgradeCredits } from "./subscription-proration";
 
 async function syncSubscription(subscription: Stripe.Subscription) {
   const userId = subscription.metadata.userId;
@@ -76,6 +77,30 @@ async function fulfillSubscriptionInvoice(
   const userId = subscription.metadata.userId;
   if (!userId) throw new Error("Missing user id in Stripe subscription metadata");
 
+  if (invoice.billing_reason === "subscription_update") {
+    const lines = await stripe.invoices.listLineItems(invoice.id, { limit: 100 });
+    const credits = calculateProratedUpgradeCredits(lines.data);
+    if (credits <= 0) return false;
+
+    const targetLine = lines.data.find(
+      (line) => line.proration && line.amount > 0 && line.price?.id
+    );
+    const targetGrant = getSubscriptionCreditGrant(targetLine?.price?.id);
+    if (!targetGrant) {
+      throw new Error(`Unknown Stripe upgrade price: ${targetLine?.price?.id}`);
+    }
+
+    await creditService.recharge({
+      userId,
+      credits,
+      orderNo: `stripe_upgrade_invoice_${invoice.id}`,
+      transType: CreditTransType.SUBSCRIPTION,
+      expiryDays: targetGrant.expiryDays,
+      remark: `Stripe prorated subscription upgrade: ${targetGrant.name}`,
+    });
+    return true;
+  }
+
   const priceId = subscription.items.data[0]?.price.id;
   const grant = getSubscriptionCreditGrant(priceId);
   if (!grant) throw new Error(`Unknown Stripe subscription price: ${priceId}`);
@@ -107,7 +132,7 @@ export async function handleEvent(event: Stripe.DiscriminatedEvent) {
     return;
   }
 
-  if (event.type === "invoice.payment_succeeded") {
+  if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid") {
     const invoice = event.data.object as Stripe.Invoice;
     if (!invoice.subscription) return;
     const subscription = await stripe.subscriptions.retrieve(

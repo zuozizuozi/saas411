@@ -143,25 +143,39 @@ function evolinkParamsTransformer(
     : params.imageUrl
       ? [params.imageUrl]
       : undefined;
+  const internalFields = new Set([
+    "aspectRatio",
+    "removeWatermark",
+    "callbackUrl",
+    "imageUrl",
+    "imageUrls",
+    "mode",
+    "outputNumber",
+    "generateAudio",
+  ]);
+  const passthroughParams = Object.fromEntries(
+    Object.entries(params).filter(([key]) => !internalFields.has(key))
+  );
   const result: Record<string, any> = {
-    ...params,
+    ...passthroughParams,
     aspect_ratio: params.aspectRatio || "16:9",
     duration: params.duration || 10,
-    remove_watermark: params.removeWatermark ?? true,
+    ...(internalModelId.startsWith("seedance-")
+      ? {}
+      : { remove_watermark: params.removeWatermark ?? true }),
     callback_url: params.callbackUrl,
     quality,
     image_urls: imageUrls,
+    generate_audio:
+      typeof params.generateAudio === "boolean"
+        ? params.generateAudio
+        : undefined,
   };
 
-  // Remove internal field names
-  result.aspectRatio = undefined;
-  result.removeWatermark = undefined;
-  result.callbackUrl = undefined;
-  result.imageUrl = undefined;
-  result.imageUrls = undefined;
-  result.mode = undefined;
-  result.outputNumber = undefined;
-  result.generateAudio = undefined;
+  // Seedance's unified API does not accept the generic watermark parameter.
+  if (internalModelId.startsWith("seedance-")) {
+    result.content_filter = true;
+  }
 
   // Model-specific adjustments
   if (internalModelId === "wan2.6") {
@@ -427,6 +441,50 @@ export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
   },
 
   // -------------------------------------------------------------------------
+  // Seedance 2.0 family (EvoLink unified generation API)
+  // -------------------------------------------------------------------------
+  "seedance-2.0-mini": {
+    internalId: "seedance-2.0-mini",
+    displayName: "Seedance 2.0 Mini",
+    providers: {
+      evolink: {
+        providerModelId: (params) => {
+          const hasImage =
+            (Array.isArray(params.imageUrls) && params.imageUrls.length > 0) ||
+            Boolean(params.imageUrl);
+          return hasImage
+            ? "seedance-2.0-mini-image-to-video"
+            : "seedance-2.0-mini-text-to-video";
+        },
+        supported: true,
+        nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        extendedDurations: [],
+        transformParams: evolinkParamsTransformer,
+      },
+    },
+  },
+  "seedance-2.0": {
+    internalId: "seedance-2.0",
+    displayName: "Seedance 2.0",
+    providers: {
+      evolink: {
+        providerModelId: (params) => {
+          const hasImage =
+            (Array.isArray(params.imageUrls) && params.imageUrls.length > 0) ||
+            Boolean(params.imageUrl);
+          return hasImage
+            ? "seedance-2.0-image-to-video"
+            : "seedance-2.0-text-to-video";
+        },
+        supported: true,
+        nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        extendedDurations: [],
+        transformParams: evolinkParamsTransformer,
+      },
+    },
+  },
+
+  // -------------------------------------------------------------------------
   // Sora 2
   // -------------------------------------------------------------------------
   "sora-2": {
@@ -550,6 +608,8 @@ export const MODEL_MAPPINGS: Record<string, ModelMapping> = {
       evolink: {
         providerModelId: "seedance-1.5-pro",
         supported: true,
+        nativeDurations: [4, 5, 6, 7, 8, 9, 10, 11, 12],
+        extendedDurations: [],
         transformParams: evolinkParamsTransformer,
       },
       kie: {
@@ -603,6 +663,12 @@ const MODEL_MODE_SUPPORT: Record<
   "zhipu-video": {
     bailian: ["text-to-video", "image-to-video"],
     zhipu: ["text-to-video", "image-to-video"],
+  },
+  "seedance-2.0-mini": {
+    evolink: ["text-to-video", "image-to-video"],
+  },
+  "seedance-2.0": {
+    evolink: ["text-to-video", "image-to-video"],
   },
   "sora-2": {
     evolink: ["text-to-video", "image-to-video"],

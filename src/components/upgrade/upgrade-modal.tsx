@@ -28,7 +28,7 @@ function UpgradeModalContent() {
   const t = useTranslations("UpgradeModal");
   const tPricing = useTranslations("PricingCards");
   const tCredits = useTranslations("Credits");
-  const { isOpen, closeModal, reason, requiredCredits } = useUpgradeModal();
+  const { isOpen, closeModal, reason, requiredCredits, availableCredits } = useUpgradeModal();
   const [userId, setUserId] = useState<string | undefined>();
 
   // 获取当前用户
@@ -45,7 +45,6 @@ function UpgradeModalContent() {
     onetime: tPricing("onetime"),
     monthly: tPricing("monthly"),
     yearly: tPricing("yearly"),
-    off_percent: tPricing("off_percent"),
     no_products: tPricing("no_products"),
     per_year: tPricing("per_year"),
     per_month: tPricing("per_month"),
@@ -63,9 +62,21 @@ function UpgradeModalContent() {
         name: tCredits("packages.starter.name"),
         description: tCredits("packages.starter.description"),
       },
+      go: {
+        name: tCredits("packages.go.name"),
+        description: tCredits("packages.go.description"),
+      },
+      plus: {
+        name: tCredits("packages.plus.name"),
+        description: tCredits("packages.plus.description"),
+      },
       standard: {
         name: tCredits("packages.standard.name"),
         description: tCredits("packages.standard.description"),
+      },
+      premium: {
+        name: tCredits("packages.premium.name"),
+        description: tCredits("packages.premium.description"),
       },
       pro: {
         name: tCredits("packages.pro.name"),
@@ -77,13 +88,13 @@ function UpgradeModalContent() {
       },
     },
     features: {
-      hd_videos: tCredits("features.hd_videos"),
-      fast_generation: tCredits("features.fast_generation"),
-      no_watermark: tCredits("features.no_watermark"),
-      commercial_use: tCredits("features.commercial_use"),
-      priority_support: tCredits("features.priority_support"),
-      api_access: tCredits("features.api_access"),
-      custom_models: tCredits("features.custom_models"),
+      all_models: tCredits("features.all_models"),
+      text_image_video: tCredits("features.text_image_video"),
+      model_quality_audio: tCredits("features.model_quality_audio"),
+      generation_status_history: tCredits("features.generation_status_history"),
+      credit_cost_preview: tCredits("features.credit_cost_preview"),
+      failed_credit_return: tCredits("features.failed_credit_return"),
+      no_platform_watermark: tCredits("features.no_platform_watermark"),
     },
   };
 
@@ -103,7 +114,11 @@ function UpgradeModalContent() {
   const getDescription = () => {
     switch (reason) {
       case "insufficient_credits":
-        return t("insufficient_credits_description", { credits: requiredCredits ?? 0 });
+        return t("insufficient_credits_description", {
+          required: requiredCredits ?? 0,
+          available: availableCredits ?? 0,
+          credits: requiredCredits ?? 0,
+        });
       case "expired":
         return t("expired_description");
       default:

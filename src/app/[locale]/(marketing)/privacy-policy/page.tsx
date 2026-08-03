@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/config/i18n-config";
 import { siteConfig } from "@/config/site";
 import { buildAlternates } from "@/lib/seo";
@@ -10,9 +10,10 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const alternates = buildAlternates("/privacy-policy", locale);
+  const t = await getTranslations({ locale, namespace: "Legal.Privacy" });
 
   return {
-    title: "Privacy Policy",
+    title: t("title"),
     alternates: {
       canonical: alternates.canonical,
       languages: alternates.languages,
@@ -20,34 +21,34 @@ export async function generateMetadata({
   };
 }
 
-export default function PrivacyPolicyPage() {
-    const t = useTranslations("Privacy");
+export default async function PrivacyPolicyPage() {
+    const t = await getTranslations("Legal.Privacy");
+    const supportEmail = siteConfig.supportEmail ?? "support@seedance.co";
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
+            <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
             <div className="prose dark:prose-invert">
-                <p>Last updated: {new Date().getFullYear()}</p>
+                <p>{t("lastUpdated", { year: new Date().getFullYear() })}</p>
 
-                <h2>1. Introduction</h2>
-                <p>Welcome to seedance.co. We respect your privacy and are committed to protecting your personal data.</p>
+                <h2>{t("introductionTitle")}</h2>
+                <p>{t("introductionBody")}</p>
 
-                <h2>2. Data We Collect</h2>
-                <p>We collect information you provide directly to us when you create an account, generate videos, or contact support.</p>
+                <h2>{t("collectionTitle")}</h2>
+                <p>{t("collectionBody")}</p>
 
-                <h2>3. How We Use Your Data</h2>
-                <p>We use your data to provide and improve our services, including generating AI videos and maintaining your transaction history.</p>
+                <h2>{t("usageTitle")}</h2>
+                <p>{t("usageBody")}</p>
 
-                <h2>4. Data Security</h2>
-                <p>We implement appropriate security measures to protect your personal information.</p>
+                <h2>{t("securityTitle")}</h2>
+                <p>{t("securityBody")}</p>
 
-                <h2>5. Contact Us</h2>
+                <h2>{t("contactTitle")}</h2>
                 <p>
-                  For privacy-related questions, email us at{" "}
-                  <a href={`mailto:${siteConfig.supportEmail}`}>
-                    {siteConfig.supportEmail}
-                  </a>
-                  .
+                  {t.rich("contactBody", {
+                    email: (chunks) => <a href={`mailto:${supportEmail}`}>{chunks}</a>,
+                    address: supportEmail,
+                  })}
                 </p>
             </div>
         </div>

@@ -32,8 +32,11 @@ import { uploadImage } from "@/lib/video-api";
 import { ToolLandingPage } from "@/components/tool/tool-landing-page";
 import { VideoHistoryPanel } from "@/components/tool/video-history-panel";
 import { toast } from "sonner";
+import { getLowCreditState } from "@/config/low-credit";
 
 const TOOL_PREFILL_KEY = "videofly_tool_prefill";
+const LOW_CREDIT_NOTICE_KEY = "seedance_low_credit_notice_at";
+const LOW_CREDIT_NOTICE_INTERVAL = 24 * 60 * 60 * 1000;
 
 // ============================================================================
 // Types
@@ -93,6 +96,8 @@ export function ToolPageLayout({
   const NOTIFICATION_ASKED_KEY = "videofly_notification_asked";
   const tNotify = useTranslations("Notifications");
   const tTool = useTranslations("ToolPage");
+  const tHistory = useTranslations("VideoHistory");
+  const tCommon = useTranslations("Common");
 
   // 状态
   const [user, setUser] = useState<any>(null);
@@ -234,12 +239,12 @@ export function ToolPageLayout({
       }
       const notificationKey = `${videoId}:failed`;
       if (shouldNotify(notificationKey)) {
-        const message = error || "Video generation failed";
+        const message = error || tHistory("generationFailed");
         toast.error(message);
         markNotified(notificationKey);
       }
     },
-    [removeGeneratingId, user?.id, invalidate, shouldNotify, markNotified]
+    [removeGeneratingId, user?.id, invalidate, shouldNotify, markNotified, tHistory]
   );
 
   const { startPolling, stopPolling, isPolling } = useVideoPolling({
@@ -402,11 +407,14 @@ export function ToolPageLayout({
     const requiredCredits = data.estimatedCredits || 0;
     const availableCredits = balance?.availableCredits ?? 0;
 
-    if (availableCredits < requiredCredits) {
+    const lowCreditState = getLowCreditState(availableCredits, requiredCredits);
+
+    if (!lowCreditState.canGenerate) {
       // 打开升级弹窗
       openModal({
         reason: "insufficient_credits",
         requiredCredits,
+        availableCredits,
       });
       return;
     }
@@ -470,7 +478,7 @@ export function ToolPageLayout({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error?.error?.message || error?.message || "Failed to generate video");
+        throw new Error(error?.error?.message || error?.message || tHistory("generationFailed"));
       }
 
       const result = await response.json();
@@ -478,11 +486,26 @@ export function ToolPageLayout({
         ? result.data.outputs
         : [result.data];
 
-      toast.success(
-        generatedOutputs.length > 1
-          ? `${generatedOutputs.length} generations started`
-          : "Generation started"
-      );
+      toast.success(tTool("generatingTag"));
+
+      if (lowCreditState.shouldWarn && typeof window !== "undefined") {
+        const lastNotice = Number(localStorage.getItem(LOW_CREDIT_NOTICE_KEY) || 0);
+        if (Date.now() - lastNotice >= LOW_CREDIT_NOTICE_INTERVAL) {
+          localStorage.setItem(LOW_CREDIT_NOTICE_KEY, String(Date.now()));
+          const isSubscriber = Boolean(balance?.plan && balance.plan !== "FREE");
+          toast.warning(tTool("lowCreditTitle"), {
+            description: tTool("lowCreditDescription", {
+              credits: lowCreditState.remainingAfterGeneration,
+            }),
+            action: {
+              label: isSubscriber
+                ? tTool("buyCredits")
+                : tTool("choosePlan"),
+              onClick: () => openModal({ reason: "upgrade" }),
+            },
+          });
+        }
+      }
 
       // 添加到历史记录
       const creditsPerOutput = Math.ceil(
@@ -523,7 +546,7 @@ export function ToolPageLayout({
       const requiredCredits = data.estimatedCredits || 0;
       optimisticRelease(requiredCredits);
       // 显示错误提示
-      toast.error(error instanceof Error ? error.message : "Failed to generate video");
+      toast.error(error instanceof Error ? error.message : tHistory("generationFailed"));
     }
     setIsSubmitting(false);
   }, [
@@ -538,6 +561,9 @@ export function ToolPageLayout({
     optimisticFreeze,
     optimisticRelease,
     tNotify,
+    tHistory,
+    tTool,
+    openModal,
   ]);
 
   // 处理重新生成
@@ -552,7 +578,7 @@ export function ToolPageLayout({
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Failed to delete video");
+        throw new Error(tCommon("error"));
       }
 
       // 从历史记录中删除
@@ -561,12 +587,12 @@ export function ToolPageLayout({
 
       // 更新 currentVideos（兼容旧逻辑）
       setCurrentVideos((prev) => prev.filter((v) => v.uuid !== uuid));
-      toast.success("Video deleted successfully");
+      toast.success(tCommon("success"));
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete video");
+      toast.error(tCommon("error"));
     }
-  }, [user?.id]);
+  }, [user?.id, tCommon]);
 
   // 处理重试失败的视频
   const handleRetry = useCallback(async (uuid: string) => {
@@ -575,7 +601,7 @@ export function ToolPageLayout({
         method: "POST",
       });
       if (!response.ok) {
-        throw new Error("Failed to retry video");
+        throw new Error(tCommon("error"));
       }
       const payload = await response.json();
       const retried = payload.data;
@@ -606,10 +632,10 @@ export function ToolPageLayout({
       });
       addGeneratingId(newVideoUuid);
       startPolling(newVideoUuid);
-      toast.success("Video retry started");
+      toast.success(tTool("generatingTag"));
     } catch (error) {
       console.error("Retry error:", error);
-      toast.error("Failed to retry video");
+      toast.error(tCommon("error"));
     }
   }, [
     addGeneratingId,
@@ -619,6 +645,8 @@ export function ToolPageLayout({
     startPolling,
     toolRoute,
     user,
+    tCommon,
+    tTool,
   ]);
 
   // 移动端：显示标签导航
@@ -678,7 +706,7 @@ export function ToolPageLayout({
                     initialAspectRatio={prefillData?.aspectRatio}
                     initialQuality={prefillData?.quality}
                     initialImageUrl={prefillData?.imageUrl}
-                    maxOutputNumber={balance?.plan === "PRO" || balance?.plan === "BUSINESS" ? 2 : 1}
+                    maxOutputNumber={1}
                   />
                 </div>
 
@@ -752,7 +780,7 @@ export function ToolPageLayout({
                 initialAspectRatio={prefillData?.aspectRatio}
                 initialQuality={prefillData?.quality}
                 initialImageUrl={prefillData?.imageUrl}
-                maxOutputNumber={balance?.plan === "PRO" || balance?.plan === "BUSINESS" ? 2 : 1}
+                maxOutputNumber={2}
               />
             </div>
           </div>

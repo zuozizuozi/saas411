@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import {
   Clapperboard,
   ImagePlay,
@@ -15,57 +15,38 @@ const primaryIcons = [Clapperboard, ImagePlay, Layers3];
 const secondaryIcons = [Workflow, ShieldCheck, Sparkles];
 
 export function FeaturesSection() {
-  const locale = useLocale();
-  const isZh = locale === "zh";
+  const t = useTranslations("Features");
 
   const primaryCards = [
     {
-      title: isZh ? "文本生成视频" : "Text to video",
-      description: isZh
-        ? "一句提示词即可生成营销短片、产品演示、故事镜头和社媒素材，适合快速起稿与成片验证。"
-        : "Turn a prompt into a launch clip, ad concept, demo scene, or social asset in one generation flow.",
-      points: isZh
-        ? ["适合营销与产品演示", "支持常见横竖比例", "适合快速出首版"]
-        : ["Built for product, marketing, and social video", "Common landscape and portrait formats", "Fast first-pass generation"],
+      title: t("textToVideo.title"),
+      description: t("textToVideo.description"),
+      points: [t("formats.description"), t("fast.description"), t("realtime.description")],
     },
     {
-      title: isZh ? "图片生成视频" : "Image to video",
-      description: isZh
-        ? "上传产品图、角色图或关键视觉，补上镜头运动、节奏与动态细节，让静态素材直接进入视频工作流。"
-        : "Animate product shots, character art, or campaign key visuals with motion, pacing, and camera energy.",
-      points: isZh
-        ? ["适合海报转视频", "适合商品与角色演示", "保留主体一致性"]
-        : ["Ideal for poster-to-video workflows", "Useful for commerce and character shots", "Keeps the main subject consistent"],
+      title: t("imageToVideo.title"),
+      description: t("imageToVideo.description"),
+      points: [t("secure.description"), t("formats.description"), t("realtime.description")],
     },
     {
-      title: isZh ? "多模型统一工作台" : "Unified model workbench",
-      description: isZh
-        ? "在同一个入口下切换模型、时长、比例与清晰度，不改你现有的鉴权、积分、任务与回调链路。"
-        : "Switch models, duration, ratios, and quality from one workbench without changing your auth, credit, or task pipeline.",
-      points: isZh
-        ? ["保持现有后端逻辑", "统一任务与积分系统", "便于后续继续接新模型"]
-        : ["Preserves your current backend flow", "One task and credit system", "Easy to expand with new providers"],
+      title: t("referenceGen.title"),
+      description: t("referenceGen.description"),
+      points: [t("ai.description"), t("secure.description"), t("formats.description")],
     },
   ];
 
   const secondaryCards = [
     {
-      title: isZh ? "完整生成链路" : "Full generation flow",
-      description: isZh
-        ? "从输入、提交、排队、回调到结果查看，用户能清楚知道任务在哪里、下一步做什么。"
-        : "Users can see the path from input to queue, callback, and final result without losing context.",
+      title: t("realtime.title"),
+      description: t("realtime.description"),
     },
     {
-      title: isZh ? "信用与任务安全" : "Safe credits and tasks",
-      description: isZh
-        ? "保留你已有的积分冻结、结算、失败回滚和历史记录，不为了改首页而动核心交易逻辑。"
-        : "Your freeze, settle, refund, and history flows stay intact while the marketing surface gets upgraded.",
+      title: t("secure.title"),
+      description: t("secure.description"),
     },
     {
-      title: isZh ? "适合继续扩展" : "Ready for next-stage growth",
-      description: isZh
-        ? "后续可继续加模板库、案例页、模型专题页和视频背景，不需要再推翻这套落地页结构。"
-        : "You can layer in templates, model pages, examples, and video backgrounds later without rebuilding the layout.",
+      title: t("enhancement.title"),
+      description: t("enhancement.description"),
     },
   ];
 
@@ -74,15 +55,13 @@ export function FeaturesSection() {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/65">
-            {isZh ? "核心能力" : "Capabilities"}
+            {t("badge")}
           </span>
           <h2 className="mt-6 text-balance text-4xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
-            {isZh ? "一套首页，把视频生成产品最关键的能力讲清楚" : "Everything users need to understand before they start generating"}
+            {t("title")}
           </h2>
           <p className="mt-5 text-lg leading-8 text-muted-foreground">
-            {isZh
-              ? "竞品首页真正有效的地方，不是堆特效，而是让用户立刻知道能做什么、怎么做、值不值得付费。"
-              : "The strongest AI video homepages explain output, workflow, and value quickly instead of relying on decoration."}
+            {t("description")}
           </p>
         </div>
 

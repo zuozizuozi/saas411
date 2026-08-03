@@ -6,8 +6,10 @@ import { userActionClient } from "@/lib/safe-action";
 import {
   createStripeCreditSession,
   createStripeSession,
+  confirmStripeSubscriptionUpgrade,
   getMySubscription,
   getUserPlans,
+  previewStripeSubscriptionChange,
 } from "@/services/billing";
 
 export const createStripeSessionAction = userActionClient
@@ -21,6 +23,27 @@ export const createStripeCreditSessionAction = userActionClient
   .schema(z.object({ packageId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
     return createStripeCreditSession(ctx.user.id, parsedInput.packageId);
+  });
+
+export const previewStripeSubscriptionChangeAction = userActionClient
+  .schema(z.object({ planId: z.string().min(1) }))
+  .action(async ({ parsedInput, ctx }) => {
+    return previewStripeSubscriptionChange(ctx.user.id, parsedInput.planId);
+  });
+
+export const confirmStripeSubscriptionUpgradeAction = userActionClient
+  .schema(
+    z.object({
+      planId: z.string().min(1),
+      prorationDate: z.number().int().positive(),
+    })
+  )
+  .action(async ({ parsedInput, ctx }) => {
+    return confirmStripeSubscriptionUpgrade(
+      ctx.user.id,
+      parsedInput.planId,
+      parsedInput.prorationDate
+    );
   });
 
 export const getUserPlansAction = userActionClient

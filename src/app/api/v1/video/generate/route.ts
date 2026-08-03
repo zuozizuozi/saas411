@@ -10,7 +10,7 @@ import { mediaAssetService } from "@/services/media-asset";
 const generateSchema = z.object({
   prompt: z.string().trim().min(1).max(20000),
   model: z.string().min(1),
-  duration: z.number().int().min(5).max(30).optional(),
+  duration: z.number().int().min(4).max(15).optional(),
   aspectRatio: z.string().optional(),
   quality: z.string().optional(),
   imageUrl: z.string().url().optional(),
