@@ -1,4 +1,8 @@
-import { analyticsService, TimeRange } from "@/lib/admin/analytics";
+import {
+  analyticsService,
+  normalizeTimeRange,
+  type TimeRange,
+} from "@/lib/admin/analytics";
 import { AnalyticsHeader } from "@/components/admin/analytics/analytics-header";
 import { StatsCards } from "@/components/admin/analytics/stats-cards";
 import { FunnelChart } from "@/components/admin/analytics/funnel-chart";
@@ -14,7 +18,7 @@ interface AdminAnalyticsPageProps {
 export default async function AdminAnalyticsPage({ searchParams }: AdminAnalyticsPageProps) {
   await requireAdmin();
   const params = await searchParams;
-  const range = params.range || "30d";
+  const range = normalizeTimeRange(params.range);
 
   // Fetch all analytics data in parallel
   const analyticsData = await analyticsService.getAnalyticsData(range);

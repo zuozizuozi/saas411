@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
 import { cn } from "@/components/ui";
+import { LocaleLink, useLocalePathname } from "@/i18n/navigation";
+import { isAdminHrefActive } from "@/lib/admin/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -46,34 +45,39 @@ const navItems: NavItem[] = [
 ];
 
 export function AdminSidebar({ locale }: AdminSidebarProps) {
-  const pathname = usePathname();
+  const pathname = useLocalePathname();
 
   return (
     <aside className="w-64 border-r bg-card">
       <div className="flex h-full flex-col">
         {/* Brand */}
         <div className="flex h-16 items-center border-b px-6">
-          <Link href={`/${locale}/admin`} className="flex items-center gap-2">
+          <LocaleLink
+            href="/admin"
+            locale={locale}
+            prefetch={false}
+            className="flex items-center gap-2"
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <span className="text-sm font-bold text-primary-foreground">A</span>
             </div>
             <span className="text-lg font-semibold">Admin</span>
-          </Link>
+          </LocaleLink>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-4">
           {navItems.map((item) => {
             // 规范化路径进行比较（移除尾部斜杠）
-            const normalizedPathname = pathname.replace(/\/$/, "");
-            const normalizedHref = `/${locale}${item.href}`.replace(/\/$/, "");
-            const isActive = normalizedPathname === normalizedHref || normalizedPathname.startsWith(`${normalizedHref}/`);
+            const isActive = isAdminHrefActive(pathname, item.href);
             const Icon = item.icon;
 
             return (
-              <Link
+              <LocaleLink
                 key={item.href}
-                href={`/${locale}${item.href}`}
+                href={item.href}
+                locale={locale}
+                prefetch={false}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
@@ -83,20 +87,22 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
               >
                 <Icon className="h-4 w-4" />
                 {item.title}
-              </Link>
+              </LocaleLink>
             );
           })}
         </nav>
 
         {/* Back to App */}
         <div className="border-t p-4">
-          <Link
-            href={`/${locale}/dashboard`}
+          <LocaleLink
+            href="/text-to-video"
+            locale={locale}
+            prefetch={false}
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to App
-          </Link>
+          </LocaleLink>
         </div>
       </div>
     </aside>

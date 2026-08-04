@@ -1,24 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api/auth";
+
 import { getUserVideos, getUserVideoStats } from "@/lib/admin/user-videos";
+import { requireAdmin } from "@/lib/api/auth";
+import { handleApiError } from "@/lib/api/response";
+import { VideoStatus } from "@/db";
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
-    const searchParams = request.nextUrl.searchParams;
+    const searchParams = new URL(request.url).searchParams;
     const userId = searchParams.get("userId");
-    const page = Number.parseInt(searchParams.get("page") || "1");
-    const status = searchParams.get("status");
+    const page = Number(searchParams.get("page") || "1");
+    const rawStatus = searchParams.get("status");
+    const status = rawStatus && rawStatus !== "all" ? rawStatus : undefined;
 
     if (!userId) {
-      return NextResponse.json({ error: "缺少用户ID" }, { status: 400 });
+      return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
+    }
+
+    if (!Number.isInteger(page) || page < 1 || page > 10_000) {
+      return NextResponse.json({ error: "Invalid page" }, { status: 400 });
+    }
+
+    if (
+      status &&
+      !Object.values(VideoStatus).includes(status as VideoStatus)
+    ) {
+      return NextResponse.json({ error: "Invalid video status" }, { status: 400 });
     }
 
     const videosData = await getUserVideos({
       userId,
       page,
       limit: 10,
-      status: status && status !== "all" ? (status as any) : undefined,
+      status: status as VideoStatus | undefined,
     });
     const stats = await getUserVideoStats(userId);
 
@@ -29,10 +44,6 @@ export async function GET(request: NextRequest) {
       stats,
     });
   } catch (error) {
-    console.error("获取用户视频失败:", error);
-    return NextResponse.json(
-      { error: "获取用户视频失败" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

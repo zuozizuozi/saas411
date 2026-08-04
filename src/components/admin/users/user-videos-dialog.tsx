@@ -81,10 +81,12 @@ export function UserVideosDialog({
     successRate: number;
   } | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
 
   // 加载视频列表和统计信息
   const loadData = React.useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const params = new URLSearchParams({
         userId,
@@ -104,6 +106,9 @@ export function UserVideosDialog({
       setStats(data.stats);
     } catch (error) {
       console.error("加载视频失败:", error);
+      setLoadError(
+        error instanceof Error ? error.message : "Failed to load user videos",
+      );
     } finally {
       setLoading(false);
     }
@@ -230,6 +235,13 @@ export function UserVideosDialog({
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : loadError ? (
+            <div className="flex h-64 flex-col items-center justify-center gap-3 text-center">
+              <p className="text-sm text-destructive">{loadError}</p>
+              <Button type="button" variant="outline" onClick={() => void loadData()}>
+                Try again
+              </Button>
             </div>
           ) : videos.length === 0 ? (
             <div className="flex items-center justify-center h-64 text-muted-foreground">

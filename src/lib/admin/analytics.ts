@@ -1,8 +1,14 @@
 import { db } from "@/db";
 import { users, videos, creditTransactions, VideoStatus, CreditTransType } from "@/db/schema";
-import { count, eq, and, sql, desc, gte } from "drizzle-orm";
+import { count, eq, and, sql, gte, type SQL } from "drizzle-orm";
 
 export type TimeRange = "today" | "7d" | "30d" | "90d" | "all";
+
+const TIME_RANGES: readonly TimeRange[] = ["today", "7d", "30d", "90d", "all"];
+
+export function normalizeTimeRange(value: string | undefined): TimeRange {
+  return TIME_RANGES.includes(value as TimeRange) ? (value as TimeRange) : "30d";
+}
 
 export interface Stats {
   totalUsers: number;
@@ -57,18 +63,18 @@ class AnalyticsService {
     }
   }
 
-  private buildTimeCondition(timeFilter: Date | null) {
-    if (!timeFilter) return sql``;
+  private buildTimeCondition(timeFilter: Date | null): SQL | undefined {
+    if (!timeFilter) return undefined;
     return sql`${users.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
   }
 
-  private buildVideoTimeCondition(timeFilter: Date | null) {
-    if (!timeFilter) return sql``;
+  private buildVideoTimeCondition(timeFilter: Date | null): SQL | undefined {
+    if (!timeFilter) return undefined;
     return sql`${videos.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
   }
 
-  private buildTransactionTimeCondition(timeFilter: Date | null) {
-    if (!timeFilter) return sql``;
+  private buildTransactionTimeCondition(timeFilter: Date | null): SQL | undefined {
+    if (!timeFilter) return undefined;
     return sql`${creditTransactions.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
   }
 
@@ -159,7 +165,7 @@ class AnalyticsService {
     const videoSuccessRate = totalFinishedVideos > 0 ? (completedVideos / totalFinishedVideos) * 100 : 0;
 
     // Users who haven't generated any video
-    const usersWithoutVideos = totalUsers - usersWithVideoCount;
+    const usersWithoutVideos = Math.max(0, totalUsers - usersWithVideoCount);
 
     return {
       totalUsers,

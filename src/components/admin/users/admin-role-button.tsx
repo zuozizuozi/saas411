@@ -37,10 +37,16 @@ export function AdminRoleButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAdmin: nextIsAdmin }),
       });
-      const payload = (await response.json()) as {
+      const responseText = await response.text();
+      let payload: {
         success?: boolean;
         error?: { message?: string };
-      };
+      } = {};
+      try {
+        payload = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        // A gateway timeout can return HTML instead of the API JSON envelope.
+      }
 
       if (!response.ok) {
         throw new Error(payload.error?.message || "管理员权限更新失败");

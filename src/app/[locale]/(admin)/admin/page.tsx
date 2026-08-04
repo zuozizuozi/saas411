@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, videos, creditPackages, VideoStatus } from "@/db/schema";
-import { count, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { connection } from "next/server";
 import { requireAdmin } from "@/lib/auth/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,50 +20,45 @@ export default async function AdminDashboardPage() {
   await connection();
   await requireAdmin();
 
-  // The production database uses one Supavisor connection per serverless
-  // instance. Keep these operations sequential and aggregate video counts in
-  // one query so concurrent commands cannot deadlock that connection.
-  const totalUsersResult = await db.select({ count: count() }).from(users);
-  const totalCreditPackagesResult = await db
-    .select({ count: count() })
-    .from(creditPackages);
-  const videoStatsResult = await db
-    .select({
-      total: count(),
-      completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
-      failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
-      pending: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.PENDING})::int`,
-    })
-    .from(videos);
+  const dashboardCutoff = new Date();
+  dashboardCutoff.setDate(dashboardCutoff.getDate() - 7);
 
-  const totalUsers = totalUsersResult[0]?.count || 0;
-  const totalVideos = videoStatsResult[0]?.total || 0;
-  const completedVideos = Number(videoStatsResult[0]?.completed || 0);
-  const failedVideos = Number(videoStatsResult[0]?.failed || 0);
-  const pendingVideos = Number(videoStatsResult[0]?.pending || 0);
+  // Keep the dashboard to one database round-trip so it cannot monopolize the
+  // single-connection serverless client with a command waterfall.
+  const [stats] = await db.execute<{
+    totalUsers: number;
+    totalCreditPackages: number;
+    totalVideos: number;
+    completedVideos: number;
+    failedVideos: number;
+    pendingVideos: number;
+    recentUsers: number;
+    recentVideos: number;
+  }>(sql`
+    select
+      (select count(*)::int from ${users}) as "totalUsers",
+      (select count(*)::int from ${creditPackages}) as "totalCreditPackages",
+      (select count(*)::int from ${videos}) as "totalVideos",
+      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.COMPLETED}) as "completedVideos",
+      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.FAILED}) as "failedVideos",
+      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.PENDING}) as "pendingVideos",
+      (select count(*)::int from ${users} where ${users.createdAt} >= ${dashboardCutoff}) as "recentUsers",
+      (select count(*)::int from ${videos} where ${videos.createdAt} >= ${dashboardCutoff}) as "recentVideos"
+  `);
+
+  const totalUsers = Number(stats?.totalUsers ?? 0);
+  const totalVideos = Number(stats?.totalVideos ?? 0);
+  const completedVideos = Number(stats?.completedVideos ?? 0);
+  const failedVideos = Number(stats?.failedVideos ?? 0);
+  const pendingVideos = Number(stats?.pendingVideos ?? 0);
+  const recentUsers = Number(stats?.recentUsers ?? 0);
+  const recentVideos = Number(stats?.recentVideos ?? 0);
 
   // 计算视频成功率
   const totalFinishedVideos = completedVideos + failedVideos;
   const successRate = totalFinishedVideos > 0
     ? (completedVideos / totalFinishedVideos) * 100
     : 0;
-
-  // 获取最近注册用户（最近7天）
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const sevenDaysAgoStr = sevenDaysAgo.toISOString();
-  const recentUsersResult = await db
-    .select({ count: count() })
-    .from(users)
-    .where(sql`${users.createdAt} >= ${sevenDaysAgoStr}::timestamp`);
-  const recentUsers = recentUsersResult[0]?.count || 0;
-
-  // 获取最近视频生成（最近7天）
-  const recentVideosResult = await db
-    .select({ count: count() })
-    .from(videos)
-    .where(sql`${videos.createdAt} >= ${sevenDaysAgoStr}::timestamp`);
-  const recentVideos = recentVideosResult[0]?.count || 0;
 
   return (
     <div className="space-y-6">
@@ -130,7 +125,9 @@ export default async function AdminDashboardPage() {
             <Coins className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCreditPackagesResult[0]?.count || 0}</div>
+            <div className="text-2xl font-bold">
+              {Number(stats?.totalCreditPackages ?? 0)}
+            </div>
             <p className="text-xs text-muted-foreground">
               所有用户
             </p>

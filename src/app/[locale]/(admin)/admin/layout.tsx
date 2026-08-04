@@ -1,6 +1,5 @@
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { RefineAdminProvider } from "@/components/admin/refine-admin-provider";
 interface AdminLayoutProps {
   children?: React.ReactNode;
   params: Promise<{
@@ -24,9 +23,7 @@ export default async function AdminLayout({
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto">
-          <RefineAdminProvider>
-            <div className="p-6">{children}</div>
-          </RefineAdminProvider>
+          <div className="p-6">{children}</div>
         </main>
       </div>
     </div>

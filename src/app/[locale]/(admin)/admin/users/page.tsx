@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 import { db } from "@/db";
 import { users, creditPackages, videos } from "@/db/schema";
-import { count, sql, desc, getTableColumns } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -30,57 +32,55 @@ interface UsersPageProps {
   }>;
 }
 
+type UserWithStats = typeof users.$inferSelect & {
+  videoCount: number;
+  packageCount: number;
+  totalCredits: number;
+};
+
 export default async function UsersPage({ searchParams }: UsersPageProps) {
   await requireAdmin();
   const params = await searchParams;
-  const page = Math.max(1, Number(params.page) || 1);
-  const search = params.search || "";
+  const page = Math.min(10_000, Math.max(1, Number(params.page) || 1));
+  const search = (params.search || "").trim().slice(0, 100);
   const limit = 20;
   const offset = (page - 1) * limit;
+  const searchPattern = `%${search}%`;
 
   // 获取用户总数（带搜索）
-  const totalUsersResult = search
-    ? await db
-      .select({ count: count() })
-      .from(users)
-      .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`)
-    : await db.select({ count: count() }).from(users);
-  const totalUsers = totalUsersResult[0]?.count || 0;
+  const [totalUsersRow] = await db.execute<{ count: number }>(sql`
+    select count(*)::int as count
+    from ${users} as u
+    where ${search} = ''
+      or u.email ilike ${searchPattern}
+      or coalesce(u.name, '') ilike ${searchPattern}
+  `);
+  const totalUsers = Number(totalUsersRow?.count ?? 0);
   const totalPages = Math.ceil(totalUsers / limit);
 
-  const userSelection = {
-    ...getTableColumns(users),
-    videoCount: sql<number>`(
-      select count(*)::int from ${videos}
-      where ${videos.userId} = ${users.id}
-    )`,
-    packageCount: sql<number>`(
-      select count(*)::int from ${creditPackages}
-      where ${creditPackages.userId} = ${users.id}
-    )`,
-    totalCredits: sql<number>`(
-      select coalesce(sum(${creditPackages.remainingCredits}), 0)::int
-      from ${creditPackages}
-      where ${creditPackages.userId} = ${users.id}
-    )`,
-  };
-
-  // Fetch the page and its per-user totals in one command. This avoids an N+1
-  // query pattern on the single production database connection.
-  const usersWithStats = search
-    ? await db
-      .select(userSelection)
-      .from(users)
-      .where(sql`${users.email} ILIKE ${`%${search}%`} OR ${users.name} ILIKE ${`%${search}%`}`)
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset)
-    : await db
-      .select(userSelection)
-      .from(users)
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset);
+  // Qualify the outer user ID explicitly. The previous correlated subqueries
+  // compiled to `videos.user_id = videos.id` and failed with text = integer.
+  const usersWithStats = await db.execute<UserWithStats>(sql`
+    select
+      u.id,
+      u.name,
+      u.email,
+      u."emailVerified",
+      u.image,
+      u."createdAt",
+      u."updatedAt",
+      u."isAdmin",
+      (select count(*)::int from ${videos} as v where v.user_id = u.id) as "videoCount",
+      (select count(*)::int from ${creditPackages} as cp where cp.user_id = u.id) as "packageCount",
+      (select coalesce(sum(cp.remaining_credits), 0)::int from ${creditPackages} as cp where cp.user_id = u.id) as "totalCredits"
+    from ${users} as u
+    where ${search} = ''
+      or u.email ilike ${searchPattern}
+      or coalesce(u.name, '') ilike ${searchPattern}
+    order by u."createdAt" desc
+    limit ${limit}
+    offset ${offset}
+  `);
 
   return (
     <div className="space-y-6">
@@ -215,28 +215,33 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  asChild={page > 1}
-                  disabled={page <= 1}
+                  asChild
                 >
-                  <a
+                  <Link
+                    prefetch={false}
+                    aria-disabled={page <= 1}
+                    className={page <= 1 ? "pointer-events-none opacity-50" : undefined}
                     href={`?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     上一页
-                  </a>
+                  </Link>
                 </Button>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page >= totalPages}
+                  asChild
                 >
-                  <a
+                  <Link
+                    prefetch={false}
+                    aria-disabled={page >= totalPages}
+                    className={page >= totalPages ? "pointer-events-none opacity-50" : undefined}
                     href={`?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
                   >
                     下一页
                     <ChevronRight className="h-4 w-4 ml-1" />
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </div>
