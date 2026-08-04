@@ -3,7 +3,20 @@ import { NextRequest } from "next/server";
 import { creditService, type CreditTransType } from "@/services/credit";
 
 import { requireAuth } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/error";
 import { apiSuccess, handleApiError } from "@/lib/api/response";
+import { parsePageLimit, parsePageOffset } from "@/lib/api/pagination";
+
+const allowedTransTypes = new Set<CreditTransType>([
+  "NEW_USER",
+  "ORDER_PAY",
+  "SUBSCRIPTION",
+  "VIDEO_CONSUME",
+  "REFUND",
+  "EXPIRED",
+  "SYSTEM_ADJUST",
+  "PAYMENT_REVERSAL",
+]);
 
 // Map database enum values to frontend expected format
 const transTypeMapping: Record<CreditTransType, string> = {
@@ -22,13 +35,19 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth(request);
     const { searchParams } = new URL(request.url);
 
-    const limit = Number.parseInt(searchParams.get("limit") || "20");
-    const offset = Number.parseInt(searchParams.get("cursor") || searchParams.get("offset") || "0");
+    const limit = parsePageLimit(searchParams.get("limit"));
+    const offset = parsePageOffset(
+      searchParams.get("cursor") ?? searchParams.get("offset")
+    );
+    const requestedType = searchParams.get("type") as CreditTransType | null;
+    if (requestedType && !allowedTransTypes.has(requestedType)) {
+      throw new ApiError("Invalid credit transaction type", 400);
+    }
 
     const result = await creditService.getHistory(user.id, {
       limit,
       offset,
-      transType: searchParams.get("type") as CreditTransType | undefined,
+      transType: requestedType ?? undefined,
     });
 
     // Transform transType to frontend-expected format

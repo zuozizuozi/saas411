@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   ArrowLeft,
+  Billing,
 } from "@/components/ui/icons";
 
 interface AdminSidebarProps {
@@ -36,6 +37,11 @@ const navItems: NavItem[] = [
     title: "Analytics",
     href: "/admin/analytics",
     icon: BarChart3,
+  },
+  {
+    title: "Payment disputes",
+    href: "/admin/disputes",
+    icon: Billing,
   },
   {
     title: "Settings",

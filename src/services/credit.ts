@@ -26,6 +26,7 @@ import {
 import { nanoid } from "nanoid";
 import { CREDITS_CONFIG } from "../config/credits";
 import { ApiError } from "@/lib/api/error";
+import { generationRiskService } from "./generation-risk";
 
 // Re-export enums for consumers
 export { CreditTransType, CreditPackageStatus };
@@ -356,14 +357,14 @@ export class CreditService {
    * 结算积分（任务成功时调用）
    */
   async settle(videoUuid: string): Promise<void> {
-    await db.transaction(async (trx) => {
+    const userId = await db.transaction(async (trx) => {
       const [candidate] = await trx
         .select({ userId: creditHolds.userId, status: creditHolds.status })
         .from(creditHolds)
         .where(eq(creditHolds.videoUuid, videoUuid))
         .limit(1);
       if (!candidate) throw new Error(`Hold not found for video: ${videoUuid}`);
-      if (candidate.status === "SETTLED") return;
+      if (candidate.status === "SETTLED") return candidate.userId;
       if (candidate.status !== "HOLDING") {
         throw new Error(`Invalid hold status: ${candidate.status}`);
       }
@@ -389,7 +390,7 @@ export class CreditService {
           .from(creditHolds)
           .where(eq(creditHolds.videoUuid, videoUuid))
           .limit(1);
-        if (existing?.status === "SETTLED") return;
+        if (existing?.status === "SETTLED") return candidate.userId;
         if (!existing) throw new Error(`Hold not found for video: ${videoUuid}`);
         throw new Error(`Invalid hold status: ${existing.status}`);
       }
@@ -431,7 +432,14 @@ export class CreditService {
         holdId: hold.id,
         remark: `Video generation settled: ${videoUuid}`,
       });
+      return hold.userId;
     });
+    try {
+      await generationRiskService.evaluateCreditVelocity(userId);
+    } catch (error) {
+      // Risk evaluation must not make a completed provider callback retry.
+      console.error("[GenerationRisk] Post-settlement evaluation failed", error);
+    }
   }
 
   /**
@@ -671,24 +679,46 @@ export class CreditService {
     credits: number;
     orderNo: string;
     transType?: CreditTransType;
-    expiryDays?: number;
+    expiryDays?: number | null;
     remark?: string;
+    operatorUserId?: string;
   }): Promise<{ packageId: number }> {
+    if (!Number.isInteger(params.credits) || params.credits <= 0) {
+      throw new ApiError("Credits must be a positive integer", 400);
+    }
     const transType = params.transType || CreditTransType.ORDER_PAY;
-    const expiryDays =
-      params.expiryDays ?? CREDITS_CONFIG.expiration.purchaseDays;
-    const expiredAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+    const expiryDays = params.expiryDays === undefined
+      ? CREDITS_CONFIG.expiration.purchaseDays
+      : params.expiryDays;
+    if (expiryDays !== null && (!Number.isInteger(expiryDays) || expiryDays <= 0)) {
+      throw new ApiError("Expiry days must be a positive integer or null", 400);
+    }
+    const expiredAt = expiryDays === null
+      ? null
+      : new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
 
     return db.transaction(async (trx) => {
       await trx.execute(
         sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${params.userId}`}))`
       );
       const [existingPackage] = await trx
-        .select({ id: creditPackages.id })
+        .select({
+          id: creditPackages.id,
+          userId: creditPackages.userId,
+          initialCredits: creditPackages.initialCredits,
+          transType: creditPackages.transType,
+        })
         .from(creditPackages)
         .where(eq(creditPackages.orderNo, params.orderNo))
         .limit(1);
       if (existingPackage) {
+        if (
+          existingPackage.userId !== params.userId ||
+          existingPackage.initialCredits !== params.credits ||
+          existingPackage.transType !== transType
+        ) {
+          throw new ApiError("Idempotency key conflicts with another credit grant", 409);
+        }
         return { packageId: existingPackage.id };
       }
 
@@ -710,11 +740,25 @@ export class CreditService {
 
       if (!pkgResult) {
         const [concurrentPackage] = await trx
-          .select({ id: creditPackages.id })
+          .select({
+            id: creditPackages.id,
+            userId: creditPackages.userId,
+            initialCredits: creditPackages.initialCredits,
+            transType: creditPackages.transType,
+          })
           .from(creditPackages)
           .where(eq(creditPackages.orderNo, params.orderNo))
           .limit(1);
-        if (concurrentPackage) return { packageId: concurrentPackage.id };
+        if (concurrentPackage) {
+          if (
+            concurrentPackage.userId !== params.userId ||
+            concurrentPackage.initialCredits !== params.credits ||
+            concurrentPackage.transType !== transType
+          ) {
+            throw new ApiError("Idempotency key conflicts with another credit grant", 409);
+          }
+          return { packageId: concurrentPackage.id };
+        }
         throw new Error("Failed to create credit package");
       }
 
@@ -727,6 +771,7 @@ export class CreditService {
         balanceAfter: balance.availableCredits,
         packageId: pkgResult.id,
         orderNo: params.orderNo,
+        operatorUserId: params.operatorUserId,
         remark: params.remark || `Recharge: ${params.orderNo}`,
       });
 
@@ -810,8 +855,14 @@ export class CreditService {
       transType?: CreditTransType;
     }
   ) {
-    const limit = options?.limit || 20;
-    const offset = options?.offset || 0;
+    const requestedLimit = options?.limit ?? 20;
+    const requestedOffset = options?.offset ?? 0;
+    const limit = Number.isSafeInteger(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 20;
+    const offset = Number.isSafeInteger(requestedOffset)
+      ? Math.min(Math.max(requestedOffset, 0), 10_000)
+      : 0;
 
     const filters = [eq(creditTransactions.userId, userId)];
     if (options?.transType) {

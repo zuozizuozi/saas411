@@ -19,6 +19,9 @@ interface BillingListProps {
 const statusConfig: Record<InvoiceStatus, { label: string; className: string }> = {
   paid: { label: "Paid", className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" },
   pending: { label: "Pending", className: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+  partially_refunded: { label: "Partially refunded", className: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+  refunded: { label: "Refunded", className: "bg-sky-500/10 text-sky-500 border-sky-500/20" },
+  disputed: { label: "Disputed", className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
   failed: { label: "Failed", className: "bg-rose-500/10 text-rose-500 border-rose-500/20" },
 };
 
@@ -58,7 +61,7 @@ export function BillingList({ invoices, hasMore, onLoadMore }: BillingListProps)
                       {formatDistanceToNow(new Date(invoice.createdAt), { addSuffix: true })}
                     </span>
                     <Badge variant="outline" className={config.className}>
-                      {t(`status.${invoice.status}`)}
+                      {config.label}
                     </Badge>
                   </div>
 

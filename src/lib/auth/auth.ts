@@ -122,8 +122,22 @@ export const auth = betterAuth({
       session: schema.sessions,
       account: schema.accounts,
       verification: schema.verifications,
+      rateLimit: schema.rateLimits,
     },
   }),
+  advanced: {
+    ipAddress: {
+      // Vercel overwrites x-real-ip at the trusted proxy boundary.
+      ipAddressHeaders: ["x-real-ip"],
+    },
+  },
+  rateLimit: {
+    enabled: process.env.NODE_ENV !== "development",
+    storage: "database",
+    modelName: "rateLimit",
+    window: 60,
+    max: 100,
+  },
   plugins,
   hooks: {
     after: createAuthMiddleware(async (context) => {

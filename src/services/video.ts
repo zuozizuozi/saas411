@@ -16,6 +16,7 @@ import { emitVideoEvent } from "@/lib/video-events";
 import { ApiError } from "@/lib/api/error";
 import { scheduleVideoReconciliation } from "@/lib/upstash";
 import { validateGenerationParams } from "./video-validation";
+import { generationPausedDetails } from "./generation-risk";
 
 export { validateGenerationParams } from "./video-validation";
 
@@ -56,16 +57,30 @@ export class VideoService {
     this.callbackBaseUrl = process.env.AI_CALLBACK_URL || "";
   }
 
-  private async assertBillingAccountUsable(userId: string) {
+  private async assertGenerationAllowed(userId: string) {
     const [account] = await db
       .select({
         billingStatus: users.billingStatus,
         creditDebt: users.creditDebt,
+        generationStatus: users.generationStatus,
+        generationPauseSource: users.generationPauseSource,
+        generationPauseReason: users.generationPauseReason,
       })
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
-    if (!account || account.billingStatus === "ACTIVE") return;
+    if (!account) throw new ApiError("User not found", 404);
+    if (account.generationStatus === "PAUSED") {
+      throw new ApiError(
+        "Video generation is temporarily paused. Please contact support.",
+        423,
+        generationPausedDetails({
+          source: account.generationPauseSource,
+          reason: account.generationPauseReason,
+        })
+      );
+    }
+    if (account.billingStatus === "ACTIVE") return;
 
     const isDebt = account.billingStatus === "PAYMENT_REQUIRED";
     throw new ApiError(
@@ -107,7 +122,7 @@ export class VideoService {
    * Create video generation task
    */
   async generate(params: GenerateVideoParams): Promise<VideoGenerationResult> {
-    await this.assertBillingAccountUsable(params.userId);
+    await this.assertGenerationAllowed(params.userId);
     const validated = validateGenerationParams(params);
     const requestedOutputs = validated.outputNumber;
     if (requestedOutputs > 1 && !params.batchUuid) {
@@ -821,7 +836,10 @@ export class VideoService {
       status?: string;
     }
   ) {
-    const limit = options?.limit || 20;
+    const requestedLimit = options?.limit ?? 20;
+    const limit = Number.isSafeInteger(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 20;
 
     const conditions = [
       eq(videos.userId, userId),
@@ -836,7 +854,13 @@ export class VideoService {
       const [cursorVideo] = await db
         .select({ createdAt: videos.createdAt })
         .from(videos)
-        .where(eq(videos.uuid, options.cursor))
+        .where(
+          and(
+            eq(videos.uuid, options.cursor),
+            eq(videos.userId, userId),
+            eq(videos.isDeleted, false)
+          )
+        )
         .limit(1);
 
       if (cursorVideo) {

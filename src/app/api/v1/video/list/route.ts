@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { videoService } from "@/services/video";
 import { requireAuth } from "@/lib/api/auth";
 import { apiSuccess, handleApiError } from "@/lib/api/response";
+import { parsePageLimit } from "@/lib/api/pagination";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const result = await videoService.listVideos(user.id, {
-      limit: Number.parseInt(searchParams.get("limit") || "20"),
+      limit: parsePageLimit(searchParams.get("limit")),
       cursor: searchParams.get("cursor") || undefined,
       status: searchParams.get("status") || undefined,
     });

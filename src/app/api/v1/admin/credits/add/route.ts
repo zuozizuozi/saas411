@@ -23,10 +23,14 @@ import { requireAdmin } from "@/lib/api/auth";
 import { apiSuccess, handleApiError } from "@/lib/api/response";
 import { creditService } from "@/services/credit";
 import { CreditTransType } from "@/db/schema";
+import { ApiError } from "@/lib/api/error";
 
 export async function POST(request: Request) {
   try {
     const admin = await requireAdmin(request);
+    if (process.env.NODE_ENV === "production") {
+      throw new ApiError("This development-only endpoint is disabled", 404);
+    }
 
     const body = await request.json();
     const { userId, credits, expiryDays, remark } = body;
