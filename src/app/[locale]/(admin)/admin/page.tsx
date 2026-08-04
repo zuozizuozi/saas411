@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, videos, creditPackages, VideoStatus } from "@/db/schema";
-import { count, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { connection } from "next/server";
 import { requireAdmin } from "@/lib/auth/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,7 +32,7 @@ export default async function AdminDashboardPage() {
       total: number;
       completed: number;
       failed: number;
-      pending: number;
+      processing: number;
       recent: number;
     }
     | undefined;
@@ -57,10 +57,11 @@ export default async function AdminDashboardPage() {
         total: count(),
         completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
         failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
-        pending: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.PENDING})::int`,
+        processing: sql<number>`count(*) filter (where ${videos.status} in (${VideoStatus.PENDING}, ${VideoStatus.GENERATING}, ${VideoStatus.UPLOADING}))::int`,
         recent: sql<number>`count(*) filter (where ${videos.createdAt} >= ${dashboardCutoffIso}::timestamp)::int`,
       })
-      .from(videos);
+      .from(videos)
+      .where(eq(videos.isDeleted, false));
   } catch (error) {
     console.error(JSON.stringify({
       level: "error",
@@ -75,7 +76,7 @@ export default async function AdminDashboardPage() {
   const totalVideos = Number(videoStats?.total ?? 0);
   const completedVideos = Number(videoStats?.completed ?? 0);
   const failedVideos = Number(videoStats?.failed ?? 0);
-  const pendingVideos = Number(videoStats?.pending ?? 0);
+  const processingVideos = Number(videoStats?.processing ?? 0);
   const recentUsers = Number(userStats?.recent ?? 0);
   const recentVideos = Number(videoStats?.recent ?? 0);
 
@@ -200,9 +201,9 @@ export default async function AdminDashboardPage() {
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{pendingVideos}</div>
+            <div className="text-2xl font-bold text-yellow-600">{processingVideos}</div>
             <p className="text-xs text-muted-foreground">
-              {totalVideos > 0 ? ((pendingVideos / totalVideos) * 100).toFixed(1) : 0}% 的总数
+              {totalVideos > 0 ? ((processingVideos / totalVideos) * 100).toFixed(1) : 0}% 的总数
             </p>
           </CardContent>
         </Card>
@@ -245,8 +246,8 @@ export default async function AdminDashboardPage() {
           >
             <Coins className="h-5 w-5 text-muted-foreground" />
             <div>
-              <div className="font-medium">积分配置</div>
-              <div className="text-sm text-muted-foreground">修改积分规则</div>
+              <div className="font-medium">配置说明</div>
+              <div className="text-sm text-muted-foreground">查看积分与权限说明</div>
             </div>
           </a>
         </CardContent>

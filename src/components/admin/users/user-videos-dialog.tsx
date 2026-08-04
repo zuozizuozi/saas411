@@ -77,7 +77,7 @@ export function UserVideosDialog({
     total: number;
     completed: number;
     failed: number;
-    generating: number;
+    processing: number;
     successRate: number;
   } | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -201,7 +201,7 @@ export function UserVideosDialog({
             </div>
             <div className="rounded-lg border p-3">
               <div className="text-2xl font-bold text-yellow-600">
-                {stats.generating}
+                {stats.processing}
               </div>
               <div className="text-xs text-muted-foreground">生成中</div>
             </div>
@@ -224,6 +224,7 @@ export function UserVideosDialog({
               <SelectItem value="all">全部状态</SelectItem>
               <SelectItem value="COMPLETED">已完成</SelectItem>
               <SelectItem value="GENERATING">生成中</SelectItem>
+              <SelectItem value="UPLOADING">上传中</SelectItem>
               <SelectItem value="FAILED">失败</SelectItem>
               <SelectItem value="PENDING">待处理</SelectItem>
             </SelectContent>

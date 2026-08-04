@@ -1,5 +1,7 @@
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { requireAdmin } from "@/lib/auth/admin";
+
 interface AdminLayoutProps {
   children?: React.ReactNode;
   params: Promise<{
@@ -11,6 +13,7 @@ export default async function AdminLayout({
   children,
   params,
 }: AdminLayoutProps) {
+  await requireAdmin();
   const { locale } = await params;
 
   return (

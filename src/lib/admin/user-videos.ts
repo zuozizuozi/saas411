@@ -97,7 +97,7 @@ export async function getUserVideoStats(userId: string) {
       total: sql<number>`count(*)::int`,
       completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
       failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
-      generating: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.GENERATING})::int`,
+      processing: sql<number>`count(*) filter (where ${videos.status} in (${VideoStatus.PENDING}, ${VideoStatus.GENERATING}, ${VideoStatus.UPLOADING}))::int`,
     })
     .from(videos)
     .where(and(eq(videos.userId, userId), eq(videos.isDeleted, false)));
@@ -105,15 +105,16 @@ export async function getUserVideoStats(userId: string) {
   const total = Number(stats?.total || 0);
   const completed = Number(stats?.completed || 0);
   const failed = Number(stats?.failed || 0);
-  const generating = Number(stats?.generating || 0);
+  const processing = Number(stats?.processing || 0);
 
-  const successRate = total > 0 ? (completed / total) * 100 : 0;
+  const finished = completed + failed;
+  const successRate = finished > 0 ? (completed / finished) * 100 : 0;
 
   return {
     total,
     completed,
     failed,
-    generating,
+    processing,
     successRate: Math.round(successRate * 10) / 10,
   };
 }

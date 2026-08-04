@@ -1,6 +1,14 @@
+import { and, count, eq, gte, sql, type SQL } from "drizzle-orm";
+
 import { db } from "@/db";
-import { users, videos, creditTransactions, VideoStatus, CreditTransType } from "@/db/schema";
-import { count, eq, and, sql, gte, type SQL } from "drizzle-orm";
+import {
+  CreditTransType,
+  creditTransactions,
+  users,
+  videos,
+  VideoStatus,
+} from "@/db/schema";
+import { toPercentage } from "./analytics-metrics";
 
 export type TimeRange = "today" | "7d" | "30d" | "90d" | "all";
 
@@ -8,6 +16,20 @@ const TIME_RANGES: readonly TimeRange[] = ["today", "7d", "30d", "90d", "all"];
 
 export function normalizeTimeRange(value: string | undefined): TimeRange {
   return TIME_RANGES.includes(value as TimeRange) ? (value as TimeRange) : "30d";
+}
+
+export function getTimeRangeStart(
+  range: TimeRange,
+  now = new Date(),
+): Date | null {
+  if (range === "all") return null;
+
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+  const daysBack = { today: 0, "7d": 6, "30d": 29, "90d": 89 }[range];
+  today.setUTCDate(today.getUTCDate() - daysBack);
+  return today;
 }
 
 export interface Stats {
@@ -27,11 +49,8 @@ export interface FunnelData {
   successfulFirstVideoUsers: number;
 }
 
-export interface TrendDataPoint {
+export interface TrendDataPoint extends FunnelData {
   date: string;
-  registeredUsers: number;
-  firstVideoUsers: number;
-  successfulFirstVideoUsers: number;
   firstVideoConversionRate: number;
   firstVideoSuccessRate: number;
 }
@@ -42,281 +61,227 @@ export interface AnalyticsData {
   trend: TrendDataPoint[];
 }
 
-class AnalyticsService {
-  private getTimeFilter(range: TimeRange): Date | null {
-    if (range === "all") return null;
+function dateKey(value: Date | string): string {
+  return new Date(value).toISOString().slice(0, 10);
+}
 
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+function buildDateSeries(start: Date, end: Date): string[] {
+  const dates: string[] = [];
+  const cursor = new Date(start);
+  cursor.setUTCHours(0, 0, 0, 0);
 
-    switch (range) {
-      case "today":
-        return today;
-      case "7d":
-        return new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      case "30d":
-        return new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-      case "90d":
-        return new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
-      default:
-        return null;
-    }
+  while (cursor <= end) {
+    dates.push(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
-  private buildTimeCondition(timeFilter: Date | null): SQL | undefined {
-    if (!timeFilter) return undefined;
-    return sql`${users.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
+  return dates;
+}
+
+class AnalyticsService {
+  private buildUserTimeCondition(timeFilter: Date | null): SQL | undefined {
+    return timeFilter ? gte(users.createdAt, timeFilter) : undefined;
   }
 
   private buildVideoTimeCondition(timeFilter: Date | null): SQL | undefined {
-    if (!timeFilter) return undefined;
-    return sql`${videos.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
+    return timeFilter ? gte(videos.createdAt, timeFilter) : undefined;
   }
 
   private buildTransactionTimeCondition(timeFilter: Date | null): SQL | undefined {
-    if (!timeFilter) return undefined;
-    return sql`${creditTransactions.createdAt} >= ${timeFilter.toISOString()}::timestamp`;
+    return timeFilter ? gte(creditTransactions.createdAt, timeFilter) : undefined;
+  }
+
+  private firstVideosQuery() {
+    return db
+      .select({
+        userId: videos.userId,
+        status: videos.status,
+        rn: sql<number>`row_number() over (partition by ${videos.userId} order by ${videos.createdAt}, ${videos.id})`.as(
+          "rn",
+        ),
+      })
+      .from(videos)
+      .where(eq(videos.isDeleted, false))
+      .as("first_videos");
   }
 
   async getStats(range: TimeRange): Promise<Stats> {
-    const timeFilter = this.getTimeFilter(range);
-    const timeCondition = this.buildTimeCondition(timeFilter);
+    const timeFilter = getTimeRangeStart(range);
+    const userTimeCondition = this.buildUserTimeCondition(timeFilter);
     const videoTimeCondition = this.buildVideoTimeCondition(timeFilter);
-    const transactionTimeCondition = this.buildTransactionTimeCondition(timeFilter);
+    const transactionTimeCondition =
+      this.buildTransactionTimeCondition(timeFilter);
+    const paidTransactionCondition = sql`${creditTransactions.transType} in (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`;
 
-    // The production client intentionally uses one Supavisor connection.
-    // Execute commands sequentially so a page cannot pipeline multiple
-    // parameterized queries onto that single connection.
+    // Supavisor is configured with one connection, so these queries are
+    // intentionally sequential to avoid pipelining commands on that connection.
     const totalUsersResult = await db
       .select({ count: count() })
       .from(users)
-      .where(timeCondition);
+      .where(userTimeCondition);
     const totalOrdersResult = await db
       .select({ count: count() })
       .from(creditTransactions)
-      .where(
-        and(
-          transactionTimeCondition,
-          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
-        ),
-      );
+      .where(and(transactionTimeCondition, paidTransactionCondition));
     const paidOrders = await db
       .selectDistinct({ orderNo: creditTransactions.orderNo })
       .from(creditTransactions)
       .where(
         and(
           transactionTimeCondition,
-          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
-          sql`${creditTransactions.orderNo} IS NOT NULL`,
+          paidTransactionCondition,
+          sql`${creditTransactions.orderNo} is not null`,
         ),
       );
     const totalVideosResult = await db
       .select({ count: count() })
       .from(videos)
       .where(and(videoTimeCondition, eq(videos.isDeleted, false)));
-    const completedVideosResult = await db
-      .select({ count: count() })
-      .from(videos)
-      .where(
-        and(
-          videoTimeCondition,
-          eq(videos.status, VideoStatus.COMPLETED),
-          eq(videos.isDeleted, false),
-        ),
-      );
-    const failedVideosResult = await db
-      .select({ count: count() })
-      .from(videos)
-      .where(
-        and(
-          videoTimeCondition,
-          eq(videos.status, VideoStatus.FAILED),
-          eq(videos.isDeleted, false),
-        ),
-      );
-    const usersWithVideos = await db
-      .selectDistinct({ userId: videos.userId })
+    const finishedVideosResult = await db
+      .select({
+        completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
+        failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
+      })
       .from(videos)
       .where(and(videoTimeCondition, eq(videos.isDeleted, false)));
+    const usersWithVideos = await db
+      .selectDistinct({ userId: users.id })
+      .from(users)
+      .innerJoin(
+        videos,
+        and(eq(videos.userId, users.id), eq(videos.isDeleted, false)),
+      )
+      .where(userTimeCondition);
     const payingUsers = await db
-      .selectDistinct({ userId: creditTransactions.userId })
-      .from(creditTransactions)
-      .where(
-        and(
-          transactionTimeCondition,
-          sql`${creditTransactions.transType} IN (${CreditTransType.ORDER_PAY}, ${CreditTransType.SUBSCRIPTION})`,
-        ),
-      );
+      .selectDistinct({ userId: users.id })
+      .from(users)
+      .innerJoin(
+        creditTransactions,
+        eq(creditTransactions.userId, users.id),
+      )
+      .where(and(userTimeCondition, paidTransactionCondition));
 
-    const totalUsers = totalUsersResult[0]?.count || 0;
-    const totalOrders = totalOrdersResult[0]?.count || 0;
-    const paidOrderCount = paidOrders.length;
-    const totalVideos = totalVideosResult[0]?.count || 0;
-    const completedVideos = completedVideosResult[0]?.count || 0;
-    const failedVideos = failedVideosResult[0]?.count || 0;
+    const totalUsers = Number(totalUsersResult[0]?.count ?? 0);
+    const totalOrders = Number(totalOrdersResult[0]?.count ?? 0);
+    const totalVideos = Number(totalVideosResult[0]?.count ?? 0);
+    const completedVideos = Number(finishedVideosResult[0]?.completed ?? 0);
+    const failedVideos = Number(finishedVideosResult[0]?.failed ?? 0);
     const usersWithVideoCount = usersWithVideos.length;
-    const payingUserCount = payingUsers.length;
-
-    // Calculate rates
-    const firstVideoConversionRate = totalUsers > 0 ? (usersWithVideoCount / totalUsers) * 100 : 0;
-    const paymentConversionRate = totalUsers > 0 ? (payingUserCount / totalUsers) * 100 : 0;
-
-    const totalFinishedVideos = completedVideos + failedVideos;
-    const videoSuccessRate = totalFinishedVideos > 0 ? (completedVideos / totalFinishedVideos) * 100 : 0;
-
-    // Users who haven't generated any video
-    const usersWithoutVideos = Math.max(0, totalUsers - usersWithVideoCount);
 
     return {
       totalUsers,
       totalOrders,
-      paidOrders: paidOrderCount,
+      paidOrders: paidOrders.length,
       totalVideos,
-      firstVideoConversionRate: Math.round(firstVideoConversionRate * 10) / 10,
-      paymentConversionRate: Math.round(paymentConversionRate * 10) / 10,
-      videoSuccessRate: Math.round(videoSuccessRate * 10) / 10,
-      usersWithoutVideos,
+      firstVideoConversionRate: toPercentage(usersWithVideoCount, totalUsers),
+      paymentConversionRate: toPercentage(payingUsers.length, totalUsers),
+      videoSuccessRate: toPercentage(
+        completedVideos,
+        completedVideos + failedVideos,
+      ),
+      usersWithoutVideos: Math.max(0, totalUsers - usersWithVideoCount),
     };
   }
 
   async getFunnelData(range: TimeRange): Promise<FunnelData> {
-    const timeFilter = this.getTimeFilter(range);
-    const timeCondition = this.buildTimeCondition(timeFilter);
-    const videoTimeCondition = this.buildVideoTimeCondition(timeFilter);
+    const userTimeCondition = this.buildUserTimeCondition(
+      getTimeRangeStart(range),
+    );
+    const firstVideos = this.firstVideosQuery();
 
-    // Get total registered users
     const totalUsersResult = await db
       .select({ count: count() })
       .from(users)
-      .where(timeCondition);
-
-    const registeredUsers = totalUsersResult[0]?.count || 0;
-
-    // Get users with their first video
-    // Using a subquery to find the first video for each user
-    const firstVideosQuery = db
-      .select({
-        userId: videos.userId,
-        status: videos.status,
-        createdAt: videos.createdAt,
-        rn: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${videos.userId} ORDER BY ${videos.createdAt} ASC)`.as("rn"),
-      })
-      .from(videos)
-      .where(and(videoTimeCondition, eq(videos.isDeleted, false)))
-      .as("first_videos");
-
-    const firstVideosResult = await db
-      .select({
-        userId: firstVideosQuery.userId,
-        status: firstVideosQuery.status,
-      })
-      .from(firstVideosQuery)
-      .where(sql`${firstVideosQuery.rn} = 1`);
-
-    const firstVideoUsers = firstVideosResult.length;
-    const successfulFirstVideoUsers = firstVideosResult.filter((v) => v.status === VideoStatus.COMPLETED).length;
+      .where(userTimeCondition);
+    const firstVideoRows = await db
+      .select({ status: firstVideos.status })
+      .from(users)
+      .innerJoin(firstVideos, eq(firstVideos.userId, users.id))
+      .where(and(userTimeCondition, sql`${firstVideos.rn} = 1`));
 
     return {
-      registeredUsers,
-      firstVideoUsers,
-      successfulFirstVideoUsers,
+      registeredUsers: Number(totalUsersResult[0]?.count ?? 0),
+      firstVideoUsers: firstVideoRows.length,
+      successfulFirstVideoUsers: firstVideoRows.filter(
+        (video) => video.status === VideoStatus.COMPLETED,
+      ).length,
     };
   }
 
   async getTrendData(range: TimeRange): Promise<TrendDataPoint[]> {
-    const timeFilter = this.getTimeFilter(range);
-    const startDate = timeFilter || new Date(0); // Epoch if no filter
+    const timeFilter = getTimeRangeStart(range);
+    const userTimeCondition = this.buildUserTimeCondition(timeFilter);
+    const firstVideos = this.firstVideosQuery();
 
-    // Determine the number of days based on range
-    const daysMap = { today: 1, "7d": 7, "30d": 30, "90d": 90, all: 365 };
-    const days = daysMap[range] || 30;
-
-    // Generate date series
-    const dates: string[] = [];
-    const now = new Date();
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0);
-      dates.push(date.toISOString().split("T")[0]);
-    }
-
-    // Get daily registrations
-    const dailyRegistrations: Record<string, number> = {};
     const registrationData = await db
       .select({
-        date: sql<string>`DATE(${users.createdAt})`.as("date"),
+        date: sql<string>`date(${users.createdAt})`.as("date"),
         count: count(),
       })
       .from(users)
-      .where(gte(users.createdAt, startDate))
-      .groupBy(sql`DATE(${users.createdAt})`)
-      .orderBy(sql`DATE(${users.createdAt})`);
-
-    registrationData.forEach((row) => {
-      dailyRegistrations[row.date] = row.count;
-    });
-
-    // Get users with their first video by date
-    const firstVideoData = await db
+      .where(userTimeCondition)
+      .groupBy(sql`date(${users.createdAt})`)
+      .orderBy(sql`date(${users.createdAt})`);
+    const firstVideoRows = await db
       .select({
-        userId: videos.userId,
-        createdAt: videos.createdAt,
-        status: videos.status,
-        rn: sql<number>`ROW_NUMBER() OVER (PARTITION BY ${videos.userId} ORDER BY ${videos.createdAt} ASC)`.as("rn"),
+        registeredAt: users.createdAt,
+        status: firstVideos.status,
       })
-      .from(videos)
-      .where(and(gte(videos.createdAt, startDate), eq(videos.isDeleted, false)));
+      .from(users)
+      .innerJoin(firstVideos, eq(firstVideos.userId, users.id))
+      .where(and(userTimeCondition, sql`${firstVideos.rn} = 1`));
 
-    // Group first videos by date
-    const dailyFirstVideos: Record<string, { total: number; successful: number }> = {};
+    if (range === "all" && registrationData.length === 0) return [];
 
-    firstVideoData.forEach((row) => {
-      if (row.rn === 1) {
-        const date = new Date(row.createdAt).toISOString().split("T")[0];
-        if (!dailyFirstVideos[date]) {
-          dailyFirstVideos[date] = { total: 0, successful: 0 };
-        }
-        dailyFirstVideos[date].total++;
-        if (row.status === VideoStatus.COMPLETED) {
-          dailyFirstVideos[date].successful++;
-        }
-      }
-    });
+    const today = getTimeRangeStart("today") as Date;
+    const startDate =
+      timeFilter ?? new Date(`${dateKey(registrationData[0].date)}T00:00:00.000Z`);
+    const dates = buildDateSeries(startDate, today);
+    const dailyRegistrations = new Map(
+      registrationData.map((row) => [dateKey(row.date), Number(row.count)]),
+    );
+    const dailyFirstVideos = new Map<
+      string,
+      { total: number; successful: number }
+    >();
 
-    // Build trend data
-    const trend: TrendDataPoint[] = dates.map((date) => {
-      const registeredUsers = dailyRegistrations[date] || 0;
-      const firstVideoData = dailyFirstVideos[date] || { total: 0, successful: 0 };
-      const firstVideoUsers = firstVideoData.total;
-      const successfulFirstVideoUsers = firstVideoData.successful;
+    for (const row of firstVideoRows) {
+      const key = dateKey(row.registeredAt);
+      const counts = dailyFirstVideos.get(key) ?? { total: 0, successful: 0 };
+      counts.total += 1;
+      if (row.status === VideoStatus.COMPLETED) counts.successful += 1;
+      dailyFirstVideos.set(key, counts);
+    }
 
-      const firstVideoConversionRate = registeredUsers > 0 ? (firstVideoUsers / registeredUsers) * 100 : 0;
-      const firstVideoSuccessRate = firstVideoUsers > 0 ? (successfulFirstVideoUsers / firstVideoUsers) * 100 : 0;
+    return dates.map((date) => {
+      const registeredUsers = dailyRegistrations.get(date) ?? 0;
+      const firstVideoCounts = dailyFirstVideos.get(date) ?? {
+        total: 0,
+        successful: 0,
+      };
 
       return {
         date,
         registeredUsers,
-        firstVideoUsers,
-        successfulFirstVideoUsers,
-        firstVideoConversionRate: Math.round(firstVideoConversionRate * 10) / 10,
-        firstVideoSuccessRate: Math.round(firstVideoSuccessRate * 10) / 10,
+        firstVideoUsers: firstVideoCounts.total,
+        successfulFirstVideoUsers: firstVideoCounts.successful,
+        firstVideoConversionRate: toPercentage(
+          firstVideoCounts.total,
+          registeredUsers,
+        ),
+        firstVideoSuccessRate: toPercentage(
+          firstVideoCounts.successful,
+          firstVideoCounts.total,
+        ),
       };
     });
-
-    return trend;
   }
 
   async getAnalyticsData(range: TimeRange): Promise<AnalyticsData> {
     const stats = await this.getStats(range);
     const funnel = await this.getFunnelData(range);
     const trend = await this.getTrendData(range);
-
-    return {
-      stats,
-      funnel,
-      trend,
-    };
+    return { stats, funnel, trend };
   }
 }
 

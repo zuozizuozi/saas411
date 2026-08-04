@@ -8,10 +8,8 @@ export default async function AdminSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">系统设置</h1>
-        <p className="text-muted-foreground">
-          配置系统参数和积分规则
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">系统配置说明</h1>
+        <p className="text-muted-foreground">查看后台配置位置与运维方式</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -25,7 +23,7 @@ export default async function AdminSettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              修改积分包价格、订阅计划、AI 模型定价等配置
+              价格、积分和模型规则由代码配置，修改并重新部署后生效。
             </p>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -35,8 +33,8 @@ export default async function AdminSettingsPage() {
                 </code>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">自动重载</span>
-                <span className="text-green-600">✓ 支持</span>
+                <span className="text-muted-foreground">生效方式</span>
+                <span>重新部署</span>
               </div>
             </div>
             <Button asChild className="w-full">

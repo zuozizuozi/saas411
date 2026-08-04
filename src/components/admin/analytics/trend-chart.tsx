@@ -11,9 +11,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { summarizeTrend } from "@/lib/admin/analytics-metrics";
 
 interface TrendDataPoint {
   date: string;
+  registeredUsers: number;
+  firstVideoUsers: number;
+  successfulFirstVideoUsers: number;
   firstVideoConversionRate: number;
   firstVideoSuccessRate: number;
 }
@@ -23,6 +27,8 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ data }: TrendChartProps) {
+  const summary = summarizeTrend(data);
+
   // Format date for display
   const formattedData = data.map((item) => ({
     ...item,
@@ -105,25 +111,15 @@ export function TrendChart({ data }: TrendChartProps) {
         {/* Summary stats */}
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">平均首视频转化率</p>
+            <p className="text-sm text-muted-foreground">总体首视频转化率</p>
             <p className="text-2xl font-bold text-purple-600">
-              {data.length > 0
-                ? (
-                    data.reduce((sum, item) => sum + item.firstVideoConversionRate, 0) / data.length
-                  ).toFixed(1)
-                : 0}
-              %
+              {summary.firstVideoConversionRate.toFixed(1)}%
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">平均首个视频成功率</p>
+            <p className="text-sm text-muted-foreground">总体首个视频成功率</p>
             <p className="text-2xl font-bold text-green-600">
-              {data.length > 0
-                ? (
-                    data.reduce((sum, item) => sum + item.firstVideoSuccessRate, 0) / data.length
-                  ).toFixed(1)
-                : 0}
-              %
+              {summary.firstVideoSuccessRate.toFixed(1)}%
             </p>
           </div>
         </div>

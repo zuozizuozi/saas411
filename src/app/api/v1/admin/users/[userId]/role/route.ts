@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -11,7 +11,7 @@ export async function PATCH(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    await requireAdmin(request);
+    const admin = await requireAdmin(request);
     const { userId } = await params;
     const body = (await request.json()) as { isAdmin?: unknown };
 
@@ -21,6 +21,21 @@ export async function PATCH(
     const nextIsAdmin = body.isAdmin;
 
     const updatedUser = await db.transaction(async (tx) => {
+      // Serialize role mutations so two administrators cannot concurrently
+      // demote each other and leave the database without an administrator.
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext('admin-role-management'))`,
+      );
+
+      const [currentAdmin] = await tx
+        .select({ isAdmin: users.isAdmin })
+        .from(users)
+        .where(eq(users.id, admin.id))
+        .limit(1);
+      if (currentAdmin?.isAdmin !== true) {
+        throw new ApiError("Administrator access was revoked", 403);
+      }
+
       const [target] = await tx
         .select({ id: users.id, email: users.email, isAdmin: users.isAdmin })
         .from(users)
@@ -50,6 +65,7 @@ export async function PATCH(
           isAdmin: users.isAdmin,
         });
 
+      if (!updated) throw new ApiError("Failed to update administrator role", 409);
       return updated;
     });
 

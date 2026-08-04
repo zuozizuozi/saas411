@@ -9,6 +9,7 @@
  * 管理员身份始终从数据库读取，确保授予和撤销能够立即生效。
  */
 
+import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -22,20 +23,31 @@ import type { Locale } from "@/config/i18n-config";
  * @returns 当前用户信息
  * @throws 如果未登录或不是管理员，则重定向
  */
-export async function requireAdmin(redirectTo?: string) {
+const getAdminUser = cache(async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session?.user) {
-    redirect(redirectTo || "/login?from=/admin");
+    return null;
   }
 
   if (!(await hasAdminRole(session.user.id))) {
-    redirect("/");
+    return false;
   }
 
   return { ...session.user, isAdmin: true };
+});
+
+export async function requireAdmin(redirectTo?: string) {
+  const adminUser = await getAdminUser();
+  if (adminUser === null) {
+    redirect(redirectTo || "/login?from=/admin");
+  }
+  if (adminUser === false) {
+    redirect("/");
+  }
+  return adminUser;
 }
 
 /**

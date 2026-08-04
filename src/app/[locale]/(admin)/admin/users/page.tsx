@@ -1,7 +1,12 @@
 import Link from "next/link";
 
 import { db } from "@/db";
-import { users, creditPackages, videos } from "@/db/schema";
+import {
+  CreditPackageStatus,
+  users,
+  creditPackages,
+  videos,
+} from "@/db/schema";
 import { sql } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -70,9 +75,15 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       u."createdAt",
       u."updatedAt",
       u."isAdmin",
-      (select count(*)::int from ${videos} as v where v.user_id = u.id) as "videoCount",
+      (select count(*)::int from ${videos} as v where v.user_id = u.id and v.is_deleted = false) as "videoCount",
       (select count(*)::int from ${creditPackages} as cp where cp.user_id = u.id) as "packageCount",
-      (select coalesce(sum(cp.remaining_credits), 0)::int from ${creditPackages} as cp where cp.user_id = u.id) as "totalCredits"
+      (
+        select coalesce(sum(cp.remaining_credits), 0)::int
+        from ${creditPackages} as cp
+        where cp.user_id = u.id
+          and cp.status = ${CreditPackageStatus.ACTIVE}
+          and (cp.expired_at is null or cp.expired_at > now())
+      ) as "totalCredits"
     from ${users} as u
     where ${search} = ''
       or u.email ilike ${searchPattern}
