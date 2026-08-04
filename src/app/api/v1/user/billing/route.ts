@@ -3,9 +3,10 @@ import { NextRequest } from "next/server";
 import { requireAuth } from "@/lib/api/auth";
 import { apiSuccess, handleApiError } from "@/lib/api/response";
 import { db } from "@/db";
-import { creditPackages } from "@/db/schema";
-import { sql, eq, and } from "drizzle-orm";
+import { creditPackages, paymentOrders } from "@/db/schema";
+import { and, desc, eq, lt } from "drizzle-orm";
 import type { CreditTransType } from "@/db/schema";
+import { parsePageLimit, parsePositiveCursor } from "@/lib/api/pagination";
 
 /**
  * GET /api/v1/user/billing
@@ -20,31 +21,35 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth(request);
     const { searchParams } = new URL(request.url);
 
-    const limit = Number.parseInt(searchParams.get("limit") || "20");
-    const cursor = searchParams.get("cursor");
+    const limit = parsePageLimit(searchParams.get("limit"));
+    const cursor = parsePositiveCursor(searchParams.get("cursor"));
 
     // Get ORDER_PAY type value
     const orderPayType: CreditTransType = "ORDER_PAY";
 
-    // Build base query - use raw SQL for complex query with enum
-    const packages = await db.execute(sql`
-      SELECT
-        id,
-        user_id as "userId",
-        initial_credits as "initialCredits",
-        remaining_credits as "remainingCredits",
-        trans_type as "transType",
-        order_no as "orderNo",
-        status,
-        expired_at as "expiredAt",
-        created_at as "createdAt"
-      FROM credit_packages
-      WHERE user_id = ${user.id}
-        AND trans_type = ${orderPayType}
-        ${cursor ? sql`AND id < ${Number.parseInt(cursor)}` : sql``}
-      ORDER BY created_at DESC
-      LIMIT ${limit + 1}
-    `);
+    const conditions = [
+      eq(creditPackages.userId, user.id),
+      eq(creditPackages.transType, orderPayType),
+      eq(paymentOrders.userId, user.id),
+      eq(creditPackages.orderNo, paymentOrders.orderNo),
+    ];
+    if (cursor) conditions.push(lt(creditPackages.id, cursor));
+
+    // Only return purchases backed by the immutable Stripe payment ledger.
+    const packages = await db
+      .select({
+        id: creditPackages.id,
+        initialCredits: creditPackages.initialCredits,
+        paymentStatus: paymentOrders.status,
+        amount: paymentOrders.amount,
+        currency: paymentOrders.currency,
+        createdAt: paymentOrders.createdAt,
+      })
+      .from(creditPackages)
+      .innerJoin(paymentOrders, eq(creditPackages.orderNo, paymentOrders.orderNo))
+      .where(and(...conditions))
+      .orderBy(desc(creditPackages.createdAt))
+      .limit(limit + 1);
 
     // Check if there's more data
     const hasMore = packages.length > limit;
@@ -56,8 +61,8 @@ export async function GET(request: NextRequest) {
       : null;
 
     // Transform to invoice format
-    const invoices = results.map((pkg: any) => {
-      const initialCredits = pkg.initialCredits as number;
+    const invoices = results.map((pkg) => {
+      const initialCredits = pkg.initialCredits;
       const itemDescription = initialCredits === 100
         ? "100 Credits"
         : initialCredits === 500
@@ -68,14 +73,24 @@ export async function GET(request: NextRequest) {
         ? "5000 Credits"
         : `${initialCredits} Credits`;
 
-      // Calculate amount based on credits (rough estimate)
-      const amount = initialCredits * 0.1; // $0.01 per credit as example
+      const status = (() => {
+        if (pkg.paymentStatus === "PAID") return "paid" as const;
+        if (pkg.paymentStatus === "PENDING") return "pending" as const;
+        if (pkg.paymentStatus === "PARTIALLY_REFUNDED") {
+          return "partially_refunded" as const;
+        }
+        if (pkg.paymentStatus === "REFUNDED") return "refunded" as const;
+        if (pkg.paymentStatus === "DISPUTED") return "disputed" as const;
+        if (pkg.paymentStatus === "DISPUTE_WON") return "paid" as const;
+        return "failed" as const;
+      })();
 
       return {
         id: String(pkg.id),
-        amount: amount,
-        currency: "USD",
-        status: (pkg.status as string).toLowerCase(),
+        userId: user.id,
+        amount: pkg.amount / 100,
+        currency: pkg.currency.toUpperCase(),
+        status,
         items: [
           {
             type: "credits",
@@ -83,7 +98,7 @@ export async function GET(request: NextRequest) {
             quantity: initialCredits,
           },
         ],
-        createdAt: new Date(pkg.createdAt as string),
+        createdAt: pkg.createdAt,
       };
     });
 

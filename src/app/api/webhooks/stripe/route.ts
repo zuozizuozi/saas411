@@ -4,15 +4,19 @@ import { stripe, type Stripe } from "@/payment";
 import { handleEvent } from "@/payment/webhooks";
 
 import { env } from "@/env.mjs";
+import { ApiError } from "@/lib/api/error";
+import { readRequestTextWithLimit } from "@/lib/api/request-body";
+
+const MAX_STRIPE_WEBHOOK_BYTES = 1024 * 1024;
 
 const handler = async (req: NextRequest) => {
-  const payload = await req.text();
   const signature = req.headers.get("Stripe-Signature");
   try {
     if (!signature) throw new Error("Missing Stripe-Signature header");
     if (!env.STRIPE_WEBHOOK_SECRET) {
       throw new Error("STRIPE_WEBHOOK_SECRET is not configured");
     }
+    const payload = await readRequestTextWithLimit(req, MAX_STRIPE_WEBHOOK_BYTES);
     const event = stripe.webhooks.constructEvent(
       payload,
       signature,
@@ -25,7 +29,8 @@ const handler = async (req: NextRequest) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.log(`❌ Error when handling Stripe Event: ${message}`);
-    return NextResponse.json({ error: "Webhook processing failed" }, { status: 400 });
+    const status = error instanceof ApiError ? error.status : 400;
+    return NextResponse.json({ error: "Webhook processing failed" }, { status });
   }
 };
 

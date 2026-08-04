@@ -8,6 +8,22 @@ const canonicalOrigin = canonicalAppUrl
   ? new URL(canonicalAppUrl).origin
   : "https://seedance.co.com";
 const canonicalHostname = new URL(canonicalOrigin).hostname;
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self' https://checkout.stripe.com",
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://js.stripe.com https://vercel.live`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https:",
+  "font-src 'self' data: https:",
+  "connect-src 'self' https: wss:",
+  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+  "worker-src 'self' blob:",
+  "upgrade-insecure-requests",
+].join("; ");
 
 if (!process.env.SKIP_ENV_VALIDATION) {
   await import("./src/env.mjs");
@@ -17,6 +33,7 @@ if (!process.env.SKIP_ENV_VALIDATION) {
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  poweredByHeader: false,
   pageExtensions: ["ts", "tsx"],
   async headers() {
     return [
@@ -25,6 +42,7 @@ const config = {
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: contentSecurityPolicy },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
@@ -53,8 +71,8 @@ const config = {
       { protocol: "https", hostname: "www.setupyourpay.com" },
     ],
   },
-  /** We already do linting and typechecking as separate tasks in CI */
-  typescript: { ignoreBuildErrors: true },
+  // Production builds must fail when TypeScript finds an error.
+  typescript: { ignoreBuildErrors: false },
   output: "standalone",
 };
 

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   check,
   index,
@@ -173,6 +174,28 @@ export const verifications = pgTable("verification", {
   expiresAt: timestamp("expiresAt").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+/** Better Auth's distributed rate-limit store for serverless deployments. */
+export const rateLimits = pgTable(
+  "rateLimit",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+    key: text("key").notNull(),
+    count: integer("count").notNull(),
+    lastRequest: bigint("lastRequest", { mode: "number" }).notNull(),
+  },
+  (table) => ({
+    keyIdx: uniqueIndex("rate_limit_key_idx").on(table.key),
+  })
+);
+
+/** Atomic counters shared by expensive application endpoints across instances. */
+export const securityRateLimits = pgTable("security_rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").default(1).notNull(),
+  windowStartedAt: timestamp("window_started_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
 });
 
 export const legacyAccounts = pgTable(
@@ -466,6 +489,37 @@ export const videos = pgTable(
   })
 );
 
+/** Upload intents are reserved before a client receives an object-store URL. */
+export const uploadReservations = pgTable(
+  "upload_reservations",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: text("user_id").notNull(),
+    storageKey: text("storage_key").notNull().unique(),
+    fileName: text("file_name").notNull(),
+    contentType: text("content_type").notNull(),
+    expectedSize: integer("expected_size").notNull(),
+    status: text("status").default("PENDING").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => ({
+    userCreatedIdx: index("upload_reservations_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+    statusExpiresIdx: index("upload_reservations_status_expires_idx").on(
+      table.status,
+      table.expiresAt
+    ),
+    positiveSize: check(
+      "upload_reservations_positive_size",
+      sql`${table.expectedSize} > 0`
+    ),
+  })
+);
+
 /** User-owned uploads that can be reused as image-to-video inputs. */
 export const mediaAssets = pgTable(
   "media_assets",
@@ -518,6 +572,7 @@ export type CreditHold = typeof creditHolds.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Video = typeof videos.$inferSelect;
 export type MediaAsset = typeof mediaAssets.$inferSelect;
+export type UploadReservation = typeof uploadReservations.$inferSelect;
 export type ProviderEvent = typeof providerEvents.$inferSelect;
 export type PaymentOrder = typeof paymentOrders.$inferSelect;
 export type PaymentDispute = typeof paymentDisputes.$inferSelect;

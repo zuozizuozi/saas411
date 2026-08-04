@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { customers, db } from "@/db";
 import { getCurrentUser } from "@/lib/auth";
 import { stripe } from "@/payment";
@@ -49,6 +51,14 @@ export type StripeSubscriptionChangePreview =
       currentPlan: string;
       targetPlan: string;
     };
+
+function stripeSessionIdempotencyKey(scope: string, userId: string, target: string) {
+  const fiveMinuteBucket = Math.floor(Date.now() / (5 * 60 * 1000));
+  const digest = createHash("sha256")
+    .update(`${scope}:${userId}:${target}:${fiveMinuteBucket}`)
+    .digest("hex");
+  return `videofly:${scope}:${digest}`;
+}
 
 function assertSupportedPrice(priceId: string): SubscriptionPriceDetails {
   const details = getSubscriptionPriceDetails(priceId);
@@ -130,10 +140,19 @@ export async function previewStripeSubscriptionChange(
     const returnUrl = process.env.NEXT_PUBLIC_APP_URL
       ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
       : "/dashboard";
-    const session = await stripe.billingPortal.sessions.create({
-      customer: customer.stripeCustomerId,
-      return_url: returnUrl,
-    });
+    const session = await stripe.billingPortal.sessions.create(
+      {
+        customer: customer.stripeCustomerId,
+        return_url: returnUrl,
+      },
+      {
+        idempotencyKey: stripeSessionIdempotencyKey(
+          "portal",
+          userId,
+          customer.stripeCustomerId
+        ),
+      }
+    );
     return { kind: "portal", url: session.url };
   }
 
@@ -252,10 +271,19 @@ export async function createStripeSession(
     : "/dashboard";
 
   if (customer?.plan && customer.plan !== "FREE" && customer.stripeCustomerId) {
-    const session = await stripe.billingPortal.sessions.create({
-      customer: customer.stripeCustomerId,
-      return_url: returnUrl,
-    });
+    const session = await stripe.billingPortal.sessions.create(
+      {
+        customer: customer.stripeCustomerId,
+        return_url: returnUrl,
+      },
+      {
+        idempotencyKey: stripeSessionIdempotencyKey(
+          "portal",
+          userId,
+          customer.stripeCustomerId
+        ),
+      }
+    );
     return { success: true as const, url: session.url };
   }
 
@@ -265,16 +293,19 @@ export async function createStripeSession(
   }
   const email = user.email!;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    payment_method_types: ["card"],
-    customer_email: email,
-    client_reference_id: userId,
-    subscription_data: { metadata: purchaseMetadata(userId, context) },
-    cancel_url: returnUrl,
-    success_url: returnUrl,
-    line_items: [{ price: planId, quantity: 1 }],
-  });
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "subscription",
+      payment_method_types: ["card"],
+      customer_email: email,
+      client_reference_id: userId,
+      subscription_data: { metadata: purchaseMetadata(userId, context) },
+      cancel_url: returnUrl,
+      success_url: returnUrl,
+      line_items: [{ price: planId, quantity: 1 }],
+    },
+    { idempotencyKey: stripeSessionIdempotencyKey("subscription", userId, planId) }
+  );
 
   if (!session.url) return { success: false as const, url: null };
   return { success: true as const, url: session.url };
@@ -302,26 +333,29 @@ export async function createStripeCreditSession(
     packageId: product.id,
     credits: String(product.credits),
   };
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
-    customer_email: user.email,
-    client_reference_id: userId,
-    metadata,
-    payment_intent_data: { metadata },
-    cancel_url: returnUrl,
-    success_url: `${returnUrl}?checkout=success`,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: product.price.currency.toLowerCase(),
-          unit_amount: product.price.amount,
-          product_data: { name: product.name },
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      payment_method_types: ["card"],
+      customer_email: user.email,
+      client_reference_id: userId,
+      metadata,
+      payment_intent_data: { metadata },
+      cancel_url: returnUrl,
+      success_url: `${returnUrl}?checkout=success`,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: product.price.currency.toLowerCase(),
+            unit_amount: product.price.amount,
+            product_data: { name: product.name },
+          },
         },
-      },
-    ],
-  });
+      ],
+    },
+    { idempotencyKey: stripeSessionIdempotencyKey("credits", userId, product.id) }
+  );
 
   if (!session.url) return { success: false as const, url: null };
   await recordPendingPaymentOrder({

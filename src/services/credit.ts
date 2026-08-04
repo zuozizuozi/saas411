@@ -810,8 +810,14 @@ export class CreditService {
       transType?: CreditTransType;
     }
   ) {
-    const limit = options?.limit || 20;
-    const offset = options?.offset || 0;
+    const requestedLimit = options?.limit ?? 20;
+    const requestedOffset = options?.offset ?? 0;
+    const limit = Number.isSafeInteger(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 20;
+    const offset = Number.isSafeInteger(requestedOffset)
+      ? Math.min(Math.max(requestedOffset, 0), 10_000)
+      : 0;
 
     const filters = [eq(creditTransactions.userId, userId)];
     if (options?.transType) {

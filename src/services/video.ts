@@ -821,7 +821,10 @@ export class VideoService {
       status?: string;
     }
   ) {
-    const limit = options?.limit || 20;
+    const requestedLimit = options?.limit ?? 20;
+    const limit = Number.isSafeInteger(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 20;
 
     const conditions = [
       eq(videos.userId, userId),
@@ -836,7 +839,13 @@ export class VideoService {
       const [cursorVideo] = await db
         .select({ createdAt: videos.createdAt })
         .from(videos)
-        .where(eq(videos.uuid, options.cursor))
+        .where(
+          and(
+            eq(videos.uuid, options.cursor),
+            eq(videos.userId, userId),
+            eq(videos.isDeleted, false)
+          )
+        )
         .limit(1);
 
       if (cursorVideo) {

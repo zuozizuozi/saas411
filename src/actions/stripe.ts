@@ -13,6 +13,7 @@ import {
   previewStripeSubscriptionChange,
 } from "@/services/billing";
 import { PAYMENT_TERMS_VERSION } from "@/services/payment-risk";
+import { enforceRateLimit } from "@/services/rate-limit";
 
 async function getPurchaseContext() {
   const requestHeaders = await headers();
@@ -28,6 +29,12 @@ async function getPurchaseContext() {
 export const createStripeSessionAction = userActionClient
   .schema(z.object({ planId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
+    await enforceRateLimit({
+      scope: "stripe-checkout",
+      identifier: ctx.user.id,
+      limit: 5,
+      windowSeconds: 300,
+    });
     const result = await createStripeSession(
       ctx.user.id,
       parsedInput.planId,
@@ -39,6 +46,12 @@ export const createStripeSessionAction = userActionClient
 export const createStripeCreditSessionAction = userActionClient
   .schema(z.object({ packageId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
+    await enforceRateLimit({
+      scope: "stripe-checkout",
+      identifier: ctx.user.id,
+      limit: 5,
+      windowSeconds: 300,
+    });
     return createStripeCreditSession(
       ctx.user.id,
       parsedInput.packageId,
@@ -49,6 +62,12 @@ export const createStripeCreditSessionAction = userActionClient
 export const previewStripeSubscriptionChangeAction = userActionClient
   .schema(z.object({ planId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
+    await enforceRateLimit({
+      scope: "stripe-preview",
+      identifier: ctx.user.id,
+      limit: 20,
+      windowSeconds: 60,
+    });
     return previewStripeSubscriptionChange(ctx.user.id, parsedInput.planId);
   });
 
@@ -60,6 +79,12 @@ export const confirmStripeSubscriptionUpgradeAction = userActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
+    await enforceRateLimit({
+      scope: "stripe-change",
+      identifier: ctx.user.id,
+      limit: 5,
+      windowSeconds: 300,
+    });
     return confirmStripeSubscriptionUpgrade(
       ctx.user.id,
       parsedInput.planId,

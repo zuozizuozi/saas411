@@ -101,7 +101,13 @@ export interface CreditHistoryResponse {
 // Billing Types
 // ============================================
 
-export type InvoiceStatus = "paid" | "pending" | "failed";
+export type InvoiceStatus =
+  | "paid"
+  | "pending"
+  | "partially_refunded"
+  | "refunded"
+  | "disputed"
+  | "failed";
 
 export interface InvoiceItem {
   type: "credits" | "subscription";
