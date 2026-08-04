@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, videos, creditPackages, VideoStatus } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 import { connection } from "next/server";
 import { requireAdmin } from "@/lib/auth/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,39 +20,64 @@ export default async function AdminDashboardPage() {
   await connection();
   await requireAdmin();
 
+  const startedAt = Date.now();
   const dashboardCutoff = new Date();
   dashboardCutoff.setDate(dashboardCutoff.getDate() - 7);
+  const dashboardCutoffIso = dashboardCutoff.toISOString();
 
-  // Keep the dashboard to one database round-trip so it cannot monopolize the
-  // single-connection serverless client with a command waterfall.
-  const [stats] = await db.execute<{
-    totalUsers: number;
-    totalCreditPackages: number;
-    totalVideos: number;
-    completedVideos: number;
-    failedVideos: number;
-    pendingVideos: number;
-    recentUsers: number;
-    recentVideos: number;
-  }>(sql`
-    select
-      (select count(*)::int from ${users}) as "totalUsers",
-      (select count(*)::int from ${creditPackages}) as "totalCreditPackages",
-      (select count(*)::int from ${videos}) as "totalVideos",
-      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.COMPLETED}) as "completedVideos",
-      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.FAILED}) as "failedVideos",
-      (select count(*)::int from ${videos} where ${videos.status} = ${VideoStatus.PENDING}) as "pendingVideos",
-      (select count(*)::int from ${users} where ${users.createdAt} >= ${dashboardCutoff}) as "recentUsers",
-      (select count(*)::int from ${videos} where ${videos.createdAt} >= ${dashboardCutoff}) as "recentVideos"
-  `);
+  let userStats: { total: number; recent: number } | undefined;
+  let totalCreditPackages = 0;
+  let videoStats:
+    | {
+      total: number;
+      completed: number;
+      failed: number;
+      pending: number;
+      recent: number;
+    }
+    | undefined;
 
-  const totalUsers = Number(stats?.totalUsers ?? 0);
-  const totalVideos = Number(stats?.totalVideos ?? 0);
-  const completedVideos = Number(stats?.completedVideos ?? 0);
-  const failedVideos = Number(stats?.failedVideos ?? 0);
-  const pendingVideos = Number(stats?.pendingVideos ?? 0);
-  const recentUsers = Number(stats?.recentUsers ?? 0);
-  const recentVideos = Number(stats?.recentVideos ?? 0);
+  try {
+    // Keep the queries simple and sequential for the single-connection
+    // Supavisor client used by each serverless instance.
+    [userStats] = await db
+      .select({
+        total: count(),
+        recent: sql<number>`count(*) filter (where ${users.createdAt} >= ${dashboardCutoffIso}::timestamp)::int`,
+      })
+      .from(users);
+
+    const [creditStats] = await db
+      .select({ total: count() })
+      .from(creditPackages);
+    totalCreditPackages = Number(creditStats?.total ?? 0);
+
+    [videoStats] = await db
+      .select({
+        total: count(),
+        completed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.COMPLETED})::int`,
+        failed: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.FAILED})::int`,
+        pending: sql<number>`count(*) filter (where ${videos.status} = ${VideoStatus.PENDING})::int`,
+        recent: sql<number>`count(*) filter (where ${videos.createdAt} >= ${dashboardCutoffIso}::timestamp)::int`,
+      })
+      .from(videos);
+  } catch (error) {
+    console.error(JSON.stringify({
+      level: "error",
+      message: "Admin dashboard statistics query failed",
+      error: error instanceof Error ? error.message : String(error),
+      durationMs: Date.now() - startedAt,
+    }));
+    throw error;
+  }
+
+  const totalUsers = Number(userStats?.total ?? 0);
+  const totalVideos = Number(videoStats?.total ?? 0);
+  const completedVideos = Number(videoStats?.completed ?? 0);
+  const failedVideos = Number(videoStats?.failed ?? 0);
+  const pendingVideos = Number(videoStats?.pending ?? 0);
+  const recentUsers = Number(userStats?.recent ?? 0);
+  const recentVideos = Number(videoStats?.recent ?? 0);
 
   // 计算视频成功率
   const totalFinishedVideos = completedVideos + failedVideos;
@@ -126,7 +151,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Number(stats?.totalCreditPackages ?? 0)}
+              {totalCreditPackages}
             </div>
             <p className="text-xs text-muted-foreground">
               所有用户
