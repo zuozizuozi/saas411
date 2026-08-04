@@ -6,6 +6,8 @@ import {
   creditTransactions,
   customers,
   db,
+  paymentOrders,
+  users,
   type CreditPackage,
 } from "@/db";
 import {
@@ -13,6 +15,7 @@ import {
   asc,
   desc,
   eq,
+  gte,
   gt,
   inArray,
   isNull,
@@ -22,6 +25,7 @@ import {
 } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { CREDITS_CONFIG } from "../config/credits";
+import { ApiError } from "@/lib/api/error";
 
 // Re-export enums for consumers
 export { CreditTransType, CreditPackageStatus };
@@ -171,13 +175,28 @@ export class CreditService {
         const toFreeze = Math.min(pkg.remainingCredits, remaining);
         allocation.push({ packageId: pkg.id, credits: toFreeze });
 
-        await trx
+        const updated = await trx
           .update(creditPackages)
           .set({
-            remainingCredits: pkg.remainingCredits - toFreeze,
-            frozenCredits: pkg.frozenCredits + toFreeze,
+            remainingCredits: sql`${creditPackages.remainingCredits} - ${toFreeze}`,
+            frozenCredits: sql`${creditPackages.frozenCredits} + ${toFreeze}`,
+            updatedAt: new Date(),
           })
-          .where(eq(creditPackages.id, pkg.id));
+          .where(
+            and(
+              eq(creditPackages.id, pkg.id),
+              eq(creditPackages.status, CreditPackageStatus.ACTIVE),
+              gte(creditPackages.remainingCredits, toFreeze),
+              or(
+                isNull(creditPackages.expiredAt),
+                gt(creditPackages.expiredAt, now)
+              )
+            )
+          )
+          .returning({ id: creditPackages.id });
+        if (updated.length !== 1) {
+          throw new Error("Credit package changed while credits were being frozen");
+        }
 
         remaining -= toFreeze;
       }
@@ -295,13 +314,27 @@ export class CreditService {
       });
 
       for (const [packageId, state] of packageState) {
-        await trx
+        const original = packages.find((pkg) => pkg.id === packageId);
+        if (!original) throw new Error(`Credit package not found: ${packageId}`);
+        const updated = await trx
           .update(creditPackages)
           .set({
             remainingCredits: state.remaining,
             frozenCredits: state.frozen,
+            updatedAt: new Date(),
           })
-          .where(eq(creditPackages.id, packageId));
+          .where(
+            and(
+              eq(creditPackages.id, packageId),
+              eq(creditPackages.status, CreditPackageStatus.ACTIVE),
+              eq(creditPackages.remainingCredits, original.remainingCredits),
+              eq(creditPackages.frozenCredits, original.frozenCredits)
+            )
+          )
+          .returning({ id: creditPackages.id });
+        if (updated.length !== 1) {
+          throw new Error("Credit package changed while batch credits were being frozen");
+        }
       }
 
       const holds = await trx.insert(creditHolds).values(holdValues).returning({
@@ -324,6 +357,21 @@ export class CreditService {
    */
   async settle(videoUuid: string): Promise<void> {
     await db.transaction(async (trx) => {
+      const [candidate] = await trx
+        .select({ userId: creditHolds.userId, status: creditHolds.status })
+        .from(creditHolds)
+        .where(eq(creditHolds.videoUuid, videoUuid))
+        .limit(1);
+      if (!candidate) throw new Error(`Hold not found for video: ${videoUuid}`);
+      if (candidate.status === "SETTLED") return;
+      if (candidate.status !== "HOLDING") {
+        throw new Error(`Invalid hold status: ${candidate.status}`);
+      }
+
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${candidate.userId}`}))`
+      );
+
       const [hold] = await trx
         .update(creditHolds)
         .set({ status: "SETTLED", settledAt: new Date() })
@@ -349,36 +397,26 @@ export class CreditService {
       const allocation = hold.packageAllocation as PackageAllocation[];
 
       for (const { packageId, credits } of allocation) {
-        const [pkg] = await trx
-          .select()
-          .from(creditPackages)
+        const [updatedPkg] = await trx
+          .update(creditPackages)
+          .set({
+            frozenCredits: sql`${creditPackages.frozenCredits} - ${credits}`,
+            updatedAt: new Date(),
+          })
           .where(eq(creditPackages.id, packageId))
-          .limit(1);
+          .returning({
+            remainingCredits: creditPackages.remainingCredits,
+            frozenCredits: creditPackages.frozenCredits,
+          });
 
-        if (pkg) {
+        if (!updatedPkg) {
+          throw new Error(`Credit package not found while settling: ${packageId}`);
+        }
+        if (updatedPkg.remainingCredits === 0 && updatedPkg.frozenCredits === 0) {
           await trx
             .update(creditPackages)
-            .set({
-              frozenCredits: pkg.frozenCredits - credits,
-            })
+            .set({ status: CreditPackageStatus.DEPLETED, updatedAt: new Date() })
             .where(eq(creditPackages.id, packageId));
-
-          const [updatedPkg] = await trx
-            .select()
-            .from(creditPackages)
-            .where(eq(creditPackages.id, packageId))
-            .limit(1);
-
-          if (
-            updatedPkg &&
-            updatedPkg.remainingCredits === 0 &&
-            updatedPkg.frozenCredits === 0
-          ) {
-            await trx
-              .update(creditPackages)
-              .set({ status: CreditPackageStatus.DEPLETED })
-              .where(eq(creditPackages.id, packageId));
-          }
         }
       }
 
@@ -415,6 +453,10 @@ export class CreditService {
         return;
       }
 
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${hold.userId}`}))`
+      );
+
       const [claimed] = await trx
         .update(creditHolds)
         .set({
@@ -434,20 +476,18 @@ export class CreditService {
       const allocation = hold.packageAllocation as PackageAllocation[];
 
       for (const { packageId, credits } of allocation) {
-        const [pkg] = await trx
-          .select()
-          .from(creditPackages)
+        const [updatedPkg] = await trx
+          .update(creditPackages)
+          .set({
+            remainingCredits: sql`${creditPackages.remainingCredits} + ${credits}`,
+            frozenCredits: sql`${creditPackages.frozenCredits} - ${credits}`,
+            status: CreditPackageStatus.ACTIVE,
+            updatedAt: new Date(),
+          })
           .where(eq(creditPackages.id, packageId))
-          .limit(1);
-
-        if (pkg) {
-          await trx
-            .update(creditPackages)
-            .set({
-              remainingCredits: pkg.remainingCredits + credits,
-              frozenCredits: pkg.frozenCredits - credits,
-            })
-            .where(eq(creditPackages.id, packageId));
+          .returning({ id: creditPackages.id });
+        if (!updatedPkg) {
+          throw new Error(`Credit package not found while releasing: ${packageId}`);
         }
       }
 
@@ -462,6 +502,164 @@ export class CreditService {
         holdId: hold.id,
         remark: `Video generation failed, credits released: ${videoUuid}`,
       });
+    });
+  }
+
+  /**
+   * Revoke credits belonging to one paid order. Already-spent credits become
+   * account debt; unrelated credit packages are never confiscated.
+   */
+  async revokeOrderCredits(params: {
+    paymentOrderId: number;
+    userId: string;
+    orderNo: string;
+    targetCredits: number;
+    amountRefunded?: number;
+    paymentStatus:
+      | "PARTIALLY_REFUNDED"
+      | "REFUNDED"
+      | "DISPUTE_LOST";
+    remark: string;
+  }): Promise<{ revoked: number; debt: number; targetCredits: number }> {
+    if (!Number.isInteger(params.targetCredits) || params.targetCredits < 0) {
+      throw new Error("Invalid payment reversal target");
+    }
+
+    return db.transaction(async (trx) => {
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${params.userId}`}))`
+      );
+
+      const [order] = await trx
+        .select()
+        .from(paymentOrders)
+        .where(eq(paymentOrders.id, params.paymentOrderId))
+        .limit(1);
+      if (!order || order.userId !== params.userId || order.orderNo !== params.orderNo) {
+        throw new Error(`Payment order mismatch: ${params.paymentOrderId}`);
+      }
+      const targetCredits = Math.max(
+        order.creditsRevoked,
+        Math.min(order.creditsGranted, params.targetCredits)
+      );
+      const credits = targetCredits - order.creditsRevoked;
+
+      const [pkg] = await trx
+        .select()
+        .from(creditPackages)
+        .where(
+          and(
+            eq(creditPackages.userId, params.userId),
+            eq(creditPackages.orderNo, params.orderNo)
+          )
+        )
+        .limit(1);
+      if (!pkg) throw new Error(`Credit package not found for order: ${params.orderNo}`);
+
+      const revoked = Math.min(credits, pkg.remainingCredits);
+      const debt = credits - revoked;
+      if (revoked > 0) {
+        const remainingCredits = pkg.remainingCredits - revoked;
+        await trx
+          .update(creditPackages)
+          .set({
+            remainingCredits,
+            status:
+              remainingCredits === 0 && pkg.frozenCredits === 0
+                ? CreditPackageStatus.DEPLETED
+                : pkg.status,
+            updatedAt: new Date(),
+          })
+          .where(eq(creditPackages.id, pkg.id));
+      }
+
+      if (debt > 0) {
+        await trx
+          .update(users)
+          .set({
+            creditDebt: sql`${users.creditDebt} + ${debt}`,
+            billingStatus: "PAYMENT_REQUIRED",
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, params.userId));
+      }
+
+
+      await trx
+        .update(paymentOrders)
+        .set({
+          creditsRevoked: targetCredits,
+          amountRefunded:
+            params.amountRefunded === undefined
+              ? order.amountRefunded
+              : Math.max(order.amountRefunded, params.amountRefunded),
+          status: params.paymentStatus,
+          updatedAt: new Date(),
+        })
+        .where(eq(paymentOrders.id, order.id));
+
+      if (credits > 0) {
+        const balance = await this.getBalanceInTx(trx, params.userId);
+        await trx.insert(creditTransactions).values({
+          transNo: `TXN${Date.now()}${nanoid(6)}`,
+          userId: params.userId,
+          transType: CreditTransType.PAYMENT_REVERSAL,
+          credits: -revoked,
+          balanceAfter: balance.availableCredits,
+          packageId: pkg.id,
+          orderNo: params.orderNo,
+          remark: `${params.remark}; revoked=${revoked}; debt=${debt}`,
+        });
+      }
+
+      return { revoked, debt, targetCredits };
+    });
+  }
+
+  /** Operator-only resolution after an externally verified repayment/review. */
+  async resolvePaymentRestriction(params: {
+    userId: string;
+    adminUserId: string;
+    debtReduction: number;
+    restoreAccess: boolean;
+    remark: string;
+  }) {
+    if (!Number.isInteger(params.debtReduction) || params.debtReduction < 0) {
+      throw new Error("Invalid debt reduction");
+    }
+    return db.transaction(async (trx) => {
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${params.userId}`}))`
+      );
+      const [account] = await trx
+        .select({ creditDebt: users.creditDebt, billingStatus: users.billingStatus })
+        .from(users)
+        .where(eq(users.id, params.userId))
+        .limit(1);
+      if (!account) throw new ApiError("User not found", 404);
+      const creditDebt = Math.max(0, account.creditDebt - params.debtReduction);
+      if (params.restoreAccess && creditDebt > 0) {
+        throw new ApiError(
+          "Outstanding credit debt must be zero before restoring access",
+          409
+        );
+      }
+      const billingStatus = params.restoreAccess ? "ACTIVE" : account.billingStatus;
+      await trx
+        .update(users)
+        .set({ creditDebt, billingStatus, updatedAt: new Date() })
+        .where(eq(users.id, params.userId));
+
+      const balance = await this.getBalanceInTx(trx, params.userId);
+      await trx.insert(creditTransactions).values({
+        transNo: `TXN${Date.now()}${nanoid(6)}`,
+        userId: params.userId,
+        transType: CreditTransType.SYSTEM_ADJUST,
+        credits: 0,
+        balanceAfter: balance.availableCredits,
+        remark: `Billing restriction adjusted by ${params.adminUserId}; debt ${account.creditDebt} -> ${creditDebt}; ${params.remark}`,
+      });
+      return { creditDebt, billingStatus };
     });
   }
 
@@ -482,6 +680,9 @@ export class CreditService {
     const expiredAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
 
     return db.transaction(async (trx) => {
+      await trx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`credit-ledger:${params.userId}`}))`
+      );
       const [existingPackage] = await trx
         .select({ id: creditPackages.id })
         .from(creditPackages)

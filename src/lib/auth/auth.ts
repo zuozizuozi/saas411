@@ -88,7 +88,7 @@ const plugins: AuthPlugin[] = [
           type,
           message: error.message,
         });
-        throw new Error(`Verification email delivery failed: ${error.message}`);
+        throw new Error("Verification email delivery failed");
       }
       console.info("[Auth OTP] delivery accepted", { emailDomain, type });
     },

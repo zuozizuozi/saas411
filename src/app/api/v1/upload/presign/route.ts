@@ -15,12 +15,19 @@ export async function POST(request: Request) {
   try {
     const user = await requireAuth(request);
     const input = schema.parse(await request.json());
-    const safeExtension = input.fileName.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const extensionByType = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/gif": "gif",
+      "image/webp": "webp",
+    } as const;
+    const safeExtension = extensionByType[input.contentType];
     const key = `uploads/${user.id}/${nanoid()}.${safeExtension}`;
     const storage = getStorage();
     const uploadUrl = await storage.createPresignedUpload({
       key,
       contentType: input.contentType,
+      contentLength: input.fileSize,
     });
     return apiSuccess({ uploadUrl, key, publicUrl: storage.getPublicUrl(key) });
   } catch (error) {

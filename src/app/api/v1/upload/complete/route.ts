@@ -9,8 +9,8 @@ import { mediaAssetService } from "@/services/media-asset";
 const schema = z.object({
   key: z.string().min(1),
   fileName: z.string().min(1).max(255),
-  contentType: z.string().min(1),
-  fileSize: z.number().int().positive(),
+  contentType: z.enum(["image/jpeg", "image/png", "image/gif", "image/webp"]),
+  fileSize: z.number().int().positive().max(10 * 1024 * 1024),
 });
 
 export async function POST(request: Request) {
@@ -24,10 +24,18 @@ export async function POST(request: Request) {
     const storage = getStorage();
     const object = await storage.verifyObject(input.key);
     if (object.size !== input.fileSize || object.size > 10 * 1024 * 1024) {
+      await storage.deleteObject(input.key);
       throw new ApiError("Uploaded file size mismatch", 400);
     }
-    if (object.contentType !== input.contentType || !object.contentType.startsWith("image/")) {
+    if (object.contentType !== input.contentType) {
+      await storage.deleteObject(input.key);
       throw new ApiError("Uploaded content type mismatch", 400);
+    }
+    try {
+      await storage.verifyImageObject(input.key, input.contentType);
+    } catch {
+      await storage.deleteObject(input.key);
+      throw new ApiError("Uploaded file is not a valid supported image", 400);
     }
 
     const asset = await mediaAssetService.create({

@@ -12,6 +12,27 @@ import {
   isSubscriptionCreditInvoiceReason,
 } from "./plans";
 import { calculateProratedUpgradeCredits } from "./subscription-proration";
+import {
+  handleChargeRefunded,
+  handleDispute,
+  processStripeEventOnce,
+  recordPaidPaymentOrder,
+  type StripeEventEnvelope,
+} from "@/services/payment-risk";
+
+async function resolvePaymentReferences(paymentIntentValue: unknown) {
+  const paymentIntentId =
+    typeof paymentIntentValue === "string"
+      ? paymentIntentValue
+      : (paymentIntentValue as { id?: string } | null)?.id ?? null;
+  if (!paymentIntentId) return { paymentIntentId: null, chargeId: null };
+  const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const chargeId =
+    typeof intent.latest_charge === "string"
+      ? intent.latest_charge
+      : intent.latest_charge?.id ?? null;
+  return { paymentIntentId, chargeId };
+}
 
 async function syncSubscription(subscription: Stripe.Subscription) {
   const userId = subscription.metadata.userId;
@@ -60,6 +81,18 @@ async function fulfillCreditPurchase(session: Stripe.Checkout.Session) {
     expiryDays: product.expireDays,
     remark: `Stripe credit purchase: ${product.name}`,
   });
+  const references = await resolvePaymentReferences(session.payment_intent);
+  await recordPaidPaymentOrder({
+    userId,
+    orderNo: `stripe_${session.id}`,
+    checkoutSessionId: session.id,
+    ...references,
+    productId: product.id,
+    amount: session.amount_total ?? product.price.amount,
+    currency: session.currency ?? product.price.currency,
+    credits: product.credits,
+    metadata: session.metadata,
+  });
   return true;
 }
 
@@ -98,6 +131,25 @@ async function fulfillSubscriptionInvoice(
       expiryDays: targetGrant.expiryDays,
       remark: `Stripe prorated subscription upgrade: ${targetGrant.name}`,
     });
+    const invoiceData = invoice as Stripe.Invoice & {
+      payment_intent?: string | Stripe.PaymentIntent | null;
+      charge?: string | Stripe.Charge | null;
+    };
+    const references = await resolvePaymentReferences(invoiceData.payment_intent);
+    await recordPaidPaymentOrder({
+      userId,
+      orderNo: `stripe_upgrade_invoice_${invoice.id}`,
+      paymentIntentId: references.paymentIntentId,
+      chargeId:
+        references.chargeId ??
+        (typeof invoiceData.charge === "string" ? invoiceData.charge : invoiceData.charge?.id),
+      invoiceId: invoice.id,
+      productId: targetLine?.price?.id,
+      amount: invoice.amount_paid,
+      currency: invoice.currency,
+      credits,
+      metadata: subscription.metadata,
+    });
     return true;
   }
 
@@ -113,10 +165,48 @@ async function fulfillSubscriptionInvoice(
     expiryDays: grant.expiryDays,
     remark: `Stripe subscription credits: ${grant.name}`,
   });
+  const invoiceData = invoice as Stripe.Invoice & {
+    payment_intent?: string | Stripe.PaymentIntent | null;
+    charge?: string | Stripe.Charge | null;
+  };
+  const references = await resolvePaymentReferences(invoiceData.payment_intent);
+  await recordPaidPaymentOrder({
+    userId,
+    orderNo: `stripe_invoice_${invoice.id}`,
+    paymentIntentId: references.paymentIntentId,
+    chargeId:
+      references.chargeId ??
+      (typeof invoiceData.charge === "string" ? invoiceData.charge : invoiceData.charge?.id),
+    invoiceId: invoice.id,
+    productId: priceId,
+    amount: invoice.amount_paid,
+    currency: invoice.currency,
+    credits: grant.credits,
+    metadata: subscription.metadata,
+  });
   return true;
 }
 
-export async function handleEvent(event: Stripe.DiscriminatedEvent) {
+async function handleEventPayload(event: Stripe.DiscriminatedEvent) {
+  if (event.type === "charge.refunded") {
+    await handleChargeRefunded(event.data.object as Stripe.Charge);
+    return;
+  }
+
+  if (
+    event.type === "charge.dispute.created" ||
+    event.type === "charge.dispute.updated" ||
+    event.type === "charge.dispute.closed" ||
+    event.type === "charge.dispute.funds_withdrawn" ||
+    event.type === "charge.dispute.funds_reinstated"
+  ) {
+    await handleDispute(
+      event as unknown as StripeEventEnvelope,
+      event.data.object as Stripe.Dispute
+    );
+    return;
+  }
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     if (await fulfillCreditPurchase(session)) return;
@@ -152,4 +242,11 @@ export async function handleEvent(event: Stripe.DiscriminatedEvent) {
   ) {
     await syncSubscription(event.data.object as Stripe.Subscription);
   }
+}
+
+export async function handleEvent(event: Stripe.DiscriminatedEvent) {
+  await processStripeEventOnce(
+    event as unknown as StripeEventEnvelope,
+    () => handleEventPayload(event)
+  );
 }

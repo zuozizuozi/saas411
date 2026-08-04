@@ -1,11 +1,15 @@
 import crypto from "node:crypto";
 
 const SIGNATURE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+const MAX_FUTURE_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 function getCallbackSecret(): string {
   const secret = process.env.CALLBACK_HMAC_SECRET;
   if (!secret) {
     throw new Error("CALLBACK_HMAC_SECRET environment variable is not set");
+  }
+  if (Buffer.byteLength(secret, "utf8") < 32) {
+    throw new Error("CALLBACK_HMAC_SECRET must be at least 32 bytes");
   }
   return secret;
 }
@@ -41,6 +45,9 @@ export function verifyCallbackSignature(
   const ts = Number.parseInt(timestamp);
   if (Number.isNaN(ts) || Date.now() - ts > SIGNATURE_EXPIRY_MS) {
     return { valid: false, error: "Signature expired" };
+  }
+  if (ts - Date.now() > MAX_FUTURE_CLOCK_SKEW_MS) {
+    return { valid: false, error: "Signature timestamp is in the future" };
   }
 
   // Verify signature

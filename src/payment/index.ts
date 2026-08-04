@@ -4,8 +4,6 @@ import { Stripe } from "stripe";
 
 import { env } from "./env.mjs";
 
-export * from "./webhooks";
-
 export type { Stripe };
 
 let _stripe: Stripe | null = null;

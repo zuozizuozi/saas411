@@ -1,0 +1,3 @@
+ALTER TABLE "payment_disputes" ADD CONSTRAINT "payment_disputes_positive_amount" CHECK ("payment_disputes"."amount" > 0);--> statement-breakpoint
+ALTER TABLE "payment_orders" ADD CONSTRAINT "payment_orders_bounded_reversals" CHECK ("payment_orders"."amount_refunded" <= "payment_orders"."amount" and "payment_orders"."credits_revoked" <= "payment_orders"."credits_granted");--> statement-breakpoint
+ALTER TABLE "user" ADD CONSTRAINT "user_nonnegative_credit_debt" CHECK ("user"."credit_debt" >= 0);

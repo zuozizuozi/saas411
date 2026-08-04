@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { headers } from "next/headers";
 
 import { userActionClient } from "@/lib/safe-action";
 import {
@@ -11,18 +12,38 @@ import {
   getUserPlans,
   previewStripeSubscriptionChange,
 } from "@/services/billing";
+import { PAYMENT_TERMS_VERSION } from "@/services/payment-risk";
+
+async function getPurchaseContext() {
+  const requestHeaders = await headers();
+  const forwardedFor = requestHeaders.get("x-forwarded-for");
+  return {
+    ip: forwardedFor?.split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || undefined,
+    userAgent: requestHeaders.get("user-agent")?.slice(0, 500) || undefined,
+    termsVersion: PAYMENT_TERMS_VERSION,
+    termsAcceptedAt: new Date(),
+  };
+}
 
 export const createStripeSessionAction = userActionClient
   .schema(z.object({ planId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
-    const result = await createStripeSession(ctx.user.id, parsedInput.planId);
+    const result = await createStripeSession(
+      ctx.user.id,
+      parsedInput.planId,
+      await getPurchaseContext()
+    );
     return { success: result.success, url: result.url };
   });
 
 export const createStripeCreditSessionAction = userActionClient
   .schema(z.object({ packageId: z.string().min(1) }))
   .action(async ({ parsedInput, ctx }) => {
-    return createStripeCreditSession(ctx.user.id, parsedInput.packageId);
+    return createStripeCreditSession(
+      ctx.user.id,
+      parsedInput.packageId,
+      await getPurchaseContext()
+    );
   });
 
 export const previewStripeSubscriptionChangeAction = userActionClient
@@ -42,7 +63,8 @@ export const confirmStripeSubscriptionUpgradeAction = userActionClient
     return confirmStripeSubscriptionUpgrade(
       ctx.user.id,
       parsedInput.planId,
-      parsedInput.prorationDate
+      parsedInput.prorationDate,
+      await getPurchaseContext()
     );
   });
 

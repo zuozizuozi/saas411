@@ -4,10 +4,11 @@ import { getServerSession } from "@/lib/auth";
 
 export const actionClient = createSafeActionClient({
   handleServerError: (e) => {
-    if (e instanceof Error) {
+    console.error("[Server Action] request failed", e);
+    if (process.env.NODE_ENV === "development" && e instanceof Error) {
       return { success: false, error: e.message };
     }
-    return { success: false, error: "Unknown error" };
+    return { success: false, error: "Request failed" };
   },
 });
 

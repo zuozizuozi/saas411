@@ -70,6 +70,11 @@ export function StripeCreditPacks({ userId }: { userId?: string }) {
           </article>
         ))}
       </div>
+      <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-5 text-muted-foreground">
+        {locale.toLowerCase().startsWith("zh")
+          ? "继续付款即表示你同意当前服务条款。积分付款成功后立即入账；发生退款或银行争议时，对应积分会被撤销，争议审核期间生成服务可能暂时受限。"
+          : "By continuing, you accept the current terms. Credits are delivered immediately after payment; related credits are reversed after refunds or bank disputes, and generation may be limited while a dispute is reviewed."}
+      </p>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -36,6 +37,17 @@ export const creditTransTypeEnum = pgEnum("CreditTransType", [
   "REFUND",
   "EXPIRED",
   "SYSTEM_ADJUST",
+  "PAYMENT_REVERSAL",
+]);
+
+export const paymentOrderStatusEnum = pgEnum("PaymentOrderStatus", [
+  "PENDING",
+  "PAID",
+  "PARTIALLY_REFUNDED",
+  "REFUNDED",
+  "DISPUTED",
+  "DISPUTE_WON",
+  "DISPUTE_LOST",
 ]);
 
 export const creditPackageStatusEnum = pgEnum("CreditPackageStatus", [
@@ -71,16 +83,27 @@ export const customers = pgTable(
   })
 );
 
-export const users = pgTable("user", {
-  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name"),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("emailVerified").default(false).notNull(),
-  image: text("image"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-  isAdmin: boolean("isAdmin").default(false).notNull(),
-});
+export const users = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: text("name"),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("emailVerified").default(false).notNull(),
+    image: text("image"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+    isAdmin: boolean("isAdmin").default(false).notNull(),
+    billingStatus: text("billing_status").default("ACTIVE").notNull(),
+    creditDebt: integer("credit_debt").default(0).notNull(),
+  },
+  (table) => ({
+    nonnegativeCreditDebt: check(
+      "user_nonnegative_credit_debt",
+      sql`${table.creditDebt} >= 0`
+    ),
+  })
+);
 
 /** Legacy table retained only for non-destructive upgrades; no runtime code uses it. */
 export const creemSubscriptions = pgTable(
@@ -250,6 +273,114 @@ export const creditPackages = pgTable(
       table.expiredAt
     ),
     orderNoIdx: uniqueIndex("credit_packages_order_no_idx").on(table.orderNo),
+    nonnegativeCredits: check(
+      "credit_packages_nonnegative_credits",
+      sql`${table.initialCredits} >= 0 and ${table.remainingCredits} >= 0 and ${table.frozenCredits} >= 0`
+    ),
+    boundedCredits: check(
+      "credit_packages_bounded_credits",
+      sql`${table.remainingCredits} + ${table.frozenCredits} <= ${table.initialCredits}`
+    ),
+  })
+);
+
+/** Stripe payment ledger used to reconcile grants, refunds, and disputes. */
+export const paymentOrders = pgTable(
+  "payment_orders",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    orderNo: text("order_no").notNull().unique(),
+    checkoutSessionId: text("checkout_session_id").unique(),
+    paymentIntentId: text("payment_intent_id"),
+    chargeId: text("charge_id"),
+    invoiceId: text("invoice_id"),
+    productId: text("product_id"),
+    amount: integer("amount").default(0).notNull(),
+    currency: text("currency").default("usd").notNull(),
+    creditsGranted: integer("credits_granted").default(0).notNull(),
+    creditsRevoked: integer("credits_revoked").default(0).notNull(),
+    amountRefunded: integer("amount_refunded").default(0).notNull(),
+    status: paymentOrderStatusEnum("status").default("PENDING").notNull(),
+    purchaseIp: text("purchase_ip"),
+    userAgent: text("user_agent"),
+    termsVersion: text("terms_version"),
+    termsAcceptedAt: timestamp("terms_accepted_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userCreatedIdx: index("payment_orders_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+    paymentIntentIdx: index("payment_orders_payment_intent_idx").on(
+      table.paymentIntentId
+    ),
+    chargeIdx: index("payment_orders_charge_idx").on(table.chargeId),
+    invoiceIdx: index("payment_orders_invoice_idx").on(table.invoiceId),
+    nonnegativeAmounts: check(
+      "payment_orders_nonnegative_amounts",
+      sql`${table.amount} >= 0 and ${table.amountRefunded} >= 0 and ${table.creditsGranted} >= 0 and ${table.creditsRevoked} >= 0`
+    ),
+    boundedReversals: check(
+      "payment_orders_bounded_reversals",
+      sql`${table.amountRefunded} <= ${table.amount} and ${table.creditsRevoked} <= ${table.creditsGranted}`
+    ),
+  })
+);
+
+/** Durable Stripe webhook inbox used for retry-safe event processing. */
+export const stripeEvents = pgTable(
+  "stripe_events",
+  {
+    eventId: text("event_id").primaryKey(),
+    eventType: text("event_type").notNull(),
+    objectId: text("object_id"),
+    status: text("status").default("PROCESSING").notNull(),
+    attempts: integer("attempts").default(1).notNull(),
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    processedAt: timestamp("processed_at"),
+  },
+  (table) => ({
+    statusUpdatedIdx: index("stripe_events_status_updated_idx").on(
+      table.status,
+      table.updatedAt
+    ),
+  })
+);
+
+/** Dispute mirror and evidence snapshot for manual submissions in Stripe. */
+export const paymentDisputes = pgTable(
+  "payment_disputes",
+  {
+    disputeId: text("dispute_id").primaryKey(),
+    paymentOrderId: integer("payment_order_id").notNull(),
+    userId: text("user_id").notNull(),
+    chargeId: text("charge_id").notNull(),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    reason: text("reason"),
+    status: text("status").notNull(),
+    dueBy: timestamp("due_by"),
+    evidenceSnapshot: jsonb("evidence_snapshot").notNull(),
+    lastStripeEventId: text("last_stripe_event_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    closedAt: timestamp("closed_at"),
+  },
+  (table) => ({
+    userIdx: index("payment_disputes_user_idx").on(table.userId),
+    statusDueIdx: index("payment_disputes_status_due_idx").on(
+      table.status,
+      table.dueBy
+    ),
+    positiveAmount: check(
+      "payment_disputes_positive_amount",
+      sql`${table.amount} > 0`
+    ),
   })
 );
 
@@ -388,6 +519,8 @@ export type CreditTransaction = typeof creditTransactions.$inferSelect;
 export type Video = typeof videos.$inferSelect;
 export type MediaAsset = typeof mediaAssets.$inferSelect;
 export type ProviderEvent = typeof providerEvents.$inferSelect;
+export type PaymentOrder = typeof paymentOrders.$inferSelect;
+export type PaymentDispute = typeof paymentDisputes.$inferSelect;
 
 export const SubscriptionPlan = {
   FREE: "FREE",
@@ -406,6 +539,7 @@ export const CreditTransType = {
   REFUND: "REFUND",
   EXPIRED: "EXPIRED",
   SYSTEM_ADJUST: "SYSTEM_ADJUST",
+  PAYMENT_REVERSAL: "PAYMENT_REVERSAL",
 } as const;
 export type CreditTransType =
   (typeof CreditTransType)[keyof typeof CreditTransType];

@@ -125,6 +125,11 @@ export function StripeSubscriptionButton({
         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
         {isPending ? (isZh ? "处理中…" : "Processing…") : label}
       </Button>
+      <p className="mt-2 text-center text-[11px] leading-4 text-muted-foreground">
+        {isZh
+          ? "继续即同意当前服务条款；退款或银行争议会撤销对应权益，审核期间生成服务可能受限。"
+          : "Continuing accepts the current terms. Refunds or bank disputes reverse related benefits and may limit generation during review."}
+      </p>
 
       <AlertDialog open={Boolean(quote)} onOpenChange={(open) => !open && setQuote(null)}>
         <AlertDialogContent>

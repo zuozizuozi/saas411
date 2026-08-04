@@ -15,6 +15,10 @@ import {
 } from "@/payment/subscription-proration";
 import { eq } from "drizzle-orm";
 import { ensureCustomer } from "./customer";
+import {
+  type PurchaseContext,
+  recordPendingPaymentOrder,
+} from "./payment-risk";
 
 export type UserSubscriptionPlan = {
   title: string;
@@ -158,7 +162,8 @@ export async function previewStripeSubscriptionChange(
 export async function confirmStripeSubscriptionUpgrade(
   userId: string,
   targetPriceId: string,
-  prorationDate: number
+  prorationDate: number,
+  context: PurchaseContext
 ) {
   const now = Math.floor(Date.now() / 1000);
   if (prorationDate > now + 30 || now - prorationDate > 10 * 60) {
@@ -194,6 +199,10 @@ export async function confirmStripeSubscriptionUpgrade(
       payment_behavior: "pending_if_incomplete",
       proration_behavior: "always_invoice",
       proration_date: prorationDate,
+      metadata: {
+        ...subscription.metadata,
+        ...purchaseMetadata(userId, context),
+      },
     },
     { idempotencyKey: `subscription-upgrade:${subscription.id}:${targetPriceId}:${prorationDate}` }
   );
@@ -217,7 +226,21 @@ export async function confirmStripeSubscriptionUpgrade(
   };
 }
 
-export async function createStripeSession(userId: string, planId: string) {
+function purchaseMetadata(userId: string, context: PurchaseContext) {
+  return {
+    userId,
+    purchaseIp: context.ip ?? "unknown",
+    userAgent: context.userAgent?.slice(0, 500) ?? "unknown",
+    termsVersion: context.termsVersion,
+    termsAcceptedAt: context.termsAcceptedAt.toISOString(),
+  };
+}
+
+export async function createStripeSession(
+  userId: string,
+  planId: string,
+  context: PurchaseContext
+) {
   assertSupportedPrice(planId);
 
   // Every Stripe flow needs a local customer row before the webhook arrives.
@@ -247,7 +270,7 @@ export async function createStripeSession(userId: string, planId: string) {
     payment_method_types: ["card"],
     customer_email: email,
     client_reference_id: userId,
-    subscription_data: { metadata: { userId } },
+    subscription_data: { metadata: purchaseMetadata(userId, context) },
     cancel_url: returnUrl,
     success_url: returnUrl,
     line_items: [{ price: planId, quantity: 1 }],
@@ -257,7 +280,11 @@ export async function createStripeSession(userId: string, planId: string) {
   return { success: true as const, url: session.url };
 }
 
-export async function createStripeCreditSession(userId: string, packageId: string) {
+export async function createStripeCreditSession(
+  userId: string,
+  packageId: string,
+  context: PurchaseContext
+) {
   const product = getOnetimeProducts().find((item) => item.id === packageId);
   if (!product) throw new Error("Unknown credit package");
 
@@ -269,17 +296,19 @@ export async function createStripeCreditSession(userId: string, packageId: strin
   const returnUrl = process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/credits`
     : "/credits";
+  const metadata = {
+    ...purchaseMetadata(userId, context),
+    purchaseType: "credits",
+    packageId: product.id,
+    credits: String(product.credits),
+  };
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
     customer_email: user.email,
     client_reference_id: userId,
-    metadata: {
-      purchaseType: "credits",
-      packageId: product.id,
-      credits: String(product.credits),
-      userId,
-    },
+    metadata,
+    payment_intent_data: { metadata },
     cancel_url: returnUrl,
     success_url: `${returnUrl}?checkout=success`,
     line_items: [
@@ -295,6 +324,16 @@ export async function createStripeCreditSession(userId: string, packageId: strin
   });
 
   if (!session.url) return { success: false as const, url: null };
+  await recordPendingPaymentOrder({
+    userId,
+    orderNo: `stripe_${session.id}`,
+    checkoutSessionId: session.id,
+    productId: product.id,
+    amount: product.price.amount,
+    currency: product.price.currency,
+    credits: product.credits,
+    context,
+  });
   return { success: true as const, url: session.url };
 }
 

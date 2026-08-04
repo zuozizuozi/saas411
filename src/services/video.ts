@@ -1,4 +1,4 @@
-import { VideoStatus, db, videos } from "@/db";
+import { VideoStatus, db, users, videos } from "@/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getStorage } from "@/lib/storage";
@@ -56,6 +56,27 @@ export class VideoService {
     this.callbackBaseUrl = process.env.AI_CALLBACK_URL || "";
   }
 
+  private async assertBillingAccountUsable(userId: string) {
+    const [account] = await db
+      .select({
+        billingStatus: users.billingStatus,
+        creditDebt: users.creditDebt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    if (!account || account.billingStatus === "ACTIVE") return;
+
+    const isDebt = account.billingStatus === "PAYMENT_REQUIRED";
+    throw new ApiError(
+      isDebt
+        ? "Payment reversal must be resolved before generating new videos"
+        : "Billing account is temporarily under dispute review",
+      isDebt ? 402 : 423,
+      { code: account.billingStatus, creditDebt: account.creditDebt }
+    );
+  }
+
   /**
    * Parse insufficient credits error and convert to structured ApiError
    */
@@ -86,6 +107,7 @@ export class VideoService {
    * Create video generation task
    */
   async generate(params: GenerateVideoParams): Promise<VideoGenerationResult> {
+    await this.assertBillingAccountUsable(params.userId);
     const validated = validateGenerationParams(params);
     const requestedOutputs = validated.outputNumber;
     if (requestedOutputs > 1 && !params.batchUuid) {
@@ -340,17 +362,18 @@ export class VideoService {
     }
 
     if (video.provider && video.provider !== providerType) {
-      console.error(
+      throw new Error(
         `Provider mismatch: expected ${video.provider}, got ${providerType}`
       );
-      return;
     }
 
-    if (video.externalTaskId && video.externalTaskId !== result.taskId) {
-      console.error(
+    if (!video.externalTaskId) {
+      throw new Error(`Callback arrived before task binding: ${videoUuid}`);
+    }
+    if (video.externalTaskId !== result.taskId) {
+      throw new Error(
         `Task ID mismatch: expected ${video.externalTaskId}, got ${result.taskId}`
       );
-      return;
     }
 
     if (result.status === "completed" && result.videoUrl) {

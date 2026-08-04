@@ -19,3 +19,14 @@ minimumReleaseAgeExclude:
 overrides:
   # Patched transitive dependency pulled by Drizzle's optional Gel adapter.
   shell-quote: 1.10.0
+  defu@<=6.1.4: 6.1.5
+  esbuild@<=0.24.2: 0.25.0
+  lodash@<=4.17.23: 4.18.1
+  lodash-es@<=4.17.23: 4.18.1
+  picomatch@<2.3.2: 2.3.2
+  picomatch@>=4.0.0 <4.0.4: 4.0.4
+  postcss@<=8.5.22: 8.5.25
+  qs@<=6.15.1: 6.15.2
+  sharp@<0.35.0: 0.35.0
+  ws@<8.21.0: 8.21.0
+  yaml@>=2.0.0 <2.8.3: 2.8.3

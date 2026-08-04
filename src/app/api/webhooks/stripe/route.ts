@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { handleEvent, stripe, type Stripe } from "@/payment";
+import { stripe, type Stripe } from "@/payment";
+import { handleEvent } from "@/payment/webhooks";
 
 import { env } from "@/env.mjs";
 
@@ -24,7 +25,7 @@ const handler = async (req: NextRequest) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.log(`❌ Error when handling Stripe Event: ${message}`);
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 400 });
   }
 };
 

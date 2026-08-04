@@ -14,6 +14,7 @@ const transTypeMapping: Record<CreditTransType, string> = {
   REFUND: "video_refund",
   EXPIRED: "expired",
   SYSTEM_ADJUST: "admin_adjust",
+  PAYMENT_REVERSAL: "payment_reversal",
 };
 
 export async function GET(request: NextRequest) {
