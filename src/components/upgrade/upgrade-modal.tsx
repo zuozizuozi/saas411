@@ -82,10 +82,6 @@ function UpgradeModalContent() {
         name: tCredits("packages.pro.name"),
         description: tCredits("packages.pro.description"),
       },
-      team: {
-        name: tCredits("packages.team.name"),
-        description: tCredits("packages.team.description"),
-      },
     },
     features: {
       all_models: tCredits("features.all_models"),

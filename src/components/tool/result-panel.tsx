@@ -67,6 +67,7 @@ export function ResultPanel({
   const tTool = useTranslations("ToolPage");
   const tStatus = useTranslations("dashboard.myCreations.status");
   const tActions = useTranslations("dashboard.myCreations.actions");
+  const tCreations = useTranslations("dashboard.myCreations");
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -338,18 +339,18 @@ export function ResultPanel({
                 <AlertDialog open={deleteDialogOpen === video.uuid} onOpenChange={(open) => !open && setDeleteDialogOpen(null)}>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>{tActions("deleteConfirm.title")}</AlertDialogTitle>
+                      <AlertDialogTitle>{tCreations("deleteConfirm.title")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        {tActions("deleteConfirm.message")}
+                        {tCreations("deleteConfirm.message")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>{tActions("deleteConfirm.cancel")}</AlertDialogCancel>
+                      <AlertDialogCancel>{tCreations("deleteConfirm.cancel")}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(video.uuid)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        {tActions("deleteConfirm.confirm")}
+                        {tCreations("deleteConfirm.confirm")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
