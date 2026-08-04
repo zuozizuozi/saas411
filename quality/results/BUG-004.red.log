@@ -1,0 +1,43 @@
+RED
+Command: vitest run src/app/api/v1/video/callback/body-limit.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/app/api/v1/video/callback/body-limit.regression.test.ts > BUG-004 / REQ-006: rejects callback JSON over 1 MiB before handling 10ms
+   → expected 200 to be 413 // Object.is equality
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/api/v1/video/callback/body-limit.regression.test.ts > BUG-004 / REQ-006: rejects callback JSON over 1 Mi
+B before handling
+AssertionError: expected 200 to be 413 // Object.is equality
+
+- Expected
++ Received
+
+- 413
++ 200
+
+ ❯ src/app/api/v1/video/callback/body-limit.regression.test.ts:22:27
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:10
+   Duration  203ms (transform 30ms, setup 0ms, import 77ms, tests 11ms, environment 0ms)
+
+     20|     params: Promise.resolve({ provider: "evolink" }),
+     21|   });
+     22|   expect(response.status).toBe(413);
+       |                           ^
+     23|   expect(handleCallback).not.toHaveBeenCalled();
+     24| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

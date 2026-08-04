@@ -1,0 +1,12 @@
+from pathlib import Path
+
+import pypdfium2 as pdfium
+
+
+pdf_path = Path(r"F:\saas411\quality\docx-render-v5\summary.pdf")
+out_dir = pdf_path.parent
+pdf = pdfium.PdfDocument(str(pdf_path))
+for index in range(len(pdf)):
+    image = pdf[index].render(scale=1.7).to_pil()
+    image.save(out_dir / f"page-{index + 1}.png")
+print(f"PAGES={len(pdf)}")

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.5.6",
+  "downgrades": [
+    {
+      "cell_id": "REQ-011/cell-BAILIAN-CALLBACK_INGRESS",
+      "authority_ref": "docs/spec/AI_PROVIDER_INTEGRATION.md:373",
+      "site_citation": "src/app/api/v1/video/callback/[provider]/route.ts:15-17",
+      "reason_class": "intentionally-partial",
+      "falsifiable_claim": "Bailian is documented as callback-unsupported and its supported completion path polls getTaskStatus; this downgrade becomes invalid if callbackUrl is forwarded for Bailian or the provider spec marks callbacks supported."
+    }
+  ]
+}

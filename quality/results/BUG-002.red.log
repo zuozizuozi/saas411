@@ -1,0 +1,103 @@
+RED
+Command: vitest run src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts > BUG-002 / REQ-007: durable exhaustion reaches a terminal policy 5ms
+   → expected 'import { serve } from "@upstash/workf…' to contain 'attempt < 80'
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts > BUG-002 / REQ-007: durable ex
+haustion reaches a terminal policy
+AssertionError: expected 'import { serve } from "@upstash/workf…' to contain 'attempt < 80'
+
+- Expected
++ Received
+
+- attempt < 80
++ import { serve } from "@upstash/workflow/nextjs";
++ import { NextResponse } from "next/server";
++ 
++ import { videoService } from "@/services/video";
++ 
++ interface VideoReconcileInput {
++   videoUuid: string;
++   userId: string;
++ }
++ 
++ /**
++  * Durable safety net for providers that delay or lose callbacks. The database
++  * remains the source of truth; this workflow only advances an existing task.
++  */
++ let workflowPost: ((request: Request) => Promise<Response>) | undefined;
++ 
++ function getWorkflowPost() {
++   if (
++     !process.env.QSTASH_TOKEN ||
++     !process.env.QSTASH_CURRENT_SIGNING_KEY ||
++     !process.env.QSTASH_NEXT_SIGNING_KEY
++   ) {
++     return null;
++   }
++ 
++   if (!workflowPost) {
++     workflowPost = serve<VideoReconcileInput>(async (context) => {
++       for (let attempt = 0; attempt < 10; attempt += 1) {
++         const result = await context.run(`refresh-video-${attempt}`, () =>
++           videoService.refreshStatus(
++             context.requestPayload.videoUuid,
++             context.requestPayload.userId
++           )
++         );
++ 
++         if (result.status === "COMPLETED" || result.status === "FAILED") {
++           return result;
++         }
++ 
++         await context.sleep(`wait-for-provider-${attempt}`, 45);
++       }
++ 
++       return { status: "PENDING", reason: "reconciliation-window-exhausted" };
++     }).POST;
++   }
++ 
++   return workflowPost;
++ }
++ 
++ export async function POST(request: Request) {
++   const handler = getWorkflowPost();
++   if (!handler) {
++     return NextResponse.json(
++       { error: "Durable workflow is not configured" },
++       { status: 503 }
++     );
++   }
++ 
++   return handler(request);
++ }
++
+
+ ❯ src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts:10:18
+      8|     "src/app/api/internal/workflows/video-reconcile/route.ts"
+      9|   ), "utf8");
+     10|   expect(source).toContain("attempt < 80");
+       |                  ^
+     11|   expect(source).toContain("failGeneration");
+     12|   expect(source).not.toContain('status: "PENDING", reason: "reconcilia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:08
+   Duration  161ms (transform 13ms, setup 0ms, import 21ms, tests 6ms, environment 0ms)
+

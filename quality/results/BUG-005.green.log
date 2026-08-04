@@ -1,0 +1,13 @@
+GREEN
+Command: vitest run src/ai/utils/callback-env-docs.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ ✓ src/ai/utils/callback-env-docs.regression.test.ts > BUG-005 / REQ-012: deployment guides use CALLBACK_HMAC_SECRET 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:11
+   Duration  212ms (transform 13ms, setup 0ms, import 21ms, tests 2ms, environment 0ms)
+

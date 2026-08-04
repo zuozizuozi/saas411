@@ -1,0 +1,255 @@
+from pathlib import Path
+import difflib
+
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "quality" / "patches"
+OUT.mkdir(parents=True, exist_ok=True)
+
+
+def new_file_patch(path: str, content: str) -> str:
+    lines = content.splitlines(keepends=True)
+    if content and not content.endswith("\n"):
+        lines[-1] += "\n"
+    body = "".join(difflib.unified_diff([], lines, fromfile="/dev/null", tofile=f"b/{path}"))
+    return f"diff --git a/{path} b/{path}\nnew file mode 100644\n{body}"
+
+
+def modification_patch(path: str, transform) -> str:
+    original = (ROOT / path).read_text(encoding="utf-8")
+    updated = transform(original)
+    if updated == original:
+        raise RuntimeError(f"Transform made no change: {path}")
+    return "".join(
+        difflib.unified_diff(
+            original.splitlines(keepends=True),
+            updated.splitlines(keepends=True),
+            fromfile=f"a/{path}",
+            tofile=f"b/{path}",
+        )
+    ).join([f"diff --git a/{path} b/{path}\n", ""])
+
+
+regression_tests = {
+    "BUG-001": ("src/services/billing-return-route.regression.test.ts", '''import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { expect, it } from "vitest";
+
+it.fails("BUG-001 / REQ-009: Stripe return destinations resolve to an app page", () => {
+  const billing = readFileSync(join(process.cwd(), "src/services/billing.ts"), "utf8");
+  const pages: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) walk(path);
+      else if (entry.name === "page.tsx") pages.push(path.replaceAll("\\\\", "/"));
+    }
+  };
+  walk(join(process.cwd(), "src/app"));
+  expect(billing).not.toContain("/dashboard");
+  expect(pages.some((path) => path.endsWith("/settings/page.tsx"))).toBe(true);
+});
+'''),
+    "BUG-002": ("src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts", '''import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { expect, it } from "vitest";
+
+it.fails("BUG-002 / REQ-007: durable exhaustion reaches a terminal policy", () => {
+  const source = readFileSync(join(
+    process.cwd(),
+    "src/app/api/internal/workflows/video-reconcile/route.ts"
+  ), "utf8");
+  expect(source).toContain("attempt < 80");
+  expect(source).toContain("failGeneration");
+  expect(source).not.toContain('status: "PENDING", reason: "reconciliation-window-exhausted"');
+});
+'''),
+    "BUG-003": ("src/app/api/v1/video/callback/provider-parity.regression.test.ts", '''import { describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+
+const { handleCallback } = vi.hoisted(() => ({
+  handleCallback: vi.fn(async () => undefined),
+}));
+vi.mock("@/services/video", () => ({ videoService: { handleCallback } }));
+vi.mock("@/ai/utils/callback-signature", () => ({
+  verifyCallbackSignature: () => ({ valid: true }),
+}));
+
+import { POST } from "./[provider]/route";
+
+describe("provider callback parity", () => {
+  it.fails("BUG-003 / REQ-011: accepts the configured Bailian provider", async () => {
+    const request = new NextRequest(
+      "https://example.com/api/v1/video/callback/bailian?videoUuid=vid-1&ts=1&sig=valid",
+      { method: "POST", body: JSON.stringify({ task_id: "task-1" }) }
+    );
+    const response = await POST(request, {
+      params: Promise.resolve({ provider: "bailian" }),
+    });
+    expect(response.status).toBe(200);
+    expect(handleCallback).toHaveBeenCalledOnce();
+  });
+});
+'''),
+    "BUG-004": ("src/app/api/v1/video/callback/body-limit.regression.test.ts", '''import { expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+
+const { handleCallback } = vi.hoisted(() => ({
+  handleCallback: vi.fn(async () => undefined),
+}));
+vi.mock("@/services/video", () => ({ videoService: { handleCallback } }));
+vi.mock("@/ai/utils/callback-signature", () => ({
+  verifyCallbackSignature: () => ({ valid: true }),
+}));
+
+import { POST } from "./[provider]/route";
+
+it.fails("BUG-004 / REQ-006: rejects callback JSON over 1 MiB before handling", async () => {
+  const request = new NextRequest(
+    "https://example.com/api/v1/video/callback/evolink?videoUuid=vid-1&ts=1&sig=valid",
+    { method: "POST", body: JSON.stringify({ padding: "x".repeat(1024 * 1024 + 1) }) }
+  );
+  const response = await POST(request, {
+    params: Promise.resolve({ provider: "evolink" }),
+  });
+  expect(response.status).toBe(413);
+  expect(handleCallback).not.toHaveBeenCalled();
+});
+'''),
+    "BUG-005": ("src/ai/utils/callback-env-docs.regression.test.ts", '''import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { expect, it } from "vitest";
+
+it.fails("BUG-005 / REQ-012: deployment guides use CALLBACK_HMAC_SECRET", () => {
+  for (const path of ["README.md", "docs/API-INTEGRATION-GUIDE.md"]) {
+    const text = readFileSync(join(process.cwd(), path), "utf8");
+    expect(text).not.toContain("AI_CALLBACK_SECRET");
+    expect(text).toContain("CALLBACK_HMAC_SECRET");
+  }
+});
+'''),
+    "BUG-006": ("src/app/csp-observability.regression.test.ts", '''import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { expect, it } from "vitest";
+
+it.fails("BUG-006: CSP allows emitted Vercel observability scripts", () => {
+  const layout = readFileSync(join(process.cwd(), "src/app/layout.tsx"), "utf8");
+  const config = readFileSync(join(process.cwd(), "next.config.mjs"), "utf8");
+  expect(layout).toContain("<Analytics />");
+  expect(layout).toContain("<SpeedInsights />");
+  expect(config).toContain("https://va.vercel-scripts.com");
+});
+'''),
+}
+
+for bug, (path, content) in regression_tests.items():
+    (OUT / f"{bug}-regression-test.patch").write_text(
+        new_file_patch(path, content), encoding="utf-8", newline="\n"
+    )
+
+
+def replace_all(text: str, old: str, new: str, expected_min=1):
+    if text.count(old) < expected_min:
+        raise RuntimeError(f"Expected at least {expected_min} matches for {old!r}")
+    return text.replace(old, new)
+
+
+fixes = {}
+
+
+def fix_bug_001(text: str) -> str:
+    text = replace_all(text, "`${process.env.NEXT_PUBLIC_APP_URL}/dashboard`", "`${process.env.NEXT_PUBLIC_APP_URL}/settings`", 2)
+    text = replace_all(text, '": /dashboard"', '": /settings"') if '": /dashboard"' in text else text
+    text = replace_all(text, '    : "/dashboard";', '    : "/settings";', 2)
+    text = text.replace("      success_url: returnUrl,\n", "      success_url: `${returnUrl}?checkout=success`,\n", 1)
+    return text
+
+
+fixes["BUG-001"] = modification_patch("src/services/billing.ts", fix_bug_001)
+
+
+def fix_bug_002(text: str) -> str:
+    text = replace_all(text, "attempt < 10", "attempt < 80")
+    return replace_all(
+        text,
+        '      return { status: "PENDING", reason: "reconciliation-window-exhausted" };',
+        '      return context.run("fail-video-after-provider-timeout", () =>\n'
+        '        videoService.failGeneration(\n'
+        '          context.requestPayload.videoUuid,\n'
+        '          "Provider did not reach a terminal state within 60 minutes"\n'
+        '        )\n'
+        '      );',
+    )
+
+
+fixes["BUG-002"] = modification_patch(
+    "src/app/api/internal/workflows/video-reconcile/route.ts", fix_bug_002
+)
+
+
+def fix_bug_003(text: str) -> str:
+    text = text.replace('import { type ProviderType } from "@/ai";\n', 'import { type ProviderType } from "@/ai";\nimport { AI_PROVIDERS } from "@/ai/provider-config";\n')
+    return replace_all(
+        text,
+        'if (!["evolink", "kie", "apimart", "zhipu"].includes(providerType))',
+        'if (!(AI_PROVIDERS as readonly string[]).includes(providerType))',
+    )
+
+
+fixes["BUG-003"] = modification_patch(
+    "src/app/api/v1/video/callback/[provider]/route.ts", fix_bug_003
+)
+
+
+def fix_bug_004(text: str) -> str:
+    text = text.replace(
+        'import { apiSuccess, apiError } from "@/lib/api/response";\n',
+        'import { apiSuccess, apiError, handleApiError } from "@/lib/api/response";\n'
+        'import { readRequestTextWithLimit } from "@/lib/api/request-body";\n\n'
+        'const MAX_AI_CALLBACK_BYTES = 1024 * 1024;\n',
+    )
+    text = replace_all(
+        text,
+        "    const payload = await request.json();",
+        "    const payloadText = await readRequestTextWithLimit(\n"
+        "      request,\n"
+        "      MAX_AI_CALLBACK_BYTES\n"
+        "    );\n"
+        "    const payload = JSON.parse(payloadText);",
+    )
+    return replace_all(
+        text,
+        '    return apiError("Callback processing failed", 500);',
+        "    return handleApiError(error);",
+    )
+
+
+fixes["BUG-004"] = modification_patch(
+    "src/app/api/v1/video/callback/[provider]/route.ts", fix_bug_004
+)
+
+
+fixes["BUG-005"] = (
+    modification_patch(
+        "README.md", lambda text: replace_all(text, "AI_CALLBACK_SECRET", "CALLBACK_HMAC_SECRET")
+    )
+    + modification_patch(
+        "docs/API-INTEGRATION-GUIDE.md",
+        lambda text: replace_all(text, "AI_CALLBACK_SECRET", "CALLBACK_HMAC_SECRET"),
+    )
+)
+
+
+fixes["BUG-006"] = modification_patch(
+    "next.config.mjs",
+    lambda text: replace_all(
+        text,
+        "https://js.stripe.com https://vercel.live`",
+        "https://js.stripe.com https://vercel.live https://va.vercel-scripts.com`",
+    ),
+)
+
+for bug, content in fixes.items():
+    (OUT / f"{bug}-fix.patch").write_text(content, encoding="utf-8", newline="\n")
+
+print(f"generated {len(regression_tests)} regression and {len(fixes)} fix patches")

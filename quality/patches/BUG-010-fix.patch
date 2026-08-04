@@ -1,0 +1,93 @@
+diff --git a/src/lib/types/dashboard.ts b/src/lib/types/dashboard.ts
+--- a/src/lib/types/dashboard.ts
++++ b/src/lib/types/dashboard.ts
+@@ -36,4 +36,6 @@ export interface ListVideosParams {
+   limit?: number;
+   cursor?: string;
+   status?: VideoStatus;
++  model?: string;
++  sortBy?: "newest" | "oldest";
+ }
+diff --git a/src/lib/api/dashboard-client.ts b/src/lib/api/dashboard-client.ts
+--- a/src/lib/api/dashboard-client.ts
++++ b/src/lib/api/dashboard-client.ts
+@@ -51,5 +51,7 @@ class ApiClient {
+     if (params.limit) searchParams.set("limit", params.limit.toString());
+     if (params.cursor) searchParams.set("cursor", params.cursor);
+     if (params.status) searchParams.set("status", params.status);
++    if (params.model) searchParams.set("model", params.model);
++    if (params.sortBy) searchParams.set("sortBy", params.sortBy);
+ 
+     const query = searchParams.toString();
+diff --git a/src/hooks/use-videos.ts b/src/hooks/use-videos.ts
+--- a/src/hooks/use-videos.ts
++++ b/src/hooks/use-videos.ts
+@@ -33,5 +33,8 @@ export function useVideos(filter?: VideoFilterOptions) {
+       return apiClient.getVideos({
+         limit: 20,
+         cursor: pageParam,
++        status: filter?.status === "all" ? undefined : filter?.status,
++        model: filter?.model === "all" ? undefined : filter?.model,
++        sortBy: filter?.sortBy,
+       });
+     },
+diff --git a/src/app/api/v1/video/list/route.ts b/src/app/api/v1/video/list/route.ts
+--- a/src/app/api/v1/video/list/route.ts
++++ b/src/app/api/v1/video/list/route.ts
+@@ -13,4 +13,6 @@ export async function GET(request: NextRequest) {
+       limit: parsePageLimit(searchParams.get("limit")),
+       cursor: searchParams.get("cursor") || undefined,
+       status: searchParams.get("status") || undefined,
++      model: searchParams.get("model") || undefined,
++      sortBy: searchParams.get("sortBy") === "oldest" ? "oldest" : "newest",
+     });
+diff --git a/src/services/video.ts b/src/services/video.ts
+--- a/src/services/video.ts
++++ b/src/services/video.ts
+@@ -1,3 +1,3 @@
+ import { VideoStatus, db, users, videos } from "@/db";
+-import { and, desc, eq, inArray, lt } from "drizzle-orm";
++import { and, asc, desc, eq, inArray, lt } from "drizzle-orm";
+ import { nanoid } from "nanoid";
+@@ -834,5 +834,7 @@ export class VideoService {
+       limit?: number;
+       cursor?: string;
+       status?: string;
++      model?: string;
++      sortBy?: "newest" | "oldest";
+     }
+   ) {
+@@ -846,7 +848,12 @@ export class VideoService {
+       eq(videos.isDeleted, false),
+     ];
+ 
+     if (options?.status) {
+-      conditions.push(eq(videos.status, options.status as typeof VideoStatus[keyof typeof VideoStatus]));
++      const status = options.status.toUpperCase();
++      if (!Object.values(VideoStatus).includes(status as typeof VideoStatus[keyof typeof VideoStatus])) {
++        throw new ApiError("Invalid video status", 400);
++      }
++      conditions.push(eq(videos.status, status as typeof VideoStatus[keyof typeof VideoStatus]));
+     }
++    if (options?.model) conditions.push(eq(videos.model, options.model));
+ 
+@@ -872,5 +879,5 @@ export class VideoService {
+       .select()
+       .from(videos)
+       .where(and(...conditions))
+-      .orderBy(desc(videos.createdAt))
++      .orderBy(options?.sortBy === "oldest" ? asc(videos.createdAt) : desc(videos.createdAt))
+       .limit(limit + 1);
+diff --git a/src/components/creation/creation-filter.tsx b/src/components/creation/creation-filter.tsx
+--- a/src/components/creation/creation-filter.tsx
++++ b/src/components/creation/creation-filter.tsx
+@@ -23,6 +23,6 @@ const availableModels = [
+   { value: "all", label: "All Models" },
+   { value: "sora-2", label: "Sora 2" },
+-  { value: "veo-3-1", label: "Veo 3.1" },
++  { value: "veo-3.1", label: "Veo 3.1" },
+-  { value: "seedance-1-5", label: "Seedance 1.5" },
+-  { value: "wan-2-6", label: "Wan 2.6" },
++  { value: "seedance-1.5-pro", label: "Seedance 1.5" },
++  { value: "wan2.6", label: "Wan 2.6" },
+ ];

@@ -1,0 +1,13 @@
+GREEN
+Command: vitest run src/hooks/use-videos-filter.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ ✓ src/hooks/use-videos-filter.regression.test.ts > BUG-010 / REQ-013: creation filters reach the list request 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:17
+   Duration  160ms (transform 14ms, setup 0ms, import 25ms, tests 2ms, environment 0ms)
+

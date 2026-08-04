@@ -1,0 +1,205 @@
+{
+    "schema_version":  "1.5.6",
+    "reqs":  {
+                 "REQ-005":  {
+                                 "pattern":  "compensation",
+                                 "items":  [
+                                               "PENDING",
+                                               "GENERATING",
+                                               "UPLOADING",
+                                               "COMPLETED",
+                                               "FAILED"
+                                           ],
+                                 "sites":  [
+                                               "LEDGER_COUPLING"
+                                           ],
+                                 "cells":  [
+                                               {
+                                                   "cell_id":  "REQ-005/cell-PENDING-LEDGER_COUPLING",
+                                                   "item":  "PENDING",
+                                                   "site":  "LEDGER_COUPLING",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:176-247"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-005/cell-GENERATING-LEDGER_COUPLING",
+                                                   "item":  "GENERATING",
+                                                   "site":  "LEDGER_COUPLING",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:314-342"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-005/cell-UPLOADING-LEDGER_COUPLING",
+                                                   "item":  "UPLOADING",
+                                                   "site":  "LEDGER_COUPLING",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:535-555"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-005/cell-COMPLETED-LEDGER_COUPLING",
+                                                   "item":  "COMPLETED",
+                                                   "site":  "LEDGER_COUPLING",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:555-566"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-005/cell-FAILED-LEDGER_COUPLING",
+                                                   "item":  "FAILED",
+                                                   "site":  "LEDGER_COUPLING",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:724-775"
+                                               }
+                                           ]
+                             },
+                 "REQ-007":  {
+                                 "pattern":  "parity",
+                                 "items":  [
+                                               "PENDING",
+                                               "PROCESSING",
+                                               "COMPLETED",
+                                               "FAILED"
+                                           ],
+                                 "sites":  [
+                                               "CALLBACK",
+                                               "USER_POLL",
+                                               "DURABLE_WORKFLOW"
+                                           ],
+                                 "cells":  [
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PENDING-CALLBACK",
+                                                   "item":  "PENDING",
+                                                   "site":  "CALLBACK",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:359-399"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PROCESSING-CALLBACK",
+                                                   "item":  "PROCESSING",
+                                                   "site":  "CALLBACK",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:359-399"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-COMPLETED-CALLBACK",
+                                                   "item":  "COMPLETED",
+                                                   "site":  "CALLBACK",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:394-395"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-FAILED-CALLBACK",
+                                                   "item":  "FAILED",
+                                                   "site":  "CALLBACK",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:396-397"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PENDING-USER_POLL",
+                                                   "item":  "PENDING",
+                                                   "site":  "USER_POLL",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:404-489"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PROCESSING-USER_POLL",
+                                                   "item":  "PROCESSING",
+                                                   "site":  "USER_POLL",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:474-482"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-COMPLETED-USER_POLL",
+                                                   "item":  "COMPLETED",
+                                                   "site":  "USER_POLL",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:456-461"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-FAILED-USER_POLL",
+                                                   "item":  "FAILED",
+                                                   "site":  "USER_POLL",
+                                                   "present":  true,
+                                                   "evidence":  "src/services/video.ts:464-472"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PENDING-DURABLE_WORKFLOW",
+                                                   "item":  "PENDING",
+                                                   "site":  "DURABLE_WORKFLOW",
+                                                   "present":  false,
+                                                   "evidence":  "src/app/api/internal/workflows/video-reconcile/route.ts:28-43 stops after ten attempts and returns PENDING without requeue/terminal action"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-PROCESSING-DURABLE_WORKFLOW",
+                                                   "item":  "PROCESSING",
+                                                   "site":  "DURABLE_WORKFLOW",
+                                                   "present":  false,
+                                                   "evidence":  "src/app/api/internal/workflows/video-reconcile/route.ts:28-43 stops after ten attempts and returns PENDING without requeue/terminal action"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-COMPLETED-DURABLE_WORKFLOW",
+                                                   "item":  "COMPLETED",
+                                                   "site":  "DURABLE_WORKFLOW",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/internal/workflows/video-reconcile/route.ts:29-37"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-007/cell-FAILED-DURABLE_WORKFLOW",
+                                                   "item":  "FAILED",
+                                                   "site":  "DURABLE_WORKFLOW",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/internal/workflows/video-reconcile/route.ts:29-37"
+                                               }
+                                           ]
+                             },
+                 "REQ-011":  {
+                                 "pattern":  "whitelist",
+                                 "items":  [
+                                               "EVOLINK",
+                                               "KIE",
+                                               "APIMART",
+                                               "BAILIAN",
+                                               "ZHIPU"
+                                           ],
+                                 "sites":  [
+                                               "CALLBACK_INGRESS"
+                                           ],
+                                 "cells":  [
+                                               {
+                                                   "cell_id":  "REQ-011/cell-EVOLINK-CALLBACK_INGRESS",
+                                                   "item":  "EVOLINK",
+                                                   "site":  "CALLBACK_INGRESS",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/v1/video/callback/[provider]/route.ts:16"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-011/cell-KIE-CALLBACK_INGRESS",
+                                                   "item":  "KIE",
+                                                   "site":  "CALLBACK_INGRESS",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/v1/video/callback/[provider]/route.ts:16"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-011/cell-APIMART-CALLBACK_INGRESS",
+                                                   "item":  "APIMART",
+                                                   "site":  "CALLBACK_INGRESS",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/v1/video/callback/[provider]/route.ts:16"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-011/cell-BAILIAN-CALLBACK_INGRESS",
+                                                   "item":  "BAILIAN",
+                                                   "site":  "CALLBACK_INGRESS",
+                                                   "present":  false,
+                                                   "evidence":  "defined at src/ai/types.ts:7 and src/ai/provider-config.ts:7; absent at callback route line 16"
+                                               },
+                                               {
+                                                   "cell_id":  "REQ-011/cell-ZHIPU-CALLBACK_INGRESS",
+                                                   "item":  "ZHIPU",
+                                                   "site":  "CALLBACK_INGRESS",
+                                                   "present":  true,
+                                                   "evidence":  "src/app/api/v1/video/callback/[provider]/route.ts:16"
+                                               }
+                                           ]
+                             }
+             }
+}

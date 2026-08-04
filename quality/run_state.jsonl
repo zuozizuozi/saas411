@@ -1,0 +1,57 @@
+{"event":"_index","ts":"2026-08-04T10:45:13Z","schema_version":"1.5.6","event_types":["_index","run_start","phase_start","pattern_walked","finding_logged","artifact_written","gate_check","phase_end","error","run_end"],"benchmark":"videofly","lever_state":"baseline","started_at":"2026-08-04T10:45:13Z"}
+{"event":"run_start","ts":"2026-08-04T10:45:13Z","runner":"codex","playbook_version":"1.5.6","target_path":"F:/saas411"}
+{"event":"phase_start","ts":"2026-08-04T10:45:13Z","phase":1}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Fallback/Degradation Path Parity","decision":"FULL","candidates":["CAND-002"]}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Dispatcher/Registry Wiring Completeness","decision":"SKIP","reason":"covered by contract and enumeration walks"}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Cross-Implementation Contract Consistency","decision":"FULL","candidates":["CAND-003","CAND-004"]}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Enumeration and Representation Completeness","decision":"FULL","candidates":["CAND-003"]}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"API Surface Consistency","decision":"FULL","candidates":["CAND-001","CAND-004"]}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Parsing/Serialization Round-Trip Integrity","decision":"SKIP","reason":"not dominant in declared scope"}
+{"event":"pattern_walked","ts":"2026-08-04T11:04:37Z","phase":1,"pattern":"Composition and Middleware Ordering","decision":"SKIP","reason":"sampled in open exploration; no broad middleware stack"}
+{"event":"artifact_written","ts":"2026-08-04T11:04:37Z","phase":1,"path":"quality/exploration_role_map.json","tracked_files":672}
+{"event":"artifact_written","ts":"2026-08-04T11:04:37Z","phase":1,"path":"quality/EXPLORATION.md","lines":219}
+{"event":"gate_check","ts":"2026-08-04T11:04:37Z","phase":1,"result":"PASS","checks_passed":13,"checks_total":13}
+{"event":"phase_end","ts":"2026-08-04T11:04:37Z","phase":1,"gate":"PASS","candidate_count":8}
+{"event":"phase_start","ts":"2026-08-04T11:15:00Z","phase":2}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/QUALITY.md","scenarios":10}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/CONTRACTS.md","contracts":38}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/REQUIREMENTS.md","requirements":12,"use_cases":7}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/COVERAGE_MATRIX.md"}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/COMPLETENESS_REPORT.md","stage":"baseline"}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/test_functional.test.ts","tests":27}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/RUN_CODE_REVIEW.md"}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/RUN_INTEGRATION_TESTS.md"}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/RUN_SPEC_AUDIT.md"}
+{"event":"artifact_written","ts":"2026-08-04T11:27:21Z","phase":2,"path":"quality/RUN_TDD_TESTS.md"}
+{"event":"gate_check","ts":"2026-08-04T11:27:21Z","phase":2,"result":"PASS","core_artifacts":10,"functional_tests":27,"typecheck":"PASS","lint":"PASS","mechanical":"PASS"}
+{"event":"phase_end","ts":"2026-08-04T11:27:21Z","phase":2,"gate":"PASS"}
+{"event":"phase_start","ts":"2026-08-04T11:40:00Z","phase":3}
+{"event":"artifact_written","ts":"2026-08-04T15:42:40Z","phase":3,"path":"quality/compensation_grid.json","pattern_reqs":3,"absent_cells":3}
+{"event":"artifact_written","ts":"2026-08-04T15:42:40Z","phase":3,"path":"quality/BUGS.md","bugs":6}
+{"event":"artifact_written","ts":"2026-08-04T15:42:40Z","phase":3,"path":"quality/code_reviews","passes":3}
+{"event":"artifact_written","ts":"2026-08-04T15:42:40Z","phase":3,"path":"quality/patches","regression_patches":6,"fix_patches":6}
+{"event":"artifact_written","ts":"2026-08-04T15:42:40Z","phase":3,"path":"quality/writeups","writeups":6}
+{"event":"gate_check","ts":"2026-08-04T15:42:40Z","phase":3,"result":"PASS","bugs":6,"patch_apply_checks":"12/12","tests":182,"typecheck":"PASS","lint":"PASS","absent_cells_accounted":"3/3"}
+{"event":"phase_end","ts":"2026-08-04T15:42:40Z","phase":3,"gate":"PASS"}
+{"event":"phase_start","ts":"2026-08-04T15:55:04Z","phase":4}
+{"event":"pass_started","ts":"2026-08-04T15:55:04Z","phase":4,"pass":"A"}
+{"event":"pass_ended","ts":"2026-08-04T16:03:00Z","phase":4,"pass":"A"}
+{"event":"pass_started","ts":"2026-08-04T16:03:00Z","phase":4,"pass":"B"}
+{"event":"pass_ended","ts":"2026-08-04T16:10:00Z","phase":4,"pass":"B"}
+{"event":"pass_started","ts":"2026-08-04T16:10:00Z","phase":4,"pass":"C"}
+{"event":"pass_ended","ts":"2026-08-04T16:16:00Z","phase":4,"pass":"C"}
+{"event":"pass_started","ts":"2026-08-04T16:16:00Z","phase":4,"pass":"D"}
+{"event":"artifact_written","ts":"2026-08-04T16:18:52Z","phase":4,"path":"quality/spec_audits","auditors":3,"triage":1}
+{"event":"artifact_written","ts":"2026-08-04T16:18:52Z","phase":4,"path":"quality/citation_semantic_check.json","reviews":0,"reason":"zero Tier 1/2 requirements"}
+{"event":"artifact_written","ts":"2026-08-04T16:18:52Z","phase":4,"path":"quality/patches","net_new_regression_patches":4,"net_new_fix_patches":3}
+{"event":"pass_ended","ts":"2026-08-04T16:18:52Z","phase":4,"pass":"D"}
+{"event":"gate_check","ts":"2026-08-04T16:18:52Z","phase":4,"result":"PASS","auditors":3,"net_new_bugs":4,"active_bugs":9,"tests":"184 pass + 8 expected fail","typecheck":"PASS","lint":"PASS","patch_apply_checks":"19/19"}
+{"event":"phase_end","ts":"2026-08-04T16:18:52Z","phase":4,"gate":"PASS"}
+{"event":"phase_start","ts":"2026-08-04T17:34:11Z","phase":5}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"entry_gate","verdict":"pass"}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"challenge_gate","verdict":"pass","active_bugs":8,"dismissed_total":2}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"tdd_closure","verdict":"pass","red":8,"green":6,"green_failed":1,"confirmed_open":1}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"mechanical_verification","verdict":"pass"}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"cardinality","verdict":"pass"}
+{"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"terminal_quality_gate","verdict":"pass","failures":0,"warnings":3}
+{"event":"phase_end","ts":"2026-08-04T18:00:53Z","phase":5,"gate":"PASS"}

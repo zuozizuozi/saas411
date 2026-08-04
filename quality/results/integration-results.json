@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "skill_version": "1.5.6",
+  "date": "2026-08-05",
+  "project": "VideoFly",
+  "recommendation": "BLOCK",
+  "groups": [
+    {"id":"local-contract-and-regression","result":"pass","evidence":"Phase 5 local regression suite plus repository typecheck/lint/full test run"},
+    {"id":"live-provider-payment-storage","result":"skipped","evidence":"No authorization to spend credits, create payments, or call production AI/storage services during this source-unchanged audit"}
+  ],
+  "summary": {"total_groups":2,"passed":1,"failed":0,"skipped":1},
+  "uc_coverage": {
+    "UC-001":"covered_pass",
+    "UC-002":"covered_fail",
+    "UC-003":"covered_fail",
+    "UC-004":"covered_fail",
+    "UC-005":"covered_fail",
+    "UC-006":"covered_fail",
+    "UC-007":"covered_pass"
+  }
+}

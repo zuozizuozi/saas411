@@ -1,0 +1,99 @@
+diff --git a/src/app/api/v1/credit/history/route.ts b/src/app/api/v1/credit/history/route.ts
+--- a/src/app/api/v1/credit/history/route.ts
++++ b/src/app/api/v1/credit/history/route.ts
+@@ -23,9 +23,9 @@ const transTypeMapping: Record<CreditTransType, string> = {
+   NEW_USER: "new_user",
+   ORDER_PAY: "order_pay",
+   SUBSCRIPTION: "subscription",
+-  VIDEO_CONSUME: "video_generate",
+-  REFUND: "video_refund",
++  VIDEO_CONSUME: "video_consume",
++  REFUND: "refund",
+   EXPIRED: "expired",
+-  SYSTEM_ADJUST: "admin_adjust",
++  SYSTEM_ADJUST: "system_adjust",
+   PAYMENT_REVERSAL: "payment_reversal",
+ };
+diff --git a/src/lib/types/dashboard.ts b/src/lib/types/dashboard.ts
+--- a/src/lib/types/dashboard.ts
++++ b/src/lib/types/dashboard.ts
+@@ -65,11 +65,14 @@ export interface ListVideosResponse {
+ // ============================================
+ 
+ export type CreditTransType =
++  | "new_user"
+   | "order_pay"
+   | "subscription"
+-  | "admin_adjust"
+-  | "video_generate"
+-  | "video_refund";
++  | "video_consume"
++  | "refund"
++  | "expired"
++  | "system_adjust"
++  | "payment_reversal";
+ 
+ export interface CreditTransaction {
+   id: string;
+diff --git a/src/components/credits/credit-history.tsx b/src/components/credits/credit-history.tsx
+--- a/src/components/credits/credit-history.tsx
++++ b/src/components/credits/credit-history.tsx
+@@ -19,36 +19,41 @@ const typeConfig: Record<string, { icon: any; label: string; color: string }> = {
+-  NEW_USER: {
++  new_user: {
+     icon: ShoppingBag,
+     label: "New User Gift",
+     color: "text-emerald-500",
+   },
+-  VIDEO_CONSUME: { // Was video_generate
++  video_consume: {
+     icon: Video,
+     label: "Video Gen",
+     color: "text-rose-500",
+   },
+-  ORDER_PAY: {
++  order_pay: {
+     icon: ShoppingBag,
+     label: "Purchase",
+     color: "text-emerald-500",
+   },
+-  SUBSCRIPTION: {
++  subscription: {
+     icon: ShoppingBag,
+     label: "Subscription",
+     color: "text-emerald-500",
+   },
+-  REFUND: { // Was video_refund
++  refund: {
+     icon: RotateCcw,
+     label: "Refund",
+     color: "text-emerald-500",
+   },
+-  EXPIRED: {
++  expired: {
+     icon: ShoppingBag,
+     label: "Expired",
+     color: "text-muted-foreground",
+   },
+-  SYSTEM_ADJUST: { // Was admin_adjust
++  system_adjust: {
+     icon: Settings,
+     label: "Admin Adjust",
+     color: "text-muted-foreground",
+   },
++  payment_reversal: {
++    icon: RotateCcw,
++    label: "Payment reversal",
++    color: "text-rose-500",
++  },
+ };
+@@ -112,4 +117,8 @@ export function CreditHistory({ transactions, hasMore, onLoadMore }: CreditHistoryProps) {
+                       <div className="flex items-center gap-2">
+                         <Icon className={cn("h-4 w-4", config.color)} />
+-                        <span>{t(`types.${transaction.transType}`)}</span>
++                        <span>
++                          {transaction.transType === "payment_reversal"
++                            ? config.label
++                            : t(`types.${transaction.transType}`)}
++                        </span>
+                       </div>

@@ -1,0 +1,13 @@
+GREEN
+Command: vitest run src/app/csp-observability.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ ✓ src/app/csp-observability.regression.test.ts > BUG-006: CSP allows emitted Vercel observability scripts 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:13
+   Duration  162ms (transform 13ms, setup 0ms, import 21ms, tests 2ms, environment 0ms)
+
