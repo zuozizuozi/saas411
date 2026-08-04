@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/icons";
 import { UserVideosButton } from "@/components/admin/users/user-videos-button";
 import { AdminRoleButton } from "@/components/admin/users/admin-role-button";
+import { CreditGrantButton } from "@/components/admin/users/credit-grant-button";
+import { GenerationControlButton } from "@/components/admin/users/generation-control-button";
 import { requireAdmin } from "@/lib/auth/admin";
 
 interface UsersPageProps {
@@ -75,6 +77,14 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       u."createdAt",
       u."updatedAt",
       u."isAdmin",
+      u.generation_status as "generationStatus",
+      u.generation_pause_source as "generationPauseSource",
+      u.generation_pause_reason as "generationPauseReason",
+      u.generation_paused_at as "generationPausedAt",
+      u.generation_paused_by as "generationPausedBy",
+      u.generation_risk_exempt_until as "generationRiskExemptUntil",
+      u.billing_status as "billingStatus",
+      u.credit_debt as "creditDebt",
       (select count(*)::int from ${videos} as v where v.user_id = u.id and v.is_deleted = false) as "videoCount",
       (select count(*)::int from ${creditPackages} as cp where cp.user_id = u.id) as "packageCount",
       (
@@ -190,6 +200,13 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                         ) : (
                           <Badge variant="outline">普通用户</Badge>
                         )}
+                        {user.generationStatus === "PAUSED" && (
+                          <Badge variant="destructive" className="ml-1.5">
+                            {user.generationPauseSource === "CREDIT_VELOCITY"
+                              ? "风控暂停"
+                              : "手动暂停"}
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString("zh-CN")}
@@ -206,6 +223,17 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                             userId={user.id}
                             userEmail={user.email}
                             isAdmin={user.isAdmin}
+                          />
+                          <CreditGrantButton
+                            userId={user.id}
+                            userEmail={user.email}
+                          />
+                          <GenerationControlButton
+                            userId={user.id}
+                            userEmail={user.email}
+                            isPaused={user.generationStatus === "PAUSED"}
+                            pauseSource={user.generationPauseSource}
+                            pauseReason={user.generationPauseReason}
                           />
                         </div>
                       </TableCell>

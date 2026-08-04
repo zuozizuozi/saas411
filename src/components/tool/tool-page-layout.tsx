@@ -33,6 +33,7 @@ import { ToolLandingPage } from "@/components/tool/tool-landing-page";
 import { VideoHistoryPanel } from "@/components/tool/video-history-panel";
 import { toast } from "sonner";
 import { getLowCreditState } from "@/config/low-credit";
+import { GenerationPausedDialog } from "@/components/tool/generation-paused-dialog";
 
 const TOOL_PREFILL_KEY = "videofly_tool_prefill";
 const LOW_CREDIT_NOTICE_KEY = "seedance_low_credit_notice_at";
@@ -106,6 +107,9 @@ export function ToolPageLayout({
   const [generatingIds, setGeneratingIds] = useState<string[]>([]);
   const [historyItems, setHistoryItems] = useState<VideoHistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<"generator" | "result">("generator");
+  const [generationPause, setGenerationPause] = useState<{
+    supportEmail: string;
+  } | null>(null);
   const historySyncUserRef = useRef<string | null>(null);
   const [prefillData, setPrefillData] = useState<{
     prompt?: string;
@@ -478,7 +482,16 @@ export function ToolPageLayout({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error?.error?.message || error?.message || tHistory("generationFailed"));
+        const code = error?.error?.details?.code;
+        if (code === "GENERATION_PAUSED") {
+          setGenerationPause({
+            supportEmail: error.error.details.supportEmail || "support@seedance.co",
+          });
+        }
+        throw Object.assign(
+          new Error(error?.error?.message || error?.message || tHistory("generationFailed")),
+          { code }
+        );
       }
 
       const result = await response.json();
@@ -546,7 +559,9 @@ export function ToolPageLayout({
       const requiredCredits = data.estimatedCredits || 0;
       optimisticRelease(requiredCredits);
       // 显示错误提示
-      toast.error(error instanceof Error ? error.message : tHistory("generationFailed"));
+      if ((error as { code?: string })?.code !== "GENERATION_PAUSED") {
+        toast.error(error instanceof Error ? error.message : tHistory("generationFailed"));
+      }
     }
     setIsSubmitting(false);
   }, [
@@ -601,7 +616,16 @@ export function ToolPageLayout({
         method: "POST",
       });
       if (!response.ok) {
-        throw new Error(tCommon("error"));
+        const error = await response.json().catch(() => null);
+        const code = error?.error?.details?.code;
+        if (code === "GENERATION_PAUSED") {
+          setGenerationPause({
+            supportEmail: error.error.details.supportEmail || "support@seedance.co",
+          });
+        }
+        throw Object.assign(new Error(error?.error?.message || tCommon("error")), {
+          code,
+        });
       }
       const payload = await response.json();
       const retried = payload.data;
@@ -635,7 +659,9 @@ export function ToolPageLayout({
       toast.success(tTool("generatingTag"));
     } catch (error) {
       console.error("Retry error:", error);
-      toast.error(tCommon("error"));
+      if ((error as { code?: string })?.code !== "GENERATION_PAUSED") {
+        toast.error(tCommon("error"));
+      }
     }
   }, [
     addGeneratingId,
@@ -651,6 +677,14 @@ export function ToolPageLayout({
 
   // 移动端：显示标签导航
   const showMobileTabs = Boolean(user);
+  const pausedDialog = (
+    <GenerationPausedDialog
+      open={Boolean(generationPause)}
+      locale={locale}
+      supportEmail={generationPause?.supportEmail ?? "support@seedance.co"}
+      onClose={() => setGenerationPause(null)}
+    />
+  );
 
   // Unauthenticated Layout: Scrollable, Tool Area + Landing Page
   if (!user) {
@@ -725,6 +759,7 @@ export function ToolPageLayout({
 
         {/* 全局升级弹窗 */}
         <UpgradeModal />
+        {pausedDialog}
       </>
     );
   }
@@ -803,6 +838,7 @@ export function ToolPageLayout({
 
       {/* 全局升级弹窗 */}
       <UpgradeModal />
+      {pausedDialog}
     </>
   );
 }

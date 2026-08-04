@@ -97,11 +97,25 @@ export const users = pgTable(
     isAdmin: boolean("isAdmin").default(false).notNull(),
     billingStatus: text("billing_status").default("ACTIVE").notNull(),
     creditDebt: integer("credit_debt").default(0).notNull(),
+    generationStatus: text("generation_status").default("ACTIVE").notNull(),
+    generationPauseSource: text("generation_pause_source"),
+    generationPauseReason: text("generation_pause_reason"),
+    generationPausedAt: timestamp("generation_paused_at"),
+    generationPausedBy: text("generation_paused_by"),
+    generationRiskExemptUntil: timestamp("generation_risk_exempt_until"),
   },
   (table) => ({
     nonnegativeCreditDebt: check(
       "user_nonnegative_credit_debt",
       sql`${table.creditDebt} >= 0`
+    ),
+    validGenerationStatus: check(
+      "user_valid_generation_status",
+      sql`${table.generationStatus} in ('ACTIVE', 'PAUSED')`
+    ),
+    validGenerationPauseSource: check(
+      "user_valid_generation_pause_source",
+      sql`${table.generationPauseSource} is null or ${table.generationPauseSource} in ('MANUAL', 'CREDIT_VELOCITY')`
     ),
   })
 );
@@ -440,6 +454,7 @@ export const creditTransactions = pgTable(
     videoUuid: text("video_uuid"),
     orderNo: text("order_no"),
     holdId: integer("hold_id"),
+    operatorUserId: text("operator_user_id"),
     remark: text("remark"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -520,6 +535,46 @@ export const uploadReservations = pgTable(
   })
 );
 
+/** Immutable warning/pause history for manual controls and credit-velocity risk. */
+export const generationRiskEvents = pgTable(
+  "generation_risk_events",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    source: text("source").notNull(),
+    action: text("action").notNull(),
+    level: text("level"),
+    status: text("status").default("OPEN").notNull(),
+    actorUserId: text("actor_user_id"),
+    paymentOrderId: integer("payment_order_id"),
+    reason: text("reason").notNull(),
+    consumedCredits: integer("consumed_credits"),
+    grantedCredits: integer("granted_credits"),
+    windowHours: integer("window_hours"),
+    emailSentAt: timestamp("email_sent_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+    resolvedBy: text("resolved_by"),
+    resolutionRemark: text("resolution_remark"),
+  },
+  (table) => ({
+    userStatusIdx: index("generation_risk_events_user_status_idx").on(
+      table.userId,
+      table.status
+    ),
+    paymentActionIdx: index("generation_risk_events_payment_action_idx").on(
+      table.paymentOrderId,
+      table.action
+    ),
+    nonnegativeMetrics: check(
+      "generation_risk_events_nonnegative_metrics",
+      sql`(${table.consumedCredits} is null or ${table.consumedCredits} >= 0)
+        and (${table.grantedCredits} is null or ${table.grantedCredits} > 0)
+        and (${table.windowHours} is null or ${table.windowHours} > 0)`
+    ),
+  })
+).enableRLS();
+
 /** User-owned uploads that can be reused as image-to-video inputs. */
 export const mediaAssets = pgTable(
   "media_assets",
@@ -570,6 +625,7 @@ export type BetterAuthUser = typeof users.$inferSelect;
 export type CreditPackage = typeof creditPackages.$inferSelect;
 export type CreditHold = typeof creditHolds.$inferSelect;
 export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type GenerationRiskEvent = typeof generationRiskEvents.$inferSelect;
 export type Video = typeof videos.$inferSelect;
 export type MediaAsset = typeof mediaAssets.$inferSelect;
 export type UploadReservation = typeof uploadReservations.$inferSelect;
