@@ -14,7 +14,7 @@ import type { Video } from "@/db";
 // Types
 // ============================================================================
 
-export type VideoHistoryStatus = "generating" | "completed" | "failed";
+export type VideoHistoryStatus = "generating" | "retrying" | "completed" | "failed";
 
 export interface VideoHistoryItem {
   uuid: string;

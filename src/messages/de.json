@@ -644,6 +644,8 @@
     "title": "Letzte Generierungen",
     "demoTitle": "Beispielvideos",
     "generating": "Ihr Video wird generiert...",
+    "retrying": "Ihr Video wird fertiggestellt...",
+    "retryingHint": "Die Bereitstellung ist vorübergehend verzögert. Automatischer Neuversuch läuft.",
     "download": "Herunterladen",
     "copyLink": "Link kopieren",
     "removeFromHistory": "Aus dem Verlauf entfernen",

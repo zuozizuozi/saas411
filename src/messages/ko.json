@@ -572,6 +572,8 @@
     "title": "최근 생성",
     "demoTitle": "예시 동영상",
     "generating": "동영상을 생성하고 있습니다...",
+    "retrying": "동영상을 마무리하고 있습니다...",
+    "retryingHint": "전달이 일시적으로 지연되어 자동으로 다시 시도하고 있습니다.",
     "download": "다운로드",
     "copyLink": "링크 복사",
     "removeFromHistory": "기록에서 삭제",

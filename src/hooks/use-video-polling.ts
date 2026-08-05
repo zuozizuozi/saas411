@@ -7,6 +7,7 @@ interface UseVideoPollingOptions {
   maxBackoffMs?: number;
   onCompleted?: (video: Video) => void;
   onFailed?: (args: { videoId: string; error?: string }) => void;
+  onRetrying?: (args: { videoId: string; error?: string }) => void;
 }
 
 export function useVideoPolling(options: UseVideoPollingOptions = {}) {
@@ -16,6 +17,7 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
     maxBackoffMs = 120000,
     onCompleted,
     onFailed,
+    onRetrying,
   } = options;
 
   const pollingTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
@@ -81,6 +83,13 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
           } else if (status === "FAILED") {
             stopPolling(videoId);
             onFailed?.({ videoId, error });
+          } else if (status === "RETRYING") {
+            onRetrying?.({ videoId, error });
+            const state = pollingState.current.get(videoId);
+            if (state) {
+              state.consecutiveErrors = 0;
+              state.nextDelay = pollInterval;
+            }
           } else {
             const state = pollingState.current.get(videoId);
             if (state) {
@@ -120,6 +129,7 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
       maxBackoffMs,
       onCompleted,
       onFailed,
+      onRetrying,
       fetchVideoDetail,
       stopPolling,
     ]

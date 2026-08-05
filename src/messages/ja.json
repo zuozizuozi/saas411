@@ -572,6 +572,8 @@
     "title": "最近の生成",
     "demoTitle": "サンプル動画",
     "generating": "動画を生成しています...",
+    "retrying": "動画を仕上げています...",
+    "retryingHint": "配信処理が一時的に遅延しています。自動的に再試行します。",
     "download": "ダウンロード",
     "copyLink": "リンクをコピー",
     "removeFromHistory": "履歴から削除",

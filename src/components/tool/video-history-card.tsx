@@ -30,6 +30,7 @@ export function VideoHistoryCard({
 
   const isCompleted = video.status === "completed";
   const isFailed = video.status === "failed";
+  const isRetrying = video.status === "retrying";
 
   // 格式化时间（显示日期和时间）
   const formatTime = (dateString: string) => {
@@ -85,6 +86,31 @@ export function VideoHistoryCard({
   };
 
   // 生成中状态
+  if (isRetrying) {
+    return (
+      <div className="space-y-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="flex items-center justify-between">
+          <p className="line-clamp-1 flex-1 text-sm font-medium text-white">
+            {video.prompt || "Untitled"}
+          </p>
+          <span className="ml-2 text-xs text-zinc-500">
+            {formatTime(video.createdAt)}
+          </span>
+        </div>
+        <div className="rounded-lg bg-zinc-800/50 p-5">
+          <div className="flex items-center justify-center gap-3 text-sm text-amber-200">
+            <Clock className="h-5 w-5 animate-pulse" />
+            <div>
+              <p className="font-medium">{t("retrying")}</p>
+              <p className="mt-0.5 text-xs text-zinc-400">{t("retryingHint")}</p>
+            </div>
+          </div>
+        </div>
+        {renderMetadata()}
+      </div>
+    );
+  }
+
   if (isGenerating || video.status === "generating") {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 space-y-4">

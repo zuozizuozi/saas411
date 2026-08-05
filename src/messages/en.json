@@ -585,6 +585,8 @@
     "title": "Recent Generations",
     "demoTitle": "Example Videos",
     "generating": "Generating your video...",
+    "retrying": "Finalizing your video...",
+    "retryingHint": "A temporary delivery issue occurred. Retrying automatically.",
     "download": "Download",
     "copyLink": "Copy link",
     "removeFromHistory": "Remove from history",

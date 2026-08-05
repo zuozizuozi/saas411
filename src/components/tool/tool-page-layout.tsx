@@ -251,11 +251,24 @@ export function ToolPageLayout({
     [removeGeneratingId, user?.id, invalidate, shouldNotify, markNotified, tHistory]
   );
 
+  const handleRetrying = useCallback(
+    ({ videoId }: { videoId: string; error?: string }) => {
+      videoHistoryStorage.updateHistory(
+        videoId,
+        { status: "retrying" },
+        user?.id
+      );
+      setHistoryItems(videoHistoryStorage.getHistory(user?.id));
+    },
+    [user?.id]
+  );
+
   const { startPolling, stopPolling, isPolling } = useVideoPolling({
     maxConsecutiveErrors: 3,
     maxBackoffMs: 60000,
     onCompleted: handleCompleted,
     onFailed: handleFailed,
+    onRetrying: handleRetrying,
   });
 
   // 检查登录状态
@@ -795,7 +808,7 @@ export function ToolPageLayout({
           </div>
         )}
 
-        <div className="grid h-fit min-h-0 max-h-[calc(100svh-92px)] grid-cols-1 gap-4 lg:grid-cols-[440px_minmax(0,1.2fr)]">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[440px_minmax(0,1.2fr)]">
           {/* Generator Panel */}
           <div
             className={`${activeTab === "generator" ? "flex" : "hidden"

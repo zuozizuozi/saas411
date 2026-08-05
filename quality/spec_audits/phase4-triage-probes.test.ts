@@ -52,7 +52,9 @@ describe("Phase 4 executable triage probes", () => {
   it("verifies BUG-007 fix: fetch binds to a validated DNS answer", () => {
     const body = source("src/lib/storage.ts");
     expect(body).not.toContain('fetch(currentUrl, { redirect: "manual", signal })');
-    expect(body).toContain("urlWithPinnedAddress");
+    expect(body).toContain("createPinnedLookup");
+    expect(body).toContain("lookup: createPinnedLookup(address)");
+    expect(body).toContain("undiciFetch(target.url");
     expect(body).toContain("dispatcher");
   });
 

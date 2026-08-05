@@ -7,11 +7,10 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { BlockList, isIP } from "node:net";
+import { BlockList, isIP, type LookupFunction } from "node:net";
 import { lookup } from "node:dns/promises";
 import {
   Agent,
-  ProxyAgent,
   fetch as undiciFetch,
   type Dispatcher,
 } from "undici";
@@ -156,27 +155,42 @@ interface PinnedRemoteMediaResponse {
   dispatcher: Dispatcher;
 }
 
-function createPinnedDispatcher(url: URL): Dispatcher {
-  const hostname = normalizeIpOrHostname(url.hostname);
-  const tlsOptions = isIP(hostname) ? undefined : { servername: hostname };
-  const proxyUrl = process.env.HTTPS_PROXY?.trim() || process.env.HTTP_PROXY?.trim();
-  if (proxyUrl) {
-    return new ProxyAgent({
-      uri: proxyUrl,
-      requestTls: tlsOptions,
-      connections: 1,
-    });
-  }
-  return new Agent({ connect: tlsOptions, connections: 1 });
+export function createPinnedLookup(
+  address: { address: string; family: number }
+): LookupFunction {
+  const pinnedAddress = {
+    address: address.address,
+    family: address.family as 4 | 6,
+  };
+
+  return (_hostname, options, callback) => {
+    if (options.all) {
+      callback(null, [pinnedAddress]);
+      return;
+    }
+    callback(null, pinnedAddress.address, pinnedAddress.family);
+  };
 }
 
-function urlWithPinnedAddress(
+function createPinnedDispatcher(
   url: URL,
   address: { address: string; family: number }
-) {
-  const pinnedUrl = new URL(url);
-  pinnedUrl.hostname = address.family === 6 ? `[${address.address}]` : address.address;
-  return pinnedUrl;
+): Dispatcher {
+  const hostname = normalizeIpOrHostname(url.hostname);
+  const proxyUrl = process.env.HTTPS_PROXY?.trim() || process.env.HTTP_PROXY?.trim();
+  if (proxyUrl) {
+    // A forward proxy would resolve the hostname again and bypass the
+    // validated address, reopening DNS-rebinding SSRF. Provider media must be
+    // fetched directly through the pinned lookup below.
+    throw new Error("Pinned provider media downloads cannot use an HTTP proxy");
+  }
+  return new Agent({
+    connect: {
+      ...(isIP(hostname) ? {} : { servername: hostname }),
+      lookup: createPinnedLookup(address),
+    },
+    connections: 1,
+  });
 }
 
 async function fetchPinnedRemoteMedia(
@@ -185,15 +199,12 @@ async function fetchPinnedRemoteMedia(
 ): Promise<PinnedRemoteMediaResponse> {
   let lastError: unknown;
   for (const address of target.addresses) {
-    const dispatcher = createPinnedDispatcher(target.url);
+    const dispatcher = createPinnedDispatcher(target.url, address);
     try {
-      const response = await undiciFetch(urlWithPinnedAddress(target.url, address), {
+      const response = await undiciFetch(target.url, {
         redirect: "manual",
         signal,
         dispatcher,
-        // The TCP/TLS destination is the validated IP, while Host and SNI retain
-        // the provider hostname for virtual hosting and certificate validation.
-        headers: { host: target.url.host },
       });
       return { response, dispatcher };
     } catch (error) {
