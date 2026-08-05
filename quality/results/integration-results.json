@@ -5,10 +5,22 @@
   "project": "VideoFly",
   "recommendation": "BLOCK",
   "groups": [
-    {"id":"local-contract-and-regression","result":"pass","evidence":"Phase 5 local regression suite plus repository typecheck/lint/full test run"},
-    {"id":"live-provider-payment-storage","result":"skipped","evidence":"No authorization to spend credits, create payments, or call production AI/storage services during this source-unchanged audit"}
+    {
+      "group": "local-contract-and-regression",
+      "name": "Local contract, regression, type, and lint verification",
+      "use_cases": ["UC-001", "UC-007"],
+      "result": "pass",
+      "evidence": "quality/results/integration-local.junit.xml plus Phase 6 full-suite, typecheck, lint, and mechanical receipts"
+    },
+    {
+      "group": "live-provider-payment-storage",
+      "name": "Disposable live provider, payment, database, and storage chain",
+      "use_cases": ["UC-002", "UC-003", "UC-004", "UC-005", "UC-006"],
+      "result": "skipped",
+      "evidence": "No disposable environment, spending approval, or authorization to create external provider/payment/storage state during this source-unchanged audit"
+    }
   ],
-  "summary": {"total_groups":2,"passed":1,"failed":0,"skipped":1},
+  "summary": {"total_groups":2,"passed":1,"failed":0,"skipped":1,"errors":0},
   "uc_coverage": {
     "UC-001":"covered_pass",
     "UC-002":"covered_fail",

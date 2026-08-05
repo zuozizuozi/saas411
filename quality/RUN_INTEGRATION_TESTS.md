@@ -17,13 +17,121 @@ Run from the repository root. Do not modify or delete source, database rows, Str
 
 ## Field Reference Table
 
-| Boundary | Exact fields | Source |
-|---|---|---|
-| Generate request | `prompt`, `model`, `duration`, `aspectRatio`, `quality`, `imageUrl`, `imageUrls`, `mode`, `outputNumber`, `generateAudio`, `removeWatermark` | `src/app/api/v1/video/generate/route.ts` |
-| Provider callback query | `videoUuid`, `ts`, `sig` | `src/app/api/v1/video/callback/[provider]/route.ts` |
-| Video identity/state | `uuid`, `userId`, `provider`, `externalTaskId`, `status`, `videoUrl`, `creditsUsed` | `src/db/schema.ts` / video service |
-| Credit hold | `userId`, `videoUuid`, `credits`, `status`, `packageAllocation` | `src/db/schema.ts` / credit service |
-| Stripe identity | `Stripe-Signature`, event `id`, purchase metadata, order number | Stripe route/payment services |
+The table scope is every request or persisted schema whose fields are asserted by this protocol. Each field is copied from the cited source; no shorthand field groups are permitted.
+
+| Schema | Field | Type and constraint | Source |
+|---|---|---|---|
+| Generate request | `prompt` | trimmed string, 1..20000 chars, required | `src/app/api/v1/video/generate/route.ts:11` |
+| Generate request | `model` | string, min 1, required | `src/app/api/v1/video/generate/route.ts:12` |
+| Generate request | `duration` | integer, 4..15, optional | `src/app/api/v1/video/generate/route.ts:13` |
+| Generate request | `aspectRatio` | string, optional | `src/app/api/v1/video/generate/route.ts:14` |
+| Generate request | `quality` | string, optional | `src/app/api/v1/video/generate/route.ts:15` |
+| Generate request | `imageUrl` | URL string, optional | `src/app/api/v1/video/generate/route.ts:16` |
+| Generate request | `imageUrls` | array of URL strings, max 2, optional | `src/app/api/v1/video/generate/route.ts:17` |
+| Generate request | `mode` | enum `text-to-video` or `image-to-video`, optional | `src/app/api/v1/video/generate/route.ts:18` |
+| Generate request | `outputNumber` | integer, 1..2, optional, default 1 | `src/app/api/v1/video/generate/route.ts:19` |
+| Generate request | `generateAudio` | boolean, optional | `src/app/api/v1/video/generate/route.ts:20` |
+| Generate request | `removeWatermark` | boolean, optional | `src/app/api/v1/video/generate/route.ts:21` |
+| Provider callback query | `videoUuid` | nonempty query string required by handler | `src/app/api/v1/video/callback/[provider]/route.ts:22,27` |
+| Provider callback query | `ts` | nonempty signed timestamp string required by handler | `src/app/api/v1/video/callback/[provider]/route.ts:23,27` |
+| Provider callback query | `sig` | nonempty HMAC string required by handler | `src/app/api/v1/video/callback/[provider]/route.ts:24,27` |
+| `videos` | `id` | serial primary key | `src/db/schema.ts:473` |
+| `videos` | `uuid` | text, required, unique | `src/db/schema.ts:474` |
+| `videos` | `batchUuid` | nullable text | `src/db/schema.ts:475` |
+| `videos` | `userId` | text, required | `src/db/schema.ts:476` |
+| `videos` | `prompt` | text, required | `src/db/schema.ts:477` |
+| `videos` | `model` | text, required | `src/db/schema.ts:478` |
+| `videos` | `parameters` | nullable JSONB | `src/db/schema.ts:479` |
+| `videos` | `status` | `PENDING|GENERATING|UPLOADING|COMPLETED|FAILED`, required, default `PENDING` | `src/db/schema.ts:60-66,480` |
+| `videos` | `provider` | nullable text | `src/db/schema.ts:481` |
+| `videos` | `externalTaskId` | nullable text | `src/db/schema.ts:482` |
+| `videos` | `errorMessage` | nullable text | `src/db/schema.ts:483` |
+| `videos` | `startImageUrl` | nullable text | `src/db/schema.ts:484` |
+| `videos` | `originalVideoUrl` | nullable text | `src/db/schema.ts:485` |
+| `videos` | `videoUrl` | nullable text | `src/db/schema.ts:486` |
+| `videos` | `thumbnailUrl` | nullable text | `src/db/schema.ts:487` |
+| `videos` | `duration` | nullable integer | `src/db/schema.ts:488` |
+| `videos` | `resolution` | nullable text | `src/db/schema.ts:489` |
+| `videos` | `aspectRatio` | nullable text | `src/db/schema.ts:490` |
+| `videos` | `fileSize` | nullable integer | `src/db/schema.ts:491` |
+| `videos` | `creditsUsed` | integer, required, default 0 | `src/db/schema.ts:492` |
+| `videos` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:493` |
+| `videos` | `updatedAt` | timestamp, required, default now | `src/db/schema.ts:494` |
+| `videos` | `completedAt` | nullable timestamp | `src/db/schema.ts:495` |
+| `videos` | `generationTime` | nullable integer | `src/db/schema.ts:496` |
+| `videos` | `isDeleted` | boolean, required, default false | `src/db/schema.ts:497` |
+| `credit_holds` | `id` | serial primary key | `src/db/schema.ts:427` |
+| `credit_holds` | `userId` | text, required | `src/db/schema.ts:428` |
+| `credit_holds` | `videoUuid` | text, required, unique | `src/db/schema.ts:429` |
+| `credit_holds` | `credits` | integer, required | `src/db/schema.ts:430` |
+| `credit_holds` | `status` | text, required, default `HOLDING` | `src/db/schema.ts:431` |
+| `credit_holds` | `packageAllocation` | JSONB, required | `src/db/schema.ts:432` |
+| `credit_holds` | `packageId` | nullable integer | `src/db/schema.ts:433` |
+| `credit_holds` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:434` |
+| `credit_holds` | `settledAt` | nullable timestamp | `src/db/schema.ts:435` |
+| `credit_packages` | `id` | serial primary key | `src/db/schema.ts:291` |
+| `credit_packages` | `userId` | text, required | `src/db/schema.ts:292` |
+| `credit_packages` | `initialCredits` | integer, required, nonnegative | `src/db/schema.ts:293,313-320` |
+| `credit_packages` | `remainingCredits` | integer, required, nonnegative | `src/db/schema.ts:294,313-320` |
+| `credit_packages` | `frozenCredits` | integer, required, default 0, nonnegative | `src/db/schema.ts:295,313-320` |
+| `credit_packages` | `transType` | `CreditTransType` enum, required | `src/db/schema.ts:33-42,296` |
+| `credit_packages` | `orderNo` | nullable text, unique index | `src/db/schema.ts:297,312` |
+| `credit_packages` | `status` | `ACTIVE|DEPLETED|EXPIRED`, required, default `ACTIVE` | `src/db/schema.ts:54-58,298` |
+| `credit_packages` | `expiredAt` | nullable timestamp | `src/db/schema.ts:299` |
+| `credit_packages` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:300` |
+| `credit_packages` | `updatedAt` | timestamp, required, default now | `src/db/schema.ts:301` |
+| `credit_transactions` | `id` | serial primary key | `src/db/schema.ts:447` |
+| `credit_transactions` | `transNo` | text, required, unique | `src/db/schema.ts:448` |
+| `credit_transactions` | `userId` | text, required | `src/db/schema.ts:449` |
+| `credit_transactions` | `transType` | `CreditTransType` enum, required | `src/db/schema.ts:33-42,450` |
+| `credit_transactions` | `credits` | integer, required | `src/db/schema.ts:451` |
+| `credit_transactions` | `balanceAfter` | integer, required | `src/db/schema.ts:452` |
+| `credit_transactions` | `packageId` | nullable integer | `src/db/schema.ts:453` |
+| `credit_transactions` | `videoUuid` | nullable text | `src/db/schema.ts:454` |
+| `credit_transactions` | `orderNo` | nullable text | `src/db/schema.ts:455` |
+| `credit_transactions` | `holdId` | nullable integer | `src/db/schema.ts:456` |
+| `credit_transactions` | `operatorUserId` | nullable text | `src/db/schema.ts:457` |
+| `credit_transactions` | `remark` | nullable text | `src/db/schema.ts:458` |
+| `credit_transactions` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:459` |
+| `payment_orders` | `id` | serial primary key | `src/db/schema.ts:328` |
+| `payment_orders` | `userId` | text, required | `src/db/schema.ts:329` |
+| `payment_orders` | `orderNo` | text, required, unique | `src/db/schema.ts:330` |
+| `payment_orders` | `checkoutSessionId` | nullable text, unique | `src/db/schema.ts:331` |
+| `payment_orders` | `paymentIntentId` | nullable text | `src/db/schema.ts:332` |
+| `payment_orders` | `chargeId` | nullable text | `src/db/schema.ts:333` |
+| `payment_orders` | `invoiceId` | nullable text | `src/db/schema.ts:334` |
+| `payment_orders` | `productId` | nullable text | `src/db/schema.ts:335` |
+| `payment_orders` | `amount` | integer, required, default 0, nonnegative | `src/db/schema.ts:336,359-366` |
+| `payment_orders` | `currency` | text, required, default `usd` | `src/db/schema.ts:337` |
+| `payment_orders` | `creditsGranted` | integer, required, default 0, nonnegative | `src/db/schema.ts:338,359-366` |
+| `payment_orders` | `creditsRevoked` | integer, required, default 0, bounded by granted | `src/db/schema.ts:339,359-366` |
+| `payment_orders` | `amountRefunded` | integer, required, default 0, bounded by amount | `src/db/schema.ts:340,359-366` |
+| `payment_orders` | `status` | payment order enum, required, default `PENDING` | `src/db/schema.ts:44-52,341` |
+| `payment_orders` | `purchaseIp` | nullable text | `src/db/schema.ts:342` |
+| `payment_orders` | `userAgent` | nullable text | `src/db/schema.ts:343` |
+| `payment_orders` | `termsVersion` | nullable text | `src/db/schema.ts:344` |
+| `payment_orders` | `termsAcceptedAt` | nullable timestamp | `src/db/schema.ts:345` |
+| `payment_orders` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:346` |
+| `payment_orders` | `updatedAt` | timestamp, required, default now | `src/db/schema.ts:347` |
+| `stripe_events` | `eventId` | text primary key | `src/db/schema.ts:374` |
+| `stripe_events` | `eventType` | text, required | `src/db/schema.ts:375` |
+| `stripe_events` | `objectId` | nullable text | `src/db/schema.ts:376` |
+| `stripe_events` | `status` | text, required, default `PROCESSING` | `src/db/schema.ts:377` |
+| `stripe_events` | `attempts` | integer, required, default 1 | `src/db/schema.ts:378` |
+| `stripe_events` | `errorMessage` | nullable text | `src/db/schema.ts:379` |
+| `stripe_events` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:380` |
+| `stripe_events` | `updatedAt` | timestamp, required, default now | `src/db/schema.ts:381` |
+| `stripe_events` | `processedAt` | nullable timestamp | `src/db/schema.ts:382` |
+| `upload_reservations` | `id` | text primary key, default generated UUID | `src/db/schema.ts:511` |
+| `upload_reservations` | `userId` | text, required | `src/db/schema.ts:512` |
+| `upload_reservations` | `storageKey` | text, required, unique | `src/db/schema.ts:513` |
+| `upload_reservations` | `fileName` | text, required | `src/db/schema.ts:514` |
+| `upload_reservations` | `contentType` | text, required | `src/db/schema.ts:515` |
+| `upload_reservations` | `expectedSize` | integer, required, positive | `src/db/schema.ts:516,531-534` |
+| `upload_reservations` | `status` | text, required, default `PENDING` | `src/db/schema.ts:517` |
+| `upload_reservations` | `expiresAt` | timestamp, required | `src/db/schema.ts:518` |
+| `upload_reservations` | `createdAt` | timestamp, required, default now | `src/db/schema.ts:519` |
+| `upload_reservations` | `completedAt` | nullable timestamp | `src/db/schema.ts:520` |
 
 ## Test Matrix
 
@@ -51,12 +159,21 @@ Execute at most one live request per provider concurrently. For each enabled pro
 ## Automated Commands
 
 ```powershell
-pnpm vitest run quality/test_functional.test.ts
+pnpm vitest run quality/test_functional.test.ts --reporter=default --reporter=junit --outputFile.junit=quality/results/integration-local.junit.xml
 pnpm test
 pnpm typecheck
 pnpm lint
 $env:SKIP_ENV_VALIDATION='1'; pnpm build
 ```
+
+Pre-flight discovery must find at least one test before execution:
+
+```powershell
+pnpm exec vitest list quality/test_functional.test.ts
+pnpm exec vitest list quality/test_regression.test.ts
+```
+
+The local group is `local-contract-and-regression` and covers `UC-001` and `UC-007`. The environment-gated group is `live-provider-payment-storage` and covers `UC-002` through `UC-006`; it is `skipped`, never `pass`, when the disposable database, sandbox credentials, spending approval, or cleanup authority is absent.
 
 Database/provider/Stripe harness commands must be added by Phase 3 after confirming the available disposable environment. Do not invent credentials or issue live paid requests without approval.
 
@@ -71,4 +188,29 @@ Database/provider/Stripe harness commands must be added by Phase 3 after confirm
 
 ## Reporting
 
-Save `quality/results/YYYY-MM-DD-integration.md` with per-test result/time/evidence, environment omissions, state cleanup, and recommendation `SHIP`, `FIX BEFORE MERGE`, or `BLOCK`. Missing credentials yield `BLOCKED`, never `PASS`.
+Save `quality/results/YYYY-MM-DD-integration.md` with per-test result/time/evidence, environment omissions, state cleanup, and recommendation `SHIP`, `FIX BEFORE MERGE`, or `BLOCK`. Missing credentials make the affected group `skipped` and the overall recommendation `BLOCK`, never `pass` or `SHIP`.
+
+Also write `quality/results/integration-results.json` with exactly these root keys and value families:
+
+```json
+{
+  "schema_version": "1.1",
+  "skill_version": "1.5.6",
+  "date": "YYYY-MM-DD",
+  "project": "VideoFly",
+  "recommendation": "SHIP | FIX BEFORE MERGE | BLOCK",
+  "groups": [
+    {
+      "group": "stable-group-id",
+      "name": "Human-readable group name",
+      "use_cases": ["UC-001"],
+      "result": "pass | fail | skipped | error",
+      "evidence": "receipt path or exact reason"
+    }
+  ],
+  "summary": {"total_groups": 1, "passed": 0, "failed": 0, "skipped": 0, "errors": 0},
+  "uc_coverage": {"UC-001": "covered_pass | covered_fail | not_run"}
+}
+```
+
+After writing, reopen the JSON and verify: all eight root keys are present with no undocumented root keys; every group contains `group`, `name`, `use_cases`, `result`, and `evidence`; result and recommendation enums are valid; summary counts equal the groups array; and every `UC-001` through `UC-007` has one coverage value. The local JUnit XML and sidecar JSON are both mandatory when the local group runs.

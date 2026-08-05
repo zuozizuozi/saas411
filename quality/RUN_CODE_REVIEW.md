@@ -6,7 +6,7 @@
 
 Review authentication/authorization, video/provider/callback/storage, credits, Stripe, upload ingestion, and frontend/API contracts. Do not propose style or experience optimization. Every finding needs severity, exact file:line, observable consequence, requirement ID, and BUG/QUESTION/OK classification. Read bodies, grep before claiming absence, and keep unverified concerns as QUESTION.
 
-Twelve baseline requirements span six core areas, which is intentionally compact. Pass 2 must expand individual conditions rather than treating one REQ as one check.
+Twelve baseline requirements span six core areas, with supplemental REQ-013 and REQ-014 added during reconciliation. Pass 2 must expand individual conditions rather than treating one REQ as one check.
 
 ## Pass 1 — Structural Correctness
 
@@ -23,7 +23,7 @@ Output `quality/code_reviews/pass-1-structural.md` with BUG, QUESTION, and verif
 
 ## Pass 2 — Requirement-by-Requirement Review
 
-Read `REQUIREMENTS.md`. For REQ-001 through REQ-012, evaluate every numbered condition separately. Record SATISFIED, VIOLATED, or NOT PROVEN with citations. Explicitly test the candidate claims from Phase 1, but do not inherit their conclusions.
+Read `REQUIREMENTS.md`. Evaluate every numbered condition in REQ-001 through REQ-014 separately; REQ-013 and REQ-014 are mandatory reconciliation follow-ups. Record SATISFIED, VIOLATED, or NOT PROVEN with citations. Explicitly test the candidate claims from Phase 1, but do not inherit their conclusions.
 
 Mandatory probes:
 
@@ -68,7 +68,7 @@ Output `quality/code_reviews/pass-3-confirmation.md` and a combined summary at `
 
 ## Completion Gate
 
-- All 12 REQs and every condition reviewed.
+- All 14 REQs and every condition reviewed, including reconciliation additions.
 - All provider list claims supported by mechanical extraction.
 - No missing-function claim without repository search evidence.
 - Every BUG has a reproducer and regression-test patch; questions remain unnumbered.

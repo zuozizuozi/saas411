@@ -24,6 +24,12 @@ Run three independent passes and save them under `quality/spec_audits/`:
 
 Each reviewer reports per candidate: CONFIRMED CODE BUG, DOCUMENTATION BUG, DESIGN DECISION, HARDENING, FALSE POSITIVE, or INSUFFICIENT EVIDENCE; exact citations; requirement; consequence; confidence; and required verification probe.
 
+## Copy-Paste Audit Prompt
+
+```text
+Audit VideoFly from the repository root as an independent specification reviewer. Read quality/EXPLORATION.md, quality/REQUIREMENTS.md, quality/CONTRACTS.md, quality/QUALITY.md, the documentation listed in this protocol, and the current implementation. Review REQ-001 through REQ-014 and CAND-001 through CAND-008. For every conclusion, label its basis as [Req: inferred — REQ-NNN] or [Req: formal — exact document section], cite exact file:line evidence, and classify it as CONFIRMED CODE BUG, DOCUMENTATION BUG, DESIGN DECISION, HARDENING, FALSE POSITIVE, or INSUFFICIENT EVIDENCE. Do not treat missing search results as proof. Resolve disagreements with an executable assertion against current source or a disposable runtime; a rejection requires a passing assertion and a confirmation requires a failing assertion. Save the report as quality/spec_audits/YYYY-MM-DD-auditor-N.md. Do not modify product source.
+```
+
 ## Required Candidate Questions
 
 - CAND-001: What is the canonical post-payment route and locale policy? Does `/dashboard` exist in any deploy rewrite?
@@ -41,11 +47,11 @@ Disagreements require executable evidence. Route claims use a production manifes
 
 ## Triage Output
 
-Produce `quality/spec_audits/triage.md` with majority/minority reasoning, probe results, final classification, REQ/UC mapping, and whether a regression test is required. Confirmed bugs become `BUG-NNN`; hardening items remain distinct and must not inflate bug counts.
+Produce `quality/spec_audits/YYYY-MM-DD-triage.md` with majority/minority reasoning, probe results, final classification, REQ/UC mapping, and whether a regression test is required. Confirmed bugs become `BUG-NNN`; hardening items remain distinct and must not inflate bug counts.
 
 ## Completion Gate
 
-- All candidates and all 12 requirements reviewed.
+- All candidates and all 14 requirements reviewed.
 - Documentation contradictions are assigned an owner and authoritative source.
 - Every confirmed code bug has executable evidence and regression-test target.
 - Every disagreement has a recorded probe rather than prose voting.

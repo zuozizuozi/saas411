@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "skill_version": "1.5.6",
+  "date": "2026-08-05",
+  "project": "VideoFly",
+  "source_run": {
+    "bugs_md_date": "2026-08-04",
+    "total_bugs": 8
+  },
+  "results": [
+    {
+      "id": "BUG-002",
+      "severity": "HIGH",
+      "summary": "Durable reconciliation abandoned nonterminal tasks",
+      "status": "FIXED",
+      "evidence": "60-minute terminal policy plus upload-lease race guard; ordinary reconciliation regression passes"
+    },
+    {
+      "id": "BUG-004",
+      "severity": "MEDIUM",
+      "summary": "AI callback parsed unbounded JSON",
+      "status": "FIXED",
+      "evidence": "1 MiB streamed-body limit returns 413 and malformed JSON returns 400; callback behavior tests pass"
+    },
+    {
+      "id": "BUG-005",
+      "severity": "MEDIUM",
+      "summary": "Deployment guides used the wrong callback secret name",
+      "status": "FIXED",
+      "evidence": "README and API guide use CALLBACK_HMAC_SECRET; repository consistency regression passes"
+    },
+    {
+      "id": "BUG-006",
+      "severity": "LOW",
+      "summary": "CSP blocked Vercel observability scripts",
+      "status": "FIXED",
+      "evidence": "script-src includes va.vercel-scripts.com while Analytics and Speed Insights remain enabled"
+    },
+    {
+      "id": "BUG-007",
+      "severity": "HIGH",
+      "summary": "DNS validation was not bound to the media connection",
+      "status": "FIXED",
+      "evidence": "Undici connects to a validated IP with original Host/SNI; redirect, proxy, byte-limit, and cleanup checks are retained"
+    },
+    {
+      "id": "BUG-008",
+      "severity": "MEDIUM",
+      "summary": "Credit history used incompatible transaction vocabularies",
+      "status": "FIXED",
+      "evidence": "API, types, UI, and seven locale dictionaries share a complete alias set; aggregate regression passes"
+    },
+    {
+      "id": "BUG-009",
+      "severity": "HIGH",
+      "summary": "QStash scheduler and receiver accepted different credentials",
+      "status": "FIXED",
+      "evidence": "Sender, receiver, and failure callback use one complete configuration helper; partial-config tests pass"
+    },
+    {
+      "id": "BUG-010",
+      "severity": "MEDIUM",
+      "summary": "My Creations filters did not affect results",
+      "status": "FIXED",
+      "evidence": "Status, model, and sort reach the database query; oldest cursor direction and client serialization are covered"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "fixed": 8,
+    "partially_fixed": 0,
+    "still_open": 0,
+    "inconclusive": 0
+  }
+}

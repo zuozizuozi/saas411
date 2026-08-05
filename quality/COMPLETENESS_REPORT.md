@@ -45,7 +45,7 @@ This is the required pre-review baseline. It intentionally contains no final com
 - Deployment documentation consistency and observability CSP intent require specification triage (CAND-006, CAND-007).
 - A deterministic paid-generation integration harness does not yet exist (CAND-008).
 
-## Post-Review Reconciliation
+## Reconciliation Evidence
 
 Updated: 2026-08-05
 
@@ -66,16 +66,15 @@ Updated: 2026-08-05
 ### Conflicts resolved
 
 - Stripe return route: code review treated the absence of a page file as a missing route. The Phase 4 executable probe read `src/middleware.ts:11-16,34-42` and proved `/dashboard` redirects to `/text-to-video`. Resolution: FALSE POSITIVE.
-- Bailian callback ingress: earlier review treated provider membership as callback capability. `docs/spec/AI_PROVIDER_INTEGRATION.md:373` explicitly marks Bailian callbacks unsupported and `src/ai/providers/bailian.ts:73-82` implements polling. Resolution: DOCUMENTED DESIGN CHOICE; the unsafe canonical-list patch is deprecated.
+- Bailian callback ingress: earlier review treated provider membership as callback capability. `src/ai/providers/bailian.ts:73-82` implements polling, and no repository contract requires callback support for every provider. The earlier citation to `docs/spec/AI_PROVIDER_INTEGRATION.md:373` was withdrawn because that row compares Evolink/KIE models, not Bailian. Resolution: IMPLEMENTED CAPABILITY CHOICE; the unsafe canonical-list patch is deprecated.
 
 ### Closure evidence
 
-- Active bug count: 8; every active bug has an executable expected-failure regression test and a red receipt.
-- Six proposed fixes pass their green test.
-- BUG-007 remains confirmed open because no connection-pinning fix is approved.
-- BUG-008's proposed fix fails green because `payment_reversal` remains absent from locale dictionaries.
-- Mechanical provider checks pass; the full repository suite passes with 184 ordinary tests and 16 expected failures.
+- Active bug count after unified repair: 0; all 8 confirmed findings retain their original red receipts and now have ordinary passing regression coverage.
+- BUG-007 is closed with connection-level IP pinning that preserves proxy tunneling, redirects, byte limits, and dispatcher cleanup.
+- BUG-008 is closed with a total transaction vocabulary across API, TypeScript, UI, and all seven locale dictionaries.
+- The post-repair repository suite passes 211/211 tests with no expected failures; typecheck and lint pass.
 
-### Updated verdict
+## Verdict
 
-**REQUIREMENTS COMPLETE; IMPLEMENTATION NOT READY TO SHIP.** All confirmed findings now trace to REQ-005, REQ-006, REQ-007, REQ-010, REQ-012, REQ-013, or REQ-014, so the declared-scope requirements set is complete with respect to the executed reviews. The product remains **BLOCKED** for release until the three HIGH findings and the incomplete BUG-008 patch are resolved and rechecked.
+**REQUIREMENTS COMPLETE; UNIFIED REPAIR IMPLEMENTED.** All confirmed findings trace to REQ-005, REQ-006, REQ-007, REQ-010, REQ-012, REQ-013, or REQ-014 and are now resolved in product source. Repository-level release verification is green; live paid-provider/payment/storage calls remain a separate deployment smoke-test gate.

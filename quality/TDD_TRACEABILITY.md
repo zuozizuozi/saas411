@@ -4,6 +4,8 @@
 
 All tests assert desired behavior. Red runs used unguarded regression patches against pristine source in an isolated worktree. Green runs applied the proposed fix only inside that worktree, then removed it. Product source in the primary workspace was never changed.
 
+Unified repair follow-up (2026-08-05): after explicit user authorization, the 8 confirmed fixes were applied to product source. Their aggregate and phase probes were converted from expected failures to ordinary passing regressions; the original red receipts remain immutable historical evidence.
+
 | Bug | Requirement | Red | Green | Verdict |
 |---|---|---|---|---|
 | BUG-002 | REQ-007 | RED | GREEN | TDD verified |

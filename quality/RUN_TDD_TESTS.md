@@ -21,20 +21,36 @@ Tests must cite REQ, BUG, and a ≤15-word behavioral contract from the authorit
 ## Commands
 
 ```powershell
-pnpm vitest run path/to/regression.test.ts --reporter=default
+$bug = "BUG-002" # replace with the confirmed BUG ID
+$repo = (Get-Location).Path
+$worktree = Join-Path $repo "quality/.tdd-worktrees/$bug"
+$regressionPatch = "$repo/quality/patches/$bug-regression-test.patch"
+$testRel = (Select-String -LiteralPath $regressionPatch -Pattern '^diff --git a/(.+\.test\.ts) b/' | Select-Object -First 1).Matches[0].Groups[1].Value
+git worktree add --detach $worktree HEAD
+git -C $worktree apply --check --whitespace=error-all $regressionPatch
+git -C $worktree apply $regressionPatch
+pnpm --dir $worktree exec vitest run $testRel --reporter=default --reporter=junit --outputFile.junit="$repo/quality/results/$bug.red.junit.xml"
+git -C $worktree apply --check --whitespace=error-all "$repo/quality/patches/$bug-fix.patch"
+git -C $worktree apply "$repo/quality/patches/$bug-fix.patch"
+# In the disposable worktree only, change the regression guard from `it.fails(` to `it(`
+# before GREEN so the same assertions must now pass; do not change the assertions.
+pnpm --dir $worktree exec vitest run $testRel --reporter=default --reporter=junit --outputFile.junit="$repo/quality/results/$bug.green.junit.xml"
 pnpm test
 pnpm typecheck
 pnpm lint
 $env:SKIP_ENV_VALIDATION='1'; pnpm build
+git worktree remove --force $worktree
 ```
 
-If JUnit reporting is unavailable without adding a dependency, set `junit_available` false; do not fail the TDD run solely for that reason.
+Run `git apply --check --whitespace=error-all` for every existing `quality/patches/BUG-NNN-regression-test.patch` and `BUG-NNN-fix.patch` before applying it. BUG-007 intentionally has no fix patch; record green as `skipped` and verdict as `confirmed open`. Vitest's native JUnit reporter is available in this repository and the red/green XML paths above are mandatory when each phase executes.
 
 ## Structured Results
 
 Write `quality/results/tdd-results.json` with exactly these top-level keys: `schema_version`, `skill_version`, `date`, `project`, `bugs`, `summary`. Each bug includes `id`, `requirement`, `red_phase`, `green_phase`, `verdict`, `regression_patch`, `fix_patch`, `fix_patch_present`, `patch_gate_passed`, `writeup_path`, `junit_red`, `junit_green`, `junit_available`, and `notes`.
 
 Allowed verdicts: `TDD verified`, `red failed`, `green failed`, `confirmed open`, `deferred`. Summary contains exactly `total`, `verified`, `confirmed_open`, `red_failed`, and `green_failed`.
+
+After writing, reopen `tdd-results.json` and verify: the six required root keys are present; every bug has at least `id`, `requirement`, `red_phase`, `green_phase`, `verdict`, `fix_patch_present`, and `writeup_path`; enum values are allowed; `summary.total` equals the bug array length; all summary buckets reconcile; and there are no undocumented root keys.
 
 ## Traceability and Writeups
 

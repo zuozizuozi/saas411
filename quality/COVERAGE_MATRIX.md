@@ -4,6 +4,8 @@
 
 Total contracts: 38 · Fully covered: 38 · Partially covered: 0 · Uncovered: 0
 
+Total requirements: 14 (12 baseline plus 2 reconciliation additions).
+
 ## Coverage by Requirement
 
 | Requirement | Contracts | Use cases | Functional coverage |

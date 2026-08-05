@@ -4,6 +4,8 @@
 
 Version: 1.0 baseline. Scope follows Phase 1 exploration and excludes marketing experience optimization and legacy Kubernetes/tRPC depth.
 
+Total requirements: 14 (12 baseline plus REQ-013 and REQ-014 from reconciliation).
+
 ## Authentication and Authorization
 
 These requirements define who may cross user, object, and administrator boundaries.

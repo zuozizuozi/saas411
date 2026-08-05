@@ -5,12 +5,12 @@
 {
   "schema_version": "2.0",
   "run_timestamp_start": "2026-08-04T10:45:13Z",
-  "run_timestamp_end": "2026-08-04T18:00:53Z",
-  "duration_seconds": 26140,
+  "run_timestamp_end": "2026-08-04T19:24:54Z",
+  "duration_seconds": 31181,
   "qpb_version": "1.5.6",
   "target_repo_path": "F:/saas411",
   "target_repo_git_sha": "bb834b248cd2c6b6209f195d25e9c06d1a0e965f",
-  "phases_executed": [1, 2, 3, 4, 5],
+  "phases_executed": [1, 2, 3, 4, 5, 6],
   "target_role_breakdown": {
     "tracked_files": 672,
     "code": 537,
@@ -21,7 +21,9 @@
   "summary": {
     "requirements": 14,
     "bugs": 8,
-    "gate_verdict": "pass"
+    "gate_verdict": "pass",
+    "unified_repair_resolved": 8,
+    "remaining_active_bugs": 0
   },
   "artifacts": [
     "REQUIREMENTS.md",
@@ -29,7 +31,9 @@
     "COMPLETENESS_REPORT.md",
     "results/tdd-results.json",
     "results/integration-results.json",
-    "results/quality-gate.log"
+    "results/quality-gate.log",
+    "results/phase6-verification.log",
+    "results/unified-repair-results.json"
   ]
 }
 ```

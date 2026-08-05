@@ -9,10 +9,10 @@ The callback route rejects `bailian` at `src/app/api/v1/video/callback/[provider
 
 ## Round 2 — Maintainer challenge
 
-The project specification explicitly records Bailian callback support as unavailable in `docs/spec/AI_PROVIDER_INTEGRATION.md:373`. Its parameter transformer does not forward `callbackUrl`, while polling is implemented by `getTaskStatus()` in `src/ai/providers/bailian.ts:73-82`. The proposed fix would admit every configured provider at callback ingress, conflating provider existence with callback capability and weakening the boundary.
+The cited provider comparison at `docs/spec/AI_PROVIDER_INTEGRATION.md:373` covers Evolink and KIE models, not Bailian, so it is not valid evidence for Bailian capability and is withdrawn here. The code nevertheless implements a complete polling path through `getTaskStatus()` in `src/ai/providers/bailian.ts:73-82`, and no repository contract requires every configured provider to accept callbacks. The proposed fix would admit every configured provider at callback ingress, conflating provider existence with callback capability and weakening the boundary. Explicit capability metadata remains a maintainability requirement, not a demonstrated supported-flow failure.
 
 ## Verdict
 
 **Verdict:** REJECTED
 
-**Verdict:** REJECTED — documented polling-only capability. Explicit capability metadata would improve maintainability, but there is no demonstrated failure in the supported Bailian flow. The finding is relocated to the dismissed appendix; its patches must not be applied.
+**Verdict:** REJECTED — implemented polling-only capability, with the earlier documentation citation withdrawn as inapplicable. Explicit capability metadata would improve maintainability, but there is no demonstrated failure in the supported Bailian flow. The finding remains in the dismissed appendix; its patches must not be applied.

@@ -55,3 +55,13 @@
 {"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"cardinality","verdict":"pass"}
 {"event":"gate_check","ts":"2026-08-04T18:00:53Z","phase":5,"gate_name":"terminal_quality_gate","verdict":"pass","failures":0,"warnings":3}
 {"event":"phase_end","ts":"2026-08-04T18:00:53Z","phase":5,"gate":"PASS"}
+{"event":"phase_start","ts":"2026-08-04T19:05:31Z","phase":6}
+{"event":"gate_check","ts":"2026-08-04T19:05:31Z","phase":6,"gate_name":"mechanical_verification","verdict":"pass"}
+{"event":"gate_check","ts":"2026-08-04T19:05:31Z","phase":6,"gate_name":"quality_gate","verdict":"pass","passes":93,"failures":0,"warnings":3}
+{"event":"gate_check","ts":"2026-08-04T19:05:31Z","phase":6,"gate_name":"functional_and_repository_tests","verdict":"pass","functional_passed":27,"suite_passed":184,"expected_failures":16}
+{"event":"gate_check","ts":"2026-08-04T19:05:31Z","phase":6,"gate_name":"file_by_file_benchmarks","verdict":"pass","field_reference_rows":111,"regression_guards":8}
+{"event":"gate_check","ts":"2026-08-04T19:05:31Z","phase":6,"gate_name":"metadata_consistency","verdict":"pass","requirements":14}
+{"event":"gate_check","ts":"2026-08-04T19:24:54Z","phase":6,"gate_name":"terminal_quality_gate","verdict":"pass","passes":93,"failures":0,"warnings":3}
+{"event":"phase_end","ts":"2026-08-04T19:24:54Z","phase":6,"gate":"PASS"}
+{"event":"run_end","ts":"2026-08-04T19:24:54Z","status":"success","active_bugs":8,"release_recommendation":"BLOCK"}
+{"event":"recheck_end","ts":"2026-08-05T04:00:02+08:00","status":"success","fixed":8,"partially_fixed":0,"still_open":0,"tests":"211/211","quality_gate":"PASS","deployment_smoke_gate":"PENDING"}

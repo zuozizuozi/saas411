@@ -102,15 +102,15 @@ Deming's principle means these invariants are encoded in shared catalogs, server
 
 **How to verify:** Replay identical and equivalent payment events concurrently; assert one order/package and one balance delta.
 
-### Scenario 8: Payment returns to an actual account page
+### Scenario 8: Legacy payment returns resolve to an actual account page
 
 **Requirement tag:** [Req: inferred — REQ-009]
 
-**What happened:** Checkout or Billing Portal succeeds externally, then redirects to `/dashboard`, which is absent from the production route manifest. Payment may succeed while the user sees a 404 and cannot verify account state.
+**What happened:** Checkout or Billing Portal may return to the legacy `/dashboard` path. The application middleware currently redirects that path to `/text-to-video`; a regression in this compatibility mapping could make a successful payment appear broken even though the payment itself completed.
 
-**The requirement:** Every configured Stripe return target is present in the production route surface and preserves locale policy.
+**The requirement:** Every configured Stripe return target either resolves directly or has a tested middleware redirect, while preserving locale policy.
 
-**How to verify:** Extract success, cancel, and portal URLs and resolve each against a production build.
+**How to verify:** Extract success, cancel, and portal URLs and assert each resolves directly or redirects to an existing localized route in a production build.
 
 ### Scenario 9: Provider media cannot reach private infrastructure
 
@@ -126,9 +126,9 @@ Deming's principle means these invariants are encoded in shared catalogs, server
 
 **Requirement tag:** [Req: inferred — REQ-011]
 
-**What happened:** `bailian` exists in the type, configuration, API-key switch, and factory but not the callback allowlist. Manual duplication permits a provider to compile while one ingress path rejects it.
+**What happened:** `bailian` exists in the type, configuration, API-key switch, and factory, while its supported completion path is polling through `getTaskStatus()` rather than callback ingress. Without explicit capability metadata, a future provider addition could compile while an actually required ingress or reconciliation path is missing.
 
-**The requirement:** A canonical provider registry or mechanical parity check covers every representation and explicit capability exception.
+**The requirement:** A canonical provider registry or mechanical parity check covers every representation and records explicit callback-versus-polling capability exceptions.
 
 **How to verify:** Run `quality/mechanical/verify.sh` and provider-parametrized contract tests.
 

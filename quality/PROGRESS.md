@@ -2,6 +2,7 @@
 
 Skill version: 1.5.6
 Date: 2026-08-04
+Requirements: 14 (12 baseline + 2 reconciliation additions)
 
 **Started:** 2026-08-04T10:45:13Z  **Benchmark:** videofly  **Lever:** baseline
 **Runner:** codex  **Playbook version:** 1.5.6
@@ -13,7 +14,7 @@ Date: 2026-08-04
 - [x] Phase 3 - Code Review *(completed 2026-08-04T15:42:40Z; gate PASS)*
 - [x] Phase 4 - Spec Audit *(completed 2026-08-04T16:18:52Z; gate PASS)*
 - [x] Phase 5 - Reconciliation *(completed 2026-08-04T18:00:53Z; gate PASS)*
-- [ ] Phase 6 - Verify
+- [x] Phase 6 - Verify *(completed 2026-08-04T19:24:54Z; gate PASS)*
 
 ## Scope declaration
 
@@ -123,7 +124,7 @@ Date: 2026-08-04
 | BUG-009 | Spec Audit | HIGH | `src/lib/upstash.ts:9-27` | scheduler accepts credentials receiver rejects | regression + fix patches generated |
 | BUG-010 | Spec Audit | MEDIUM | creations filter UI/client/service | filters do not affect results | regression + fix patches generated |
 
-Dismissed provenance: finding 001 was a middleware-route false positive; finding 003 is a documented Bailian polling-only capability. Both old patch pairs are deprecated.
+Dismissed provenance: finding 001 was a middleware-route false positive; finding 003 is an implemented Bailian polling-only capability and no repository contract requires callback ingress. The earlier documentation citation for that conclusion was withdrawn as inapplicable. Both old patch pairs are deprecated.
 
 ## Terminal Gate Verification
 
@@ -156,10 +157,35 @@ BUG tracker has 8 entries. 8 have regression tests, 0 have exemptions, 0 are unr
 
 ## Phase 5 outcome
 
-- Challenge reconciliation reduced the active set from 9 to 8: the Bailian callback finding was rejected because the in-repo provider specification explicitly documents polling-only behavior. The earlier Stripe route false positive remains dismissed.
+- Challenge reconciliation reduced the active set from 9 to 8: the Bailian callback finding was rejected because polling is implemented and no repository contract requires callback ingress. The earlier Stripe route false positive remains dismissed; the previously cited provider-comparison row was later withdrawn as inapplicable to Bailian.
 - Active severity: 3 HIGH, 4 MEDIUM, 1 LOW. Code review contributes 4 active bugs; specification audit contributes 4 net-new bugs.
 - Closure: all 8 active bugs have named executable regression tests and RED receipts. Six proposed fixes turn GREEN; BUG-007 has no approved connection-pinning patch; BUG-008's proposed patch fails GREEN because `payment_reversal` remains untranslated.
 - Requirements reconciliation added REQ-014 for enabled observability/CSP consistency; all active findings now trace to a requirement.
 - Mechanical verification passed. The terminal Quality Playbook gate passed with 0 failures and 3 compatibility warnings for intentionally legacy-shaped manifests.
 - Repository validation passed: 184 ordinary tests plus 16 expected failures, typecheck, lint, and 19/19 patch apply checks.
 - No product source file was modified; TDD mutations occurred only in a disposable isolated worktree that was removed.
+
+## Phase 6 Mechanical Closure
+
+- Command: `bash quality/mechanical/verify.sh`
+- Stdout: `PASS: mechanical provider artifacts reproduce source exactly`
+- Exit code: `0`
+
+## Phase 6 outcome
+
+- Final Quality Playbook gate: PASS with 93 pass lines, 0 failures, and 3 legacy-manifest compatibility warnings.
+- Verification benchmarks: all applicable Phase 6 batches passed; continuation-only checks were skipped because this is the baseline run and no `SEED_CHECKS.md` exists.
+- Audit-artifact corrections: removed stale `/dashboard` and Bailian callback claims, withdrew the inapplicable Bailian documentation citation, added complete provider two-list evidence, expanded the integration Field Reference Table to 111 exact field rows, and normalized integration sidecar/JUnit instructions.
+- Functional verification: 27/27 quality functional tests pass; the full repository suite reports 184 passing and 16 expected-failure tests; typecheck, lint, production build, mechanical verification, and 19 patch apply checks pass.
+- Release recommendation remains BLOCK because 3 HIGH, 4 MEDIUM, and 1 LOW active findings are not applied to product source; BUG-007 has no approved fix and BUG-008's proposed fix is incomplete.
+- Product source remains unchanged; all new work is confined to `quality/` and the cumulative desktop summary document.
+
+Run complete. 8 BUGs found (4 from code review, 4 from spec audit). 8 regression tests written. 0 exemptions granted.
+
+## Unified repair follow-up (2026-08-05)
+
+- User authorized one unified source repair after the six audit phases.
+- Resolved all 8 active findings: BUG-002, BUG-004, BUG-005, BUG-006, BUG-007, BUG-008, BUG-009, and BUG-010.
+- Added behavior coverage for bounded AI callbacks, complete QStash configuration, safe remote-media validation, dashboard filter query serialization, and reconciliation timeout policy.
+- Converted active expected-failure probes to ordinary regression tests; the full suite now passes 211/211 with no expected failures.
+- TypeScript and Biome checks pass after the repair. Production build, dependency audit, secret scan, mechanical checks, and final document refresh are recorded in the unified repair result artifact.

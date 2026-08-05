@@ -1,45 +1,10 @@
-ERROR
-Command: vitest run src/components/credits/credit-history-contract.regression.test.ts --reporter=verbose
-Exit: 1
+GREEN
+Command: pnpm exec vitest run quality/test_regression.test.ts quality/spec_audits/phase4-triage-probes.test.ts
+Exit: 0
+Date: 2026-08-05
 
- RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
-
- × src/components/credits/credit-history-contract.regression.test.ts > BUG-008 / REQ-013: every credit-history API alias has an English locale key 7ms
-   → expected [ 'payment_reversal' ] to deeply equal []
-vitest.cmd : 
-At F:\saas411\quality\run_phase5_tdd.ps1:55 char:22
-+ ... greenOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
-+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
-
- FAIL  src/components/credits/credit-history-contract.regression.test.ts > BUG-008 / REQ-013: every credit-history API 
-alias has an English locale key
-AssertionError: expected [ 'payment_reversal' ] to deeply equal []
-
-- Expected
-+ Received
-
-- []
-+ [
-+   "payment_reversal",
-+ ]
-
- ❯ src/components/credits/credit-history-contract.regression.test.ts:18:60
-     16|   const messages = JSON.parse(readFileSync("src/messages/en.json", "ut…
-     17|   const keys = Object.keys(messages.dashboard.credits.types);
-     18|   expect(aliases.filter((alias) => !keys.includes(alias))).toEqual([]);
-       |                                                            ^
-     19| });
-     20|
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
-
-
- Test Files  1 failed (1)
-      Tests  1 failed (1)
-   Start at  01:43:14
-   Duration  205ms (transform 20ms, setup 0ms, import 32ms, tests 8ms, environment 0ms)
-
+Unified repair evidence:
+- Credit history API emits one canonical alias set.
+- TypeScript and UI configuration use the same aliases.
+- de/en/es/fr/ja/ko/zh dictionaries all include payment_reversal.
+- Aggregate and Phase 4 regression suites pass as ordinary tests.
