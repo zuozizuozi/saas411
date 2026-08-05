@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreditBalance, useCreditHistory } from "@/hooks/use-credits";
 import { BalanceCard, CreditHistory } from "@/components/credits";
+import { getSafeAuthCallbackURL } from "@/lib/auth/callback-url";
 
 interface CreditsPageProps {
   locale: string;
@@ -71,15 +72,15 @@ export function CreditsPage({ locale }: CreditsPageProps) {
       // 显示成功提示
       // toast.success(t("paymentSuccess"));
 
-      // 如果有 returnTo，延迟跳转回去
-      if (returnTo) {
-        const decodedPath = decodeURIComponent(returnTo);
+      // 只允许应用内路径，避免脚本 URL 或外部地址进入路由器。
+      const safeReturnTo = getSafeAuthCallbackURL(returnTo, "");
+      if (safeReturnTo) {
         // 使用 toast 显示正在跳转
         // toast.info(t("redirectingBack"));
 
         // 延迟跳转，让用户看清成功提示
         setTimeout(() => {
-          router.push(decodedPath);
+          router.push(safeReturnTo);
         }, 1500);
       }
     }

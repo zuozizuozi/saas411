@@ -1,5 +1,5 @@
 import { VideoStatus, db, users, videos } from "@/db";
-import { and, desc, eq, inArray, lt } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, lt } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getStorage } from "@/lib/storage";
 import { calculateModelCredits } from "../config/credits";
@@ -744,6 +744,12 @@ export class VideoService {
         return { status: video.status, errorMessage: video.errorMessage };
       }
 
+      // Completion owns the UPLOADING lease. A timeout or late provider failure
+      // must not release the hold while storage and credit settlement are active.
+      if (video.status === VideoStatus.UPLOADING) {
+        return { status: video.status, errorMessage: video.errorMessage };
+      }
+
       const [claimed] = await db
         .update(videos)
         .set({
@@ -758,7 +764,20 @@ export class VideoService {
           )
         )
         .returning({ uuid: videos.uuid });
-      if (!claimed) return { status: video.status, errorMessage: video.errorMessage };
+      if (!claimed) {
+        const [current] = await db
+          .select({
+            status: videos.status,
+            errorMessage: videos.errorMessage,
+          })
+          .from(videos)
+          .where(eq(videos.uuid, videoUuid))
+          .limit(1);
+        return {
+          status: current?.status ?? video.status,
+          errorMessage: current?.errorMessage ?? video.errorMessage,
+        };
+      }
 
       await creditService.release(videoUuid);
 
@@ -834,6 +853,8 @@ export class VideoService {
       limit?: number;
       cursor?: string;
       status?: string;
+      model?: string;
+      sortBy?: "newest" | "oldest";
     }
   ) {
     const requestedLimit = options?.limit ?? 20;
@@ -847,8 +868,22 @@ export class VideoService {
     ];
 
     if (options?.status) {
-      conditions.push(eq(videos.status, options.status as typeof VideoStatus[keyof typeof VideoStatus]));
+      const status = options.status.toUpperCase();
+      if (
+        !Object.values(VideoStatus).includes(
+          status as (typeof VideoStatus)[keyof typeof VideoStatus]
+        )
+      ) {
+        throw new ApiError("Invalid video status", 400);
+      }
+      conditions.push(
+        eq(
+          videos.status,
+          status as (typeof VideoStatus)[keyof typeof VideoStatus]
+        )
+      );
     }
+    if (options?.model) conditions.push(eq(videos.model, options.model));
 
     if (options?.cursor) {
       const [cursorVideo] = await db
@@ -864,7 +899,11 @@ export class VideoService {
         .limit(1);
 
       if (cursorVideo) {
-        conditions.push(lt(videos.createdAt, cursorVideo.createdAt));
+        conditions.push(
+          options?.sortBy === "oldest"
+            ? gt(videos.createdAt, cursorVideo.createdAt)
+            : lt(videos.createdAt, cursorVideo.createdAt)
+        );
       }
     }
 
@@ -872,7 +911,11 @@ export class VideoService {
       .select()
       .from(videos)
       .where(and(...conditions))
-      .orderBy(desc(videos.createdAt))
+      .orderBy(
+        options?.sortBy === "oldest"
+          ? asc(videos.createdAt)
+          : desc(videos.createdAt)
+      )
       .limit(limit + 1);
 
     const hasMore = list.length > limit;
@@ -881,6 +924,7 @@ export class VideoService {
     return {
       videos: list,
       nextCursor: hasMore ? list[list.length - 1]?.uuid : undefined,
+      hasMore,
     };
   }
 

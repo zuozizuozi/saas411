@@ -550,7 +550,8 @@
         "video_consume": "동영상 생성",
         "refund": "환불",
         "expired": "만료",
-        "system_adjust": "관리자 조정"
+        "system_adjust": "관리자 조정",
+        "payment_reversal": "결제 취소"
       }
     },
     "settings": {

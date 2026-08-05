@@ -33,6 +33,9 @@ export function useVideos(filter?: VideoFilterOptions) {
       return apiClient.getVideos({
         limit: 20,
         cursor: pageParam,
+        status: filter?.status === "all" ? undefined : filter?.status,
+        model: filter?.model === "all" ? undefined : filter?.model,
+        sortBy: filter?.sortBy,
       });
     },
     initialPageParam: undefined as string | undefined,

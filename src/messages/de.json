@@ -622,7 +622,8 @@
         "video_consume": "Videogenerierung",
         "refund": "Erstattung",
         "expired": "Abgelaufen",
-        "system_adjust": "Admin-Anpassung"
+        "system_adjust": "Admin-Anpassung",
+        "payment_reversal": "Zahlungsrückbuchung"
       }
     },
     "settings": {

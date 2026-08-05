@@ -1,0 +1,19 @@
+# Internal audit artifacts and local agent state are not production inputs.
+quality/
+outputs/
+.tmp/
+.codex-deploy/
+.codex-qa/
+.codex-tmp/
+.agents/
+.claude/
+.vscode/
+design-system/
+
+# Local-only credentials and developer documentation.
+.env
+.env.*
+docs/
+
+# Maintenance scripts are not used by the Next.js production build.
+scripts/

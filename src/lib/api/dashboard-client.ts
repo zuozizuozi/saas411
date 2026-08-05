@@ -51,6 +51,8 @@ class ApiClient {
     if (params.limit) searchParams.set("limit", params.limit.toString());
     if (params.cursor) searchParams.set("cursor", params.cursor);
     if (params.status) searchParams.set("status", params.status);
+    if (params.model) searchParams.set("model", params.model);
+    if (params.sortBy) searchParams.set("sortBy", params.sortBy);
 
     const query = searchParams.toString();
     return this.request<ListVideosResponse>(`/video/list${query ? `?${query}` : ""}`);

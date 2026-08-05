@@ -7,8 +7,14 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { isIP } from "node:net";
+import { BlockList, isIP } from "node:net";
 import { lookup } from "node:dns/promises";
+import {
+  Agent,
+  ProxyAgent,
+  fetch as undiciFetch,
+  type Dispatcher,
+} from "undici";
 
 export interface StorageConfig {
   endpoint: string;
@@ -19,35 +25,56 @@ export interface StorageConfig {
   publicDomain?: string;
 }
 
-const PRIVATE_IPV4_RANGES = [
-  /^10\./,
-  /^127\./,
-  /^169\.254\./,
-  /^172\.(1[6-9]|2\d|3[01])\./,
-  /^192\.168\./,
-  /^0\./,
-];
+const NON_PUBLIC_ADDRESSES = new BlockList();
+
+for (const [network, prefix] of [
+  ["0.0.0.0", 8],
+  ["10.0.0.0", 8],
+  ["100.64.0.0", 10],
+  ["127.0.0.0", 8],
+  ["169.254.0.0", 16],
+  ["172.16.0.0", 12],
+  ["192.0.0.0", 24],
+  ["192.0.2.0", 24],
+  ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["198.51.100.0", 24],
+  ["203.0.113.0", 24],
+  ["224.0.0.0", 4],
+  ["240.0.0.0", 4],
+] as const) {
+  NON_PUBLIC_ADDRESSES.addSubnet(network, prefix, "ipv4");
+}
+
+for (const [network, prefix] of [
+  ["::", 128],
+  ["::1", 128],
+  ["64:ff9b::", 96],
+  ["64:ff9b:1::", 48],
+  ["2001:db8::", 32],
+  ["fc00::", 7],
+  ["fe80::", 10],
+  ["fec0::", 10],
+  ["ff00::", 8],
+] as const) {
+  NON_PUBLIC_ADDRESSES.addSubnet(network, prefix, "ipv6");
+}
+
+function normalizeIpOrHostname(value: string) {
+  return value.toLowerCase().replace(/^\[|\]$/g, "").split("%")[0] ?? value;
+}
 
 function isPrivateAddress(address: string) {
-  const normalized = address.toLowerCase().split("%")[0] ?? address.toLowerCase();
+  const normalized = normalizeIpOrHostname(address);
   if (isIP(normalized) === 4) {
-    return PRIVATE_IPV4_RANGES.some((range) => range.test(normalized));
+    return NON_PUBLIC_ADDRESSES.check(normalized, "ipv4");
   }
   if (isIP(normalized) !== 6) return false;
+  // Mapped IPv4 addresses are unnecessary for provider downloads and can
+  // otherwise obscure a private IPv4 target in an IPv6 literal.
   return (
-    normalized === "::" ||
-    normalized === "::1" ||
-    normalized.startsWith("fc") ||
-    normalized.startsWith("fd") ||
-    normalized.startsWith("fe8") ||
-    normalized.startsWith("fe9") ||
-    normalized.startsWith("fea") ||
-    normalized.startsWith("feb") ||
-    normalized.startsWith("::ffff:127.") ||
-    normalized.startsWith("::ffff:10.") ||
-    normalized.startsWith("::ffff:192.168.") ||
-    /^::ffff:172\.(1[6-9]|2\d|3[01])\./.test(normalized) ||
-    normalized.startsWith("::ffff:169.254.")
+    normalized.startsWith("::ffff:") ||
+    NON_PUBLIC_ADDRESSES.check(normalized, "ipv6")
   );
 }
 
@@ -56,12 +83,13 @@ export function assertSafeRemoteMediaUrl(sourceUrl: string) {
   if (url.protocol !== "https:") {
     throw new Error("Provider media URL must use HTTPS");
   }
-  const hostname = url.hostname.toLowerCase();
+  if (url.username || url.password) {
+    throw new Error("Provider media URL cannot include credentials");
+  }
+  const hostname = normalizeIpOrHostname(url.hostname);
   if (
     hostname === "localhost" ||
     hostname.endsWith(".localhost") ||
-    hostname === "[::1]" ||
-    hostname === "::1" ||
     isPrivateAddress(hostname)
   ) {
     throw new Error("Provider media URL cannot target a private network");
@@ -69,14 +97,34 @@ export function assertSafeRemoteMediaUrl(sourceUrl: string) {
   return url;
 }
 
-export async function assertSafeRemoteMediaUrlResolved(sourceUrl: string) {
+interface ResolvedRemoteMediaTarget {
+  url: URL;
+  addresses: Array<{ address: string; family: number }>;
+}
+
+async function resolveSafeRemoteMediaTarget(
+  sourceUrl: string
+): Promise<ResolvedRemoteMediaTarget> {
   const url = assertSafeRemoteMediaUrl(sourceUrl);
-  if (isIP(url.hostname)) return url;
-  const addresses = await lookup(url.hostname, { all: true, verbatim: true });
-  if (addresses.length === 0 || addresses.some(({ address }) => isPrivateAddress(address))) {
+  const hostname = normalizeIpOrHostname(url.hostname);
+  const ipFamily = isIP(hostname);
+  const addresses = ipFamily
+    ? [{ address: hostname, family: ipFamily }]
+    : await lookup(hostname, { all: true, verbatim: true });
+  if (
+    addresses.length === 0 ||
+    addresses.some(
+      ({ address, family }) =>
+        (family !== 4 && family !== 6) || isPrivateAddress(address)
+    )
+  ) {
     throw new Error("Provider media URL resolves to a private network");
   }
-  return url;
+  return { url, addresses };
+}
+
+export async function assertSafeRemoteMediaUrlResolved(sourceUrl: string) {
+  return (await resolveSafeRemoteMediaTarget(sourceUrl)).url;
 }
 
 export function detectSupportedImageType(bytes: Uint8Array) {
@@ -101,22 +149,96 @@ export function detectSupportedImageType(bytes: Uint8Array) {
   return null;
 }
 
-async function fetchSafeRemoteMedia(sourceUrl: string) {
-  let currentUrl = await assertSafeRemoteMediaUrlResolved(sourceUrl);
+type RemoteMediaResponse = Awaited<ReturnType<typeof undiciFetch>>;
+
+interface PinnedRemoteMediaResponse {
+  response: RemoteMediaResponse;
+  dispatcher: Dispatcher;
+}
+
+function createPinnedDispatcher(url: URL): Dispatcher {
+  const hostname = normalizeIpOrHostname(url.hostname);
+  const tlsOptions = isIP(hostname) ? undefined : { servername: hostname };
+  const proxyUrl = process.env.HTTPS_PROXY?.trim() || process.env.HTTP_PROXY?.trim();
+  if (proxyUrl) {
+    return new ProxyAgent({
+      uri: proxyUrl,
+      requestTls: tlsOptions,
+      connections: 1,
+    });
+  }
+  return new Agent({ connect: tlsOptions, connections: 1 });
+}
+
+function urlWithPinnedAddress(
+  url: URL,
+  address: { address: string; family: number }
+) {
+  const pinnedUrl = new URL(url);
+  pinnedUrl.hostname = address.family === 6 ? `[${address.address}]` : address.address;
+  return pinnedUrl;
+}
+
+async function fetchPinnedRemoteMedia(
+  target: ResolvedRemoteMediaTarget,
+  signal: AbortSignal
+): Promise<PinnedRemoteMediaResponse> {
+  let lastError: unknown;
+  for (const address of target.addresses) {
+    const dispatcher = createPinnedDispatcher(target.url);
+    try {
+      const response = await undiciFetch(urlWithPinnedAddress(target.url, address), {
+        redirect: "manual",
+        signal,
+        dispatcher,
+        // The TCP/TLS destination is the validated IP, while Host and SNI retain
+        // the provider hostname for virtual hosting and certificate validation.
+        headers: { host: target.url.host },
+      });
+      return { response, dispatcher };
+    } catch (error) {
+      lastError = error;
+      await dispatcher.close();
+    }
+  }
+  throw lastError ?? new Error("Provider media URL has no reachable address");
+}
+
+async function releasePinnedResponse({
+  response,
+  dispatcher,
+}: PinnedRemoteMediaResponse) {
+  if (response.body && !response.bodyUsed) {
+    await response.body.cancel().catch(() => undefined);
+  }
+  await dispatcher.close();
+}
+
+async function fetchSafeRemoteMedia(
+  sourceUrl: string
+): Promise<PinnedRemoteMediaResponse> {
+  let currentTarget = await resolveSafeRemoteMediaTarget(sourceUrl);
   const signal = AbortSignal.timeout(120_000);
   for (let redirectCount = 0; redirectCount <= 3; redirectCount += 1) {
-    const response = await fetch(currentUrl, { redirect: "manual", signal });
-    if (response.status < 300 || response.status >= 400) return response;
+    const pinnedResponse = await fetchPinnedRemoteMedia(currentTarget, signal);
+    const { response } = pinnedResponse;
+    if (response.status < 300 || response.status >= 400) return pinnedResponse;
     const location = response.headers.get("location");
-    if (!location) throw new Error("Provider media redirect is missing Location");
-    currentUrl = await assertSafeRemoteMediaUrlResolved(
-      new URL(location, currentUrl).toString()
-    );
+    if (!location) {
+      await releasePinnedResponse(pinnedResponse);
+      throw new Error("Provider media redirect is missing Location");
+    }
+    const nextUrl = new URL(location, currentTarget.url).toString();
+    await releasePinnedResponse(pinnedResponse);
+    currentTarget = await resolveSafeRemoteMediaTarget(nextUrl);
   }
   throw new Error("Provider media exceeded the redirect limit");
 }
 
-async function readResponseWithLimit(response: Response, maxBytes: number) {
+async function readResponseWithLimit(
+  response: RemoteMediaResponse,
+  maxBytes: number
+) {
   if (!response.body) throw new Error("Provider video response has no body");
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -253,30 +375,35 @@ export class Storage {
     const maxBytes = Number.isFinite(configuredLimit)
       ? configuredLimit
       : 262_144_000;
-    const response = await fetchSafeRemoteMedia(params.sourceUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to download: ${response.statusText}`);
+    const pinnedResponse = await fetchSafeRemoteMedia(params.sourceUrl);
+    const { response } = pinnedResponse;
+    try {
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.statusText}`);
+      }
+
+      const declaredLength = Number.parseInt(
+        response.headers.get("content-length") ?? "0",
+        10
+      );
+      if (declaredLength > maxBytes) {
+        throw new Error(`Provider video exceeds the ${maxBytes} byte limit`);
+      }
+
+      const buffer = await readResponseWithLimit(response, maxBytes);
+      const contentType =
+        params.contentType ||
+        response.headers.get("content-type") ||
+        "video/mp4";
+
+      return this.uploadFile({
+        key: params.key,
+        body: buffer,
+        contentType,
+      });
+    } finally {
+      await releasePinnedResponse(pinnedResponse);
     }
-
-    const declaredLength = Number.parseInt(
-      response.headers.get("content-length") ?? "0",
-      10
-    );
-    if (declaredLength > maxBytes) {
-      throw new Error(`Provider video exceeds the ${maxBytes} byte limit`);
-    }
-
-    const buffer = await readResponseWithLimit(response, maxBytes);
-    const contentType =
-      params.contentType ||
-      response.headers.get("content-type") ||
-      "video/mp4";
-
-    return this.uploadFile({
-      key: params.key,
-      body: buffer,
-      contentType,
-    });
   }
 
   /**
