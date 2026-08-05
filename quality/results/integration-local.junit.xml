@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="0.0152128">
+    <testsuite name="quality/test_functional.test.ts" timestamp="2026-08-04T19:14:47.608Z" hostname="WIM-20251106GNO" tests="27" failures="0" errors="0" skipped="0" time="0.0152128">
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 accepts configured provider evolink" time="0.0015843">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 accepts configured provider kie" time="0.0001934">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 accepts configured provider apimart" time="0.0001411">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 accepts configured provider bailian" time="0.0001138">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 accepts configured provider zhipu" time="0.0001162">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 rejects unknown provider token " time="0.0001803">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 rejects unknown provider token unknown" time="0.0000966">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 rejects unknown provider token evolink-extra" time="0.0002433">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-011 rejects unknown provider token KIE" time="0.0001135">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-004 rejects a disabled catalog placeholder" time="0.0007608">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-004 rejects unsupported model duration" time="0.0001706">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-004 rejects images in text-to-video mode" time="0.00012">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Spec requirements &gt; REQ-004 requires an image in image-to-video mode" time="0.0001211">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Fitness scenarios &gt; Scenario 5 / REQ-006 accepts a fresh bound signature" time="0.0028487">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Fitness scenarios &gt; Scenario 5 / REQ-006 rejects a signature replayed for another video" time="0.0007094">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Fitness scenarios &gt; Scenario 5 / REQ-006 rejects excessive future clock skew" time="0.0004742">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Fitness scenarios &gt; Scenario 9 / REQ-010 accepts a public HTTPS media URL" time="0.0041639">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Fitness scenarios &gt; Scenario 10 / REQ-011 keeps the canonical provider set explicit" time="0.0003866">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination http://cdn.example.com/video.mp4" time="0.0001669">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination https://localhost/video.mp4" time="0.0000666">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination https://127.0.0.1/video.mp4" time="0.0002163">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination https://10.0.0.1/video.mp4" time="0.0001118">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination https://192.168.1.1/video.mp4" time="0.0001555">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects unsafe remote destination https://[::1]/video.mp4" time="0.0000797">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 rejects HTML disguised as an image" time="0.0001701">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-010 detects supported image magic bytes" time="0.0000934">
+        </testcase>
+        <testcase classname="quality/test_functional.test.ts" name="Boundaries and edge cases &gt; REQ-006 rejects a weak callback secret" time="0.0001353">
+        </testcase>
+    </testsuite>
+</testsuites>

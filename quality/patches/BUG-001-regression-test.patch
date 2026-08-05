@@ -1,0 +1,23 @@
+diff --git a/src/services/billing-return-route.regression.test.ts b/src/services/billing-return-route.regression.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/services/billing-return-route.regression.test.ts
+@@ -0,0 +1,18 @@
++import { readFileSync, readdirSync } from "node:fs";
++import { join } from "node:path";
++import { expect, it } from "vitest";
++
++it.fails("BUG-001 / REQ-009: Stripe return destinations resolve to an app page", () => {
++  const billing = readFileSync(join(process.cwd(), "src/services/billing.ts"), "utf8");
++  const pages: string[] = [];
++  const walk = (dir: string) => {
++    for (const entry of readdirSync(dir, { withFileTypes: true })) {
++      const path = join(dir, entry.name);
++      if (entry.isDirectory()) walk(path);
++      else if (entry.name === "page.tsx") pages.push(path.replaceAll("\\", "/"));
++    }
++  };
++  walk(join(process.cwd(), "src/app"));
++  expect(billing).not.toContain("/dashboard");
++  expect(pages.some((path) => path.endsWith("/settings/page.tsx"))).toBe(true);
++});

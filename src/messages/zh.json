@@ -563,7 +563,8 @@
         "video_consume": "视频生成",
         "refund": "退款",
         "expired": "已过期",
-        "system_adjust": "管理员调整"
+        "system_adjust": "管理员调整",
+        "payment_reversal": "支付撤销"
       }
     },
     "settings": {

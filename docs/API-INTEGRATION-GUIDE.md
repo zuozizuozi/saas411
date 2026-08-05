@@ -52,7 +52,7 @@ KIE_BASE_URL=https://api.kie.ai/api/v1
 
 # 通用
 AI_CALLBACK_URL=https://yourdomain.com/api/v1/video/callback
-AI_CALLBACK_SECRET=your_callback_secret
+CALLBACK_HMAC_SECRET=your_callback_secret
 ```
 
 ---
@@ -983,7 +983,7 @@ DEFAULT_AI_PROVIDER=evolink
 
 # Callback
 AI_CALLBACK_URL=https://yourdomain.com/api/v1/video/callback
-AI_CALLBACK_SECRET=your_callback_secret
+CALLBACK_HMAC_SECRET=your_callback_secret
 
 # ============================================
 # Creem Payment

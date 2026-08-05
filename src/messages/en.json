@@ -563,7 +563,8 @@
         "video_consume": "Video Gen",
         "refund": "Refund",
         "expired": "Expired",
-        "system_adjust": "Admin Adjust"
+        "system_adjust": "Admin Adjust",
+        "payment_reversal": "Payment Reversal"
       }
     },
     "settings": {

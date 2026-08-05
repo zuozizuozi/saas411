@@ -17,40 +17,45 @@ interface CreditHistoryProps {
 }
 
 const typeConfig: Record<string, { icon: any; label: string; color: string }> = {
-  NEW_USER: {
+  new_user: {
     icon: ShoppingBag,
     label: "New User Gift",
     color: "text-emerald-500",
   },
-  VIDEO_CONSUME: { // Was video_generate
+  video_consume: {
     icon: Video,
     label: "Video Gen",
     color: "text-rose-500",
   },
-  ORDER_PAY: {
+  order_pay: {
     icon: ShoppingBag,
     label: "Purchase",
     color: "text-emerald-500",
   },
-  SUBSCRIPTION: {
+  subscription: {
     icon: ShoppingBag,
     label: "Subscription",
     color: "text-emerald-500",
   },
-  REFUND: { // Was video_refund
+  refund: {
     icon: RotateCcw,
     label: "Refund",
     color: "text-emerald-500",
   },
-  EXPIRED: {
+  expired: {
     icon: ShoppingBag,
     label: "Expired",
     color: "text-muted-foreground",
   },
-  SYSTEM_ADJUST: { // Was admin_adjust
+  system_adjust: {
     icon: Settings,
     label: "Admin Adjust",
     color: "text-muted-foreground",
+  },
+  payment_reversal: {
+    icon: RotateCcw,
+    label: "Payment reversal",
+    color: "text-rose-500",
   },
 };
 

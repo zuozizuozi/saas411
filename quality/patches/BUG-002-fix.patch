@@ -1,0 +1,26 @@
+diff --git a/src/app/api/internal/workflows/video-reconcile/route.ts b/src/app/api/internal/workflows/video-reconcile/route.ts
+--- a/src/app/api/internal/workflows/video-reconcile/route.ts
++++ b/src/app/api/internal/workflows/video-reconcile/route.ts
+@@ -25,7 +25,7 @@
+ 
+   if (!workflowPost) {
+     workflowPost = serve<VideoReconcileInput>(async (context) => {
+-      for (let attempt = 0; attempt < 10; attempt += 1) {
++      for (let attempt = 0; attempt < 80; attempt += 1) {
+         const result = await context.run(`refresh-video-${attempt}`, () =>
+           videoService.refreshStatus(
+             context.requestPayload.videoUuid,
+@@ -40,7 +40,12 @@
+         await context.sleep(`wait-for-provider-${attempt}`, 45);
+       }
+ 
+-      return { status: "PENDING", reason: "reconciliation-window-exhausted" };
++      return context.run("fail-video-after-provider-timeout", () =>
++        videoService.failGeneration(
++          context.requestPayload.videoUuid,
++          "Provider did not reach a terminal state within 60 minutes"
++        )
++      );
+     }).POST;
+   }
+ 

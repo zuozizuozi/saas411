@@ -1,0 +1,13 @@
+GREEN
+Command: vitest run src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ ✓ src/app/api/internal/workflows/video-reconcile/reconciliation.regression.test.ts > BUG-002 / REQ-007: durable exhaustion reaches a terminal policy 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:09
+   Duration  139ms (transform 13ms, setup 0ms, import 21ms, tests 2ms, environment 0ms)
+

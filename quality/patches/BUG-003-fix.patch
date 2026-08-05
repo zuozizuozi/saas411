@@ -1,0 +1,20 @@
+diff --git a/src/app/api/v1/video/callback/[provider]/route.ts b/src/app/api/v1/video/callback/[provider]/route.ts
+--- a/src/app/api/v1/video/callback/[provider]/route.ts
++++ b/src/app/api/v1/video/callback/[provider]/route.ts
+@@ -1,6 +1,7 @@
+ import { NextRequest } from "next/server";
+ import { videoService } from "@/services/video";
+ import { type ProviderType } from "@/ai";
++import { AI_PROVIDERS } from "@/ai/provider-config";
+ import { verifyCallbackSignature } from "@/ai/utils/callback-signature";
+ import { apiSuccess, apiError } from "@/lib/api/response";
+ 
+@@ -13,7 +14,7 @@
+     const providerType = provider as ProviderType;
+ 
+     // Validate provider type
+-    if (!["evolink", "kie", "apimart", "zhipu"].includes(providerType)) {
++    if (!(AI_PROVIDERS as readonly string[]).includes(providerType)) {
+       return apiError("Invalid provider", 400);
+     }
+ 

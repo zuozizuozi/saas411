@@ -1,0 +1,123 @@
+RED
+Command: vitest run src/app/csp-observability.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/app/csp-observability.regression.test.ts > BUG-006: CSP allows emitted Vercel observability scripts 7ms
+   → expected '// @ts-check\r\nimport createNextIntl…' to contain 'https://va.vercel-scripts.com'
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/csp-observability.regression.test.ts > BUG-006: CSP allows emitted Vercel observability scripts
+AssertionError: expected '// @ts-check\r\nimport createNextIntl…' to contain 'https://va.vercel-scripts.com'
+
+- Expected
++ Received
+
+- https://va.vercel-scripts.com
++ // @ts-check
++ import createNextIntlPlugin from "next-intl/plugin";
++ 
++ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
++ 
++ const canonicalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
++ const canonicalOrigin = canonicalAppUrl
++   ? new URL(canonicalAppUrl).origin
++   : "https://seedance.co.com";
++ const canonicalHostname = new URL(canonicalOrigin).hostname;
++ const contentSecurityPolicy = [
++   "default-src 'self'",
++   "base-uri 'self'",
++   "object-src 'none'",
++   "frame-ancestors 'none'",
++   "form-action 'self' https://checkout.stripe.com",
++   `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://js.stri
+pe.com https://vercel.live`,
++   "style-src 'self' 'unsafe-inline'",
++   "img-src 'self' data: blob: https:",
++   "media-src 'self' blob: https:",
++   "font-src 'self' data: https:",
++   "connect-src 'self' https: wss:",
++   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
++   "worker-src 'self' blob:",
++   "upgrade-insecure-requests",
++ ].join("; ");
++ 
++ if (!process.env.SKIP_ENV_VALIDATION) {
++   await import("./src/env.mjs");
++   await import("./src/lib/auth/env.mjs");
++ }
++ 
++ /** @type {import("next").NextConfig} */
++ const config = {
++   reactStrictMode: true,
++   poweredByHeader: false,
++   pageExtensions: ["ts", "tsx"],
++   async headers() {
++     return [
++       {
++         source: "/:path*",
++         headers: [
++           { key: "X-Content-Type-Options", value: "nosniff" },
++           { key: "X-Frame-Options", value: "DENY" },
++           { key: "Content-Security-Policy", value: contentSecurityPolicy },
++           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
++           {
++             key: "Permissions-Policy",
++             value: "camera=(), microphone=(), geolocation=()",
++           },
++         ],
++       },
++     ];
++   },
++   async redirects() {
++     return [
++       {
++         source: "/:path*",
++         has: [{ type: "host", value: `www.${canonicalHostname}` }],
++         destination: `${canonicalOrigin}/:path*`,
++         permanent: true,
++       },
++     ];
++   },
++   images: {
++     remotePatterns: [
++       { protocol: "https", hostname: "images.unsplash.com" },
++       { protocol: "https", hostname: "avatars.githubusercontent.com" },
++       { protocol: "https", hostname: "www.twillot.com" },
++       { protocol: "https", hostname: "cdnv2.ruguoapp.com" },
++       { protocol: "https", hostname: "www.setupyourpay.com" },
++     ],
++   },
++   // Production builds must fail when TypeScript finds an error.
++   typescript: { ignoreBuildErrors: false },
++   output: "standalone",
++ };
++ 
++ // Compose plugins
++ export default withNextIntl(config);
++
+
+ ❯ src/app/csp-observability.regression.test.ts:10:18
+      8|   expect(layout).toContain("<Analytics />");
+      9|   expect(layout).toContain("<SpeedInsights />");
+     10|   expect(config).toContain("https://va.vercel-scripts.com");
+       |                  ^
+     11| });
+     12|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:12
+   Duration  186ms (transform 15ms, setup 0ms, import 26ms, tests 8ms, environment 0ms)
+

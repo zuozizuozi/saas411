@@ -16,6 +16,7 @@ describe("getSafeAuthCallbackURL", () => {
     "//attacker.example/path",
     "javascript:alert(1)",
     "data:text/html,hello",
+    "%",
   ])("rejects unsafe callback %s", (candidate) => {
     expect(getSafeAuthCallbackURL(candidate, fallback)).toBe(fallback);
   });

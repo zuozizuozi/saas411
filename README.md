@@ -142,7 +142,7 @@ STORAGE_DOMAIN='https://your-domain.com'
 EVOLINK_API_KEY='your-evolink-key'
 KIE_API_KEY='your-kie-key'
 AI_CALLBACK_URL='https://your-domain.com/api/v1/video/callback'
-AI_CALLBACK_SECRET='your-callback-secret'
+CALLBACK_HMAC_SECRET='your-callback-secret'
 
 # 支付 - Creem (主要)
 CREEM_API_KEY='your-creem-key'

@@ -1,0 +1,45 @@
+RED
+Command: vitest run src/hooks/use-videos-filter.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/hooks/use-videos-filter.regression.test.ts > BUG-010 / REQ-013: creation filters reach the list request 4ms
+   → expected 'apiClient.getVideos({\r\n        limi…' to contain 'status:'
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/hooks/use-videos-filter.regression.test.ts > BUG-010 / REQ-013: creation filters reach the list request
+
+AssertionError: expected 'apiClient.getVideos({\r\n        limi…' to contain 'status:'
+
+- Expected
++ Received
+
+- status:
++ apiClient.getVideos({
++         limit: 20,
++         cursor: pageParam,
++       
+
+ ❯ src/hooks/use-videos-filter.regression.test.ts:10:19
+      8|     source.indexOf("});", source.indexOf("apiClient.getVideos"))
+      9|   );
+     10|   expect(request).toContain("status:");
+       |                   ^
+     11|   expect(request).toContain("model:");
+     12|   expect(request).toContain("sortBy:");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:16
+   Duration  165ms (transform 13ms, setup 0ms, import 22ms, tests 5ms, environment 0ms)
+

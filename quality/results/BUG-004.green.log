@@ -1,0 +1,33 @@
+GREEN
+Command: vitest run src/app/api/v1/video/callback/body-limit.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+vitest.cmd : stderr | src/app/api/v1/video/callback/body-limit.regression.test.ts > BUG-004 / REQ-006: rejects callback
+ JSON over 1 MiB before handling
+At F:\saas411\quality\run_phase5_tdd.ps1:55 char:22
++ ... greenOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | src/ap...before handling:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Callback error: ApiError: Request body is too large
+    at readRequestTextWithLimit (F:/saas411/quality/workspace/phase5-worktree/src/lib/api/request-body.ts:23:15)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at Module.POST (F:/saas411/quality/workspace/phase5-worktree/src/app/api/v1/video/callback/[provider]/route.ts:43:2
+5)
+    at F:/saas411/quality/workspace/phase5-worktree/src/app/api/v1/video/callback/body-limit.regression.test.ts:19:20
+    at file:///F:/saas411/node_modules/.pnpm/@vitest+runner@4.1.10/node_modules/@vitest/runner/dist/chunk-artifact.js:1
+903:20 {
+  status: 413,
+  details: undefined
+}
+
+ ✓ src/app/api/v1/video/callback/body-limit.regression.test.ts > BUG-004 / REQ-006: rejects callback JSON over 1 MiB before handling 9ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:10
+   Duration  234ms (transform 33ms, setup 0ms, import 81ms, tests 9ms, environment 0ms)
+

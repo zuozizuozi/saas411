@@ -550,7 +550,8 @@
         "video_consume": "動画生成",
         "refund": "払い戻し",
         "expired": "期限切れ",
-        "system_adjust": "管理者による調整"
+        "system_adjust": "管理者による調整",
+        "payment_reversal": "支払い取消"
       }
     },
     "settings": {

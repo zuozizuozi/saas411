@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.5.6",
+  "generated_at": "2026-08-04T11:15:00Z",
+  "records": [
+    {"id":"UC-001","title":"Guest generator login gate","actor":"unauthenticated visitor","preconditions":["No valid session"],"flow":["Open generator","Enter prompt","Submit"],"postconditions":["Login shown","No paid or persistent state created"],"formal_doc_refs":["docs/project-blueprint.md"]},
+    {"id":"UC-002","title":"Authenticated text-to-video generation","actor":"authenticated user","preconditions":["Supported model","Sufficient credits"],"flow":["Submit","Freeze","Bind provider","Complete or fail"],"postconditions":["Stored video and settled charge or failed video and released hold"],"formal_doc_refs":["docs/VIDEO-OPERATIONS.md","docs/spec/CREDIT_CALCULATOR.md"]},
+    {"id":"UC-003","title":"Authenticated image-to-video generation","actor":"authenticated user","preconditions":["Owned uploaded image","Sufficient credits"],"flow":["Select asset","Submit","Complete lifecycle"],"postconditions":["Owned input only and resolved output/ledger"],"formal_doc_refs":["docs/VIDEO-OPERATIONS.md"]},
+    {"id":"UC-004","title":"Signed provider callback","actor":"AI provider","preconditions":["Stored task binding","Unexpired signed URL"],"flow":["Verify","Parse","Bind","Complete or fail"],"postconditions":["One terminal transition and ledger resolution"],"formal_doc_refs":["docs/spec/AI_PROVIDER_INTEGRATION.md"]},
+    {"id":"UC-005","title":"Missed callback recovery","actor":"QStash workflow or operator","preconditions":["Accepted nonterminal task"],"flow":["Poll durably","Handle delay/failure","Converge or escalate"],"postconditions":["No abandoned generation or hold"],"formal_doc_refs":["docs/VIDEO-OPERATIONS.md","docs/project-blueprint.md"]},
+    {"id":"UC-006","title":"Subscription or credit purchase","actor":"authenticated customer and Stripe","preconditions":["Valid price and Stripe configuration"],"flow":["Create session","Return","Verify webhook","Reconcile"],"postconditions":["Existing return page and exactly-once entitlement"],"formal_doc_refs":["docs/security-payment-operations.md"]},
+    {"id":"UC-007","title":"Administrator operation","actor":"administrator","preconditions":["Current database role"],"flow":["Access admin page or API","Perform operation"],"postconditions":["Admin succeeds and others are denied"],"formal_doc_refs":["src/lib/auth/admin-role.ts"]}
+  ]
+}

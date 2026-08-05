@@ -1,0 +1,34 @@
+diff --git a/src/services/billing.ts b/src/services/billing.ts
+--- a/src/services/billing.ts
++++ b/src/services/billing.ts
+@@ -138,8 +138,8 @@
+ 
+   if (!isImmediateUpgrade(current, target)) {
+     const returnUrl = process.env.NEXT_PUBLIC_APP_URL
+-      ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+-      : "/dashboard";
++      ? `${process.env.NEXT_PUBLIC_APP_URL}/settings`
++      : "/settings";
+     const session = await stripe.billingPortal.sessions.create(
+       {
+         customer: customer.stripeCustomerId,
+@@ -267,8 +267,8 @@
+   const customer = await ensureCustomer(userId);
+ 
+   const returnUrl = process.env.NEXT_PUBLIC_APP_URL
+-    ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+-    : "/dashboard";
++    ? `${process.env.NEXT_PUBLIC_APP_URL}/settings`
++    : "/settings";
+ 
+   if (customer?.plan && customer.plan !== "FREE" && customer.stripeCustomerId) {
+     const session = await stripe.billingPortal.sessions.create(
+@@ -301,7 +301,7 @@
+       client_reference_id: userId,
+       subscription_data: { metadata: purchaseMetadata(userId, context) },
+       cancel_url: returnUrl,
+-      success_url: returnUrl,
++      success_url: `${returnUrl}?checkout=success`,
+       line_items: [{ price: planId, quantity: 1 }],
+     },
+     { idempotencyKey: stripeSessionIdempotencyKey("subscription", userId, planId) }

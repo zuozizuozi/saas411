@@ -1,0 +1,10 @@
+GREEN
+Command: pnpm exec vitest run quality/test_regression.test.ts quality/spec_audits/phase4-triage-probes.test.ts
+Exit: 0
+Date: 2026-08-05
+
+Unified repair evidence:
+- Credit history API emits one canonical alias set.
+- TypeScript and UI configuration use the same aliases.
+- de/en/es/fr/ja/ko/zh dictionaries all include payment_reversal.
+- Aggregate and Phase 4 regression suites pass as ordinary tests.

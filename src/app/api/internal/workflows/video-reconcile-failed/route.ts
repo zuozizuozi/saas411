@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
+import { getWorkflowConfig } from "@/lib/upstash";
 
 /**
  * QStash failure callback. Keep this endpoint intentionally small: the task
@@ -10,9 +11,14 @@ let verifiedPost:
   | undefined;
 
 function getVerifiedPost() {
-  const currentSigningKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
-  const nextSigningKey = process.env.QSTASH_NEXT_SIGNING_KEY;
-  if (!currentSigningKey || !nextSigningKey) return null;
+  let config: ReturnType<typeof getWorkflowConfig>;
+  try {
+    config = getWorkflowConfig();
+  } catch (error) {
+    console.error("Invalid QStash failure callback configuration", error);
+    return null;
+  }
+  if (!config) return null;
 
   if (!verifiedPost) {
     verifiedPost = verifySignatureAppRouter(
@@ -24,7 +30,10 @@ function getVerifiedPost() {
         );
         return NextResponse.json({ received: true });
       },
-      { currentSigningKey, nextSigningKey }
+      {
+        currentSigningKey: config.currentSigningKey,
+        nextSigningKey: config.nextSigningKey,
+      }
     );
   }
 

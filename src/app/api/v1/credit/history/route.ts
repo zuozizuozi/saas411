@@ -23,10 +23,10 @@ const transTypeMapping: Record<CreditTransType, string> = {
   NEW_USER: "new_user",
   ORDER_PAY: "order_pay",
   SUBSCRIPTION: "subscription",
-  VIDEO_CONSUME: "video_generate",
-  REFUND: "video_refund",
+  VIDEO_CONSUME: "video_consume",
+  REFUND: "refund",
   EXPIRED: "expired",
-  SYSTEM_ADJUST: "admin_adjust",
+  SYSTEM_ADJUST: "system_adjust",
   PAYMENT_REVERSAL: "payment_reversal",
 };
 

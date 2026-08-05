@@ -22,9 +22,9 @@ interface CreationFilterProps {
 const availableModels = [
   { value: "all", label: "All Models" },
   { value: "sora-2", label: "Sora 2" },
-  { value: "veo-3-1", label: "Veo 3.1" },
-  { value: "seedance-1-5", label: "Seedance 1.5" },
-  { value: "wan-2-6", label: "Wan 2.6" },
+  { value: "veo-3.1", label: "Veo 3.1" },
+  { value: "seedance-1.5-pro", label: "Seedance 1.5" },
+  { value: "wan2.6", label: "Wan 2.6" },
 ];
 
 const statusOptions = [

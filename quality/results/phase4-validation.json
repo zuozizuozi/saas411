@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "skill_version": "1.5.6",
+  "phase": 4,
+  "completed_at": "2026-08-04T16:18:52Z",
+  "gate": "PASS",
+  "auditors": 3,
+  "net_new_bugs": 4,
+  "active_bugs": 9,
+  "retracted_bugs": 1,
+  "triage_probes": { "passed": 2, "expected_fail": 8, "total": 10 },
+  "repository_tests": { "passed": 184, "expected_fail": 8, "total": 192 },
+  "typecheck": "PASS",
+  "lint": "PASS",
+  "patch_apply_checks": "19/19",
+  "semantic_citation_check": "NO_OP_ZERO_TIER_1_2"
+}

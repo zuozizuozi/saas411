@@ -1,0 +1,18 @@
+diff --git a/src/lib/storage-dns-binding.regression.test.ts b/src/lib/storage-dns-binding.regression.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/lib/storage-dns-binding.regression.test.ts
+@@ -0,0 +1,13 @@
++import { readFileSync } from "node:fs";
++import { expect, it } from "vitest";
++
++it.fails("BUG-007 / REQ-010: binds media fetch to the DNS address validated as public", () => {
++  const source = readFileSync("src/lib/storage.ts", "utf8");
++  expect(source).toMatch(/lookup\(url\.hostname/);
++  expect(source).not.toContain(
++    'fetch(currentUrl, { redirect: "manual", signal })'
++  );
++  expect(source).toMatch(
++    /dispatcher|connect:\s*\{|lookup:\s*\(/
++  );
++});

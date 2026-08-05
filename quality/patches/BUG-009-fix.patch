@@ -1,0 +1,44 @@
+diff --git a/src/lib/upstash.ts b/src/lib/upstash.ts
+--- a/src/lib/upstash.ts
++++ b/src/lib/upstash.ts
+@@ -1,13 +1,28 @@
+ import { Client } from "@upstash/qstash";
+ 
++function getWorkflowConfig() {
++  const config = {
++    token: process.env.QSTASH_TOKEN,
++    appUrl: process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""),
++    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,
++    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
++  };
++  const configured = Object.values(config).filter(Boolean).length;
++  if (configured > 0 && configured < Object.keys(config).length) {
++    throw new Error("Incomplete QStash workflow configuration");
++  }
++  return config;
++}
++
+ function getQStashClient() {
+-  const token = process.env.QSTASH_TOKEN;
++  const { token } = getWorkflowConfig();
+   if (!token) return null;
+   return new Client({ token, baseUrl: process.env.QSTASH_URL });
+ }
+ 
+ export function isWorkflowEnabled(): boolean {
+-  return Boolean(process.env.QSTASH_TOKEN && process.env.NEXT_PUBLIC_APP_URL);
++  const config = getWorkflowConfig();
++  return Object.values(config).every(Boolean);
+ }
+ 
+ /** Queue a durable reconciliation pass after a provider accepts a task. */
+@@ -15,8 +30,8 @@ export async function scheduleVideoReconciliation(input: {
+   videoUuid: string;
+   userId: string;
+ }) {
++  const { appUrl } = getWorkflowConfig();
+   const client = getQStashClient();
+-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+   if (!client || !appUrl) return null;
+ 
+   return client.publishJSON({

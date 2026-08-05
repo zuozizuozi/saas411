@@ -1,0 +1,18 @@
+diff --git a/src/hooks/use-videos-filter.regression.test.ts b/src/hooks/use-videos-filter.regression.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/hooks/use-videos-filter.regression.test.ts
+@@ -0,0 +1,13 @@
++import { readFileSync } from "node:fs";
++import { expect, it } from "vitest";
++
++it.fails("BUG-010 / REQ-013: creation filters reach the list request", () => {
++  const source = readFileSync("src/hooks/use-videos.ts", "utf8");
++  const request = source.slice(
++    source.indexOf("apiClient.getVideos"),
++    source.indexOf("});", source.indexOf("apiClient.getVideos"))
++  );
++  expect(request).toContain("status:");
++  expect(request).toContain("model:");
++  expect(request).toContain("sortBy:");
++});

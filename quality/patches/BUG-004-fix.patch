@@ -1,0 +1,36 @@
+diff --git a/src/app/api/v1/video/callback/[provider]/route.ts b/src/app/api/v1/video/callback/[provider]/route.ts
+--- a/src/app/api/v1/video/callback/[provider]/route.ts
++++ b/src/app/api/v1/video/callback/[provider]/route.ts
+@@ -2,7 +2,10 @@
+ import { videoService } from "@/services/video";
+ import { type ProviderType } from "@/ai";
+ import { verifyCallbackSignature } from "@/ai/utils/callback-signature";
+-import { apiSuccess, apiError } from "@/lib/api/response";
++import { apiSuccess, apiError, handleApiError } from "@/lib/api/response";
++import { readRequestTextWithLimit } from "@/lib/api/request-body";
++
++const MAX_AI_CALLBACK_BYTES = 1024 * 1024;
+ 
+ export async function POST(
+   request: NextRequest,
+@@ -37,7 +40,11 @@
+       return apiError(verification.error || "Invalid signature", 401);
+     }
+ 
+-    const payload = await request.json();
++    const payloadText = await readRequestTextWithLimit(
++      request,
++      MAX_AI_CALLBACK_BYTES
++    );
++    const payload = JSON.parse(payloadText);
+ 
+     // Pass in videoUuid (already verified)
+     await videoService.handleCallback(providerType, payload, videoUuid);
+@@ -45,6 +52,6 @@
+     return apiSuccess({ received: true });
+   } catch (error) {
+     console.error("Callback error:", error);
+-    return apiError("Callback processing failed", 500);
++    return handleApiError(error);
+   }
+ }

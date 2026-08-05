@@ -1,0 +1,2719 @@
+{
+    "schema_version":  "1.0",
+    "generated_at":  "2026-08-04T11:01:25.1755860Z",
+    "provenance":  "git ls-files",
+    "tracked_file_count":  672,
+    "role_breakdown":  {
+                           "code":  537,
+                           "configuration":  9,
+                           "documentation":  42,
+                           "fixture_or_asset":  17,
+                           "operational":  41,
+                           "test":  26
+                       },
+    "files":  [
+                  {
+                      "path":  ".agents/skills/landing-page-builder/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/landing-page-builder/references/checklist.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/landing-page-builder/references/design-principles.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/landing-page-builder/references/workflow-steps.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/pricing-setup/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/charts.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/colors.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/icons.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/landing.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/products.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/react-performance.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/astro.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/react.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/stacks/vue.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/styles.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/typography.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/data/web-interface.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/__pycache__/search.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/core.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/ui-ux-pro-max/scripts/search.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/00-project-brief.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/01-env-and-deps.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/02-brand-config.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/03-theme-styles.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/04-seo-metadata.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/05-landing-page.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/06-logo-favicon.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/07-og-image.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/08-sitemap.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/09-legal-pages.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/10-checklist.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/config-map.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/references/pattern-catalog.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/scripts/fetch-og-image.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/scripts/generate-logo.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/templates/favicon-svg-circle.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/templates/favicon-svg-shield.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/templates/favicon-svg-square.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/templates/manifest.webmanifest",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".agents/skills/videofly-init/templates/og-image-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/api-reference.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/context.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/settings.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/landing-page-builder/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/landing-page-builder/references/checklist.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/landing-page-builder/references/design-principles.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/landing-page-builder/references/workflow-steps.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/pricing-setup/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/charts.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/colors.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/icons.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/landing.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/products.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/react-performance.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/astro.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/react.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/stacks/vue.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/styles.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/typography.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/data/web-interface.csv",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/__pycache__/search.cpython-314.pyc",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/core.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/ui-ux-pro-max/scripts/search.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/SKILL.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/00-project-brief.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/01-env-and-deps.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/02-brand-config.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/03-theme-styles.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/04-seo-metadata.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/05-landing-page.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/06-logo-favicon.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/07-og-image.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/08-sitemap.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/09-legal-pages.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/10-checklist.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/config-map.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/references/pattern-catalog.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/scripts/fetch-og-image.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/scripts/generate-logo.py",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/templates/favicon-svg-circle.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/templates/favicon-svg-shield.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/templates/favicon-svg-square.svg",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/templates/manifest.webmanifest",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/videofly-init/templates/og-image-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".codex-dev.stderr.log",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".codex-dev.stdout.log",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".env.example",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  ".gitignore",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".mcp.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  ".vscode/settings.json",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "AGENTS.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "CLAUDE.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "LICENSE",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "README.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "biome.json",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "design-system/videofly/MASTER.md",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "docs/API-INTEGRATION-GUIDE.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/bytedance/seedance-1.5-pro.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/sora-2-image-to-video.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/sora-2-text-to-video.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/veo-3-1.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/wan/2-6-image-to-video.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/wan/2-6-text-to-video.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/API_KIE/wan/2-6-video-to-video.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/CONFIGURATION_GUIDE.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/CREEM-SETUP-GUIDE.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/PROXY_SETUP.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/README.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/STRIPE-PRICING-CHECKLIST.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/VIDEO-OPERATIONS.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/home-mobile-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/image-to-video-mobile-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/text-to-video-desktop-1440.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/text-to-video-mobile-hero-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/videofly-home-mobile-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/videofly-image-to-video-desktop-1440.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/videofly-image-to-video-mobile-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/videofly-pricing-desktop-1440.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/design-references/seedance-tv/videofly-text-to-video-mobile-390.png",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/project-blueprint.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/evolink.ai/multilingual-module.spec.md",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/components/generator-workspace.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/components/home-hero.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/components/pricing.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/components/product-shell.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/components/tool-marketing.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/global-extraction.json",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/research/seedance-tv/mobile-extraction.json",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/security-payment-operations.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/AI_PROVIDER_INTEGRATION.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/COMPONENT_SPECIFICATION.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/CREDIT_CALCULATOR.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/DASHBOARD_DESIGN_SPEC.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/PRICING_REFERENCE.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "docs/spec/RESEND_EMAIL_TEMPLATES.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "drizzle.config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "next.config.mjs",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "package.json",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "pnpm-lock.yaml",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "pnpm-workspace.yaml",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "postcss.config.mjs",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "public/apple-touch-icon.png",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/favicon.ico",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/favicon.svg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/icon-192.png",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/icon-512.png",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/avatars/nok8s.jpeg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/avatars/saasfly-logo.svg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/blog/blog-post-1.jpg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/blog/blog-post-2.jpg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/blog/blog-post-3.jpg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/blog/blog-post-4.jpg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/images/noise.webp",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/logo.svg",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/og.png",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/site.webmanifest",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "public/videos/videofly-hero-reference.mp4",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "scripts/README.md",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "scripts/add-credits.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/check-evolink-status.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/check-stuck-videos.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/check-user-credits.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/manage-admin.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/recover-direct.js",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/recover-stuck-videos.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/recover-to-r2.js",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/recover-videos.js",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/reset-user-credits.ts",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/test-proxy.mjs",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "scripts/test-storage.mjs",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/actions/customer.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/actions/stripe.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/model-mapping.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/model-mapping.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/provider-config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/provider-http.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/provider-http.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/providers/apimart.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/providers/bailian.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/providers/bailian.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/providers/evolink.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/providers/evolink.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/providers/kie.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/providers/zhipu.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/providers/zhipu.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/routing.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/routing.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/types.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/ai/utils/callback-signature.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/ai/utils/callback-signature.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/analytics/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/disputes/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/error.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/loading.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/settings/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(admin)/admin/users/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(auth)/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(auth)/login/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(auth)/register/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(dashboard)/credits/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(dashboard)/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(dashboard)/my-creations/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(dashboard)/settings/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/pricing/loading.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/pricing/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/privacy-policy/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/privacy/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/seedance-1-5/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/sora-2/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/terms-of-service/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/terms/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/veo-3-1/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(marketing)/wan-2-6/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(tool)/image-to-video/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(tool)/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/[locale]/(tool)/text-to-video/page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/auth/[...all]/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/health/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/internal/cron/generation-risk/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/internal/cron/upload-cleanup/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/internal/workflows/video-reconcile-failed/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/internal/workflows/video-reconcile/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/credits/add/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/models/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/provider-health/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/user-videos/route.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/user-videos/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/users/[userId]/billing/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/users/[userId]/credits/grant/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/users/[userId]/generation/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/admin/users/[userId]/role/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/assets/route.ts",
+                      "role":  "fixture_or_asset"
+                  },
+                  {
+                      "path":  "src/app/api/v1/config/models/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/credit/balance/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/credit/history/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/upload/complete/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/upload/presign/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/upload/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/user/billing/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/user/me/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/[uuid]/retry/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/[uuid]/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/[uuid]/status/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/callback/[provider]/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/events/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/generate/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/list/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/recover/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/v1/video/task/[taskId]/status/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/api/webhooks/stripe/route.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/robots.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/app/sitemap.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/admin-header.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/admin-sidebar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/analytics/analytics-header.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/analytics/funnel-chart.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/analytics/stat-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/analytics/stats-cards.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/analytics/trend-chart.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/refine-admin-provider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/users/admin-role-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/users/credit-grant-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/users/generation-control-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/users/user-videos-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/admin/users/user-videos-dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/counting-number.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/flip.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/gradient.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/highlight.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/sliding-number.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/typing.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/animate-ui/writing.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/base-item.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/billing-form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/billing/billing-list.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/billing/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/billing/settings-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/blog-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/blog/blog-posts.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/code-copy.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/comments.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/creation-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/creation-empty.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/creation-filter.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/creation-grid.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/creation-skeleton.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/my-creations-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/creation/video-detail-dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/credits/balance-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/credits/buy-credits-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/credits/credit-history.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/credits/credits-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/credits/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/document-guide.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/email-otp-form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/empty-placeholder.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/features-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/features-grid.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/github-star.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/header.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/cta-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/faq-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/features-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/footer.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/header.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/hero-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/how-it-works-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/pricing-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/landing/showcase-section.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/language-switcher.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/layout/header-simple.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/layout/mobile-menu-context.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/layout/sidebar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/layout/tool-layout-content.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/layout/tool-layout-wrapper.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/locale-change.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-beam.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-gradient-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-grid-pattern.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-list.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-shiny-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/animated-subscribe-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/avatar-circles.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/bento-grid.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/blur-fade.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/border-beam.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/box-reveal.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/confetti.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/dot-pattern.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/flip-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/grid-pattern.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/hero-video-dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/hyper-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/interactive-grid-pattern.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/interactive-hover-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/magic-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/marquee.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/meteors.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/morphing-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/number-ticker.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/pulsating-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/rainbow-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/ripple-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/ripple.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/scroll-based-velocity.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/shimmer-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/shiny-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/sparkles-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/twitter-card-client.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/twitter-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/typing-animation.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/magicui/word-rotate.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/main-nav.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/meteors-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/mobile-nav.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/modal-provider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/modal.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/mode-toggle.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/nav.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/navbar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/plausible-provider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/billing-form-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/dark-pricing.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/pricing-cards.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/pricing-faq.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/stripe-credit-packs.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/price/stripe-subscription-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/query-provider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/questions.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/rightside-marketing.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/shell.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/sign-in-modal.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/site-footer.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tailwind-indicator.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/theme-provider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/theme-toggle.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/content-panel.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/demo-videos.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/generating-progress-bar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/generation-paused-dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/generator-panel.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/result-panel-wrapper.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/result-panel.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/tool-examples-panel.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/tool-landing-page.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/tool-page-layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/video-history-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/tool/video-history-panel.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/3d-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/accordion.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/alert-dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/alert.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/animated-gradient-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/animated-list.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/animated-tooltip.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/avatar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/background-lines.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/badge.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/breadcrumb.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/calendar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/callout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/card-hover-effect.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/card-skeleton.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/checkbox.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/colorful-text.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/command.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/container-scroll-animation.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/data-table.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/data/globe.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/dialog.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/drawer.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/dropdown-menu.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/following-pointer.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/glowing-effect.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/icons.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/infinite-moving-cards.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/input.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/label.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/marquee.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/meteors.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/navigation-menu.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/pagination.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/popover.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/progress.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/radio-group.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/scroll-area.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/select.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/separator.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/sheet.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/skeleton.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/slider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/sonner.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/sparkles.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/spinner.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/switch.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/table.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/tabs.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/text-generate-effect.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/text-reveal.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/tooltip.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/typewriter-effect.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/utils/cn.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/ui/wobble-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/upgrade/upgrade-modal.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/user-account-nav.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/user-auth-form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/user-avatar.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/user-name-form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/user/avatar-fallback.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/compact-generator.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/defaults.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/duration-slider.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/generator-hooks.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/types.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/video-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/video-generator-core.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/video-generator-input.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-generator/video-status-card.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/components/video-scroll.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/billing-provider.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/credits.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/config/credits.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/generation-risk.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/config/generation-risk.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/i18n-config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/low-credit.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/config/low-credit.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/navigation.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/price/price-data.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/config/price/price-data.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/price/price-faq-data.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/pricing-user.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/providers.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/showcase-media.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/site.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/tool-pages/adapter.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/tool-pages/image-to-video.config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/tool-pages/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/tool-pages/text-to-video.config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/tool-pages/types.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/config/ui/docs.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/content/docs/admin-guide.mdx",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "src/content/docs/configuration.mdx",
+                      "role":  "documentation"
+                  },
+                  {
+                      "path":  "src/db/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/db/migrations/0000_baseline.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/0001_enable_rls.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/0002_sparkling_doorman.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/0003_flat_jamie_braddock.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/0004_nappy_romulus.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/0005_peaceful_magneto.sql",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0000_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0001_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0002_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0003_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0004_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/0005_snapshot.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/migrations/meta/_journal.json",
+                      "role":  "operational"
+                  },
+                  {
+                      "path":  "src/db/schema.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/env.mjs",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-billing.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-credit-packages.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-credits.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-lock-body.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-media-query.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-mounted.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-notification-deduplication.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-scroll.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-signin-modal.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-upgrade-modal.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-video-polling.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/hooks/use-videos.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/i18n/messages.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/i18n/messages.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/i18n/navigation.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/i18n/request.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/i18n/routing.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/i18n/supplemental-messages.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/admin/analytics-metrics.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/admin/analytics-metrics.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/admin/analytics.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/admin/analytics.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/admin/navigation.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/admin/navigation.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/admin/user-videos.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/auth.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/dashboard-client.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/error.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/pagination.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/api/pagination.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/request-body.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/api/request-body.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/api/response.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/admin-role.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/admin.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/auth.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/callback-url.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/auth/callback-url.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/client.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/db.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/env.mjs",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/auth/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/credit-calculator.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/currency.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/email.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/emails/email-otp-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/emails/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/emails/reset-password-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/emails/utils.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/emails/welcome-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/generate-pattern.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/model-display.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/proxy-config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/safe-action.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/seo.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/seo.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/storage.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/lib/storage.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/toc.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/types/dashboard.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/upstash.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/use-debounce.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/use-mounted.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/utils.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/validations/user.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/video-api.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/video-events.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/video-history-storage.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/video-task-storage.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/lib/zod-form.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/components/email-button.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/components/email-layout.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/templates/email-otp-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/templates/reset-password-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/templates/welcome-email.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/mail/types.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/de.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/en.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/es.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/fr.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/ja.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/ko.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/messages/zh.json",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/middleware.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/env.mjs",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/index.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/plans.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/payment/plans.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/subscription-proration.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/payment/subscription-proration.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/subscriptions.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/payment/webhooks.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/registry/magicui/shine-border.tsx",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/billing.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/credit.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/customer.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/generation-quota.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/generation-risk.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/media-asset.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/payment-reversal.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/services/payment-reversal.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/payment-risk.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/provider-health.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/rate-limit.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/upload-reservation.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/video-validation.test.ts",
+                      "role":  "test"
+                  },
+                  {
+                      "path":  "src/services/video-validation.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/services/video.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/stores/credits-store.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/stores/videos-store.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/calsans.ttf",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/fonts/CalSans-SemiBold.ttf",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/fonts/CalSans-SemiBold.woff",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/fonts/CalSans-SemiBold.woff2",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/fonts/Inter-Bold.ttf",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/fonts/Inter-Regular.ttf",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/globals.css",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/theme/default.css",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/themes/emerald-dark.css",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/themes/modern-blue.css",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/styles/themes/purple-gradient.css",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/types/index.d.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/types/k8s.d.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "src/types/meteors.d.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "tailwind.config.ts",
+                      "role":  "code"
+                  },
+                  {
+                      "path":  "tsconfig.json",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "vercel.json",
+                      "role":  "configuration"
+                  },
+                  {
+                      "path":  "vitest.config.ts",
+                      "role":  "code"
+                  }
+              ],
+    "breakdown":  {
+                      "counts":  {
+                                     "skill-prose":  0,
+                                     "skill-reference":  0,
+                                     "skill-tool":  0,
+                                     "code":  537,
+                                     "other":  135
+                                 },
+                      "percentages":  {
+                                          "skill_share":  0,
+                                          "code_share":  79.91,
+                                          "tool_share":  0,
+                                          "other_share":  20.09
+                                      }
+                  }
+}

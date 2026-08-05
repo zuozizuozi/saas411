@@ -4,7 +4,7 @@ vi.mock("node:dns/promises", () => ({
   lookup: vi.fn(async (hostname: string) =>
     hostname === "private.example.com"
       ? [{ address: "10.0.0.5", family: 4 }]
-      : [{ address: "203.0.113.10", family: 4 }]
+      : [{ address: "93.184.216.34", family: 4 }]
   ),
 }));
 
@@ -27,7 +27,10 @@ describe("assertSafeRemoteMediaUrl", () => {
     "https://127.0.0.1/video.mp4",
     "https://10.0.0.1/video.mp4",
     "https://192.168.1.1/video.mp4",
+    "https://100.64.0.1/video.mp4",
     "https://[::1]/video.mp4",
+    "https://[fd00::1]/video.mp4",
+    "https://user:password@cdn.example.com/video.mp4",
   ])("rejects unsafe provider URL %s", (url) => {
     expect(() => assertSafeRemoteMediaUrl(url)).toThrow();
   });

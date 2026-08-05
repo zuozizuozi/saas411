@@ -1,0 +1,48 @@
+RED
+Command: vitest run src/components/credits/credit-history-contract.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/components/credits/credit-history-contract.regression.test.ts > BUG-008 / REQ-013: every credit-history API alias has an English locale key 5ms
+   → expected [ 'video_generate', …(3) ] to deeply equal []
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/credits/credit-history-contract.regression.test.ts > BUG-008 / REQ-013: every credit-history API 
+alias has an English locale key
+AssertionError: expected [ 'video_generate', …(3) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "video_generate",
++   "video_refund",
++   "admin_adjust",
++   "payment_reversal",
++ ]
+
+ ❯ src/components/credits/credit-history-contract.regression.test.ts:18:60
+     16|   const messages = JSON.parse(readFileSync("src/messages/en.json", "ut…
+     17|   const keys = Object.keys(messages.dashboard.credits.types);
+     18|   expect(aliases.filter((alias) => !keys.includes(alias))).toEqual([]);
+       |                                                            ^
+     19| });
+     20|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:14
+   Duration  169ms (transform 13ms, setup 0ms, import 22ms, tests 6ms, environment 0ms)
+

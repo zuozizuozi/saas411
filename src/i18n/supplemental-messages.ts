@@ -32,7 +32,8 @@ export const supplementalMessages: Record<string, SupplementalMessages> = {
     Mail: { welcome: { featuresList: { models: "Créez avec Seedance 2.0 Mini, Seedance 2.0 et Seedance 1.5 Pro" } } },
     Emails: { welcome: { featuresList: { models: "Créez avec Seedance 2.0 Mini, Seedance 2.0 et Seedance 1.5 Pro" } } },
     dashboard: { credits: { types: { new_user: "Crédit système" } } },
-    PricingCards: { off_percent: "-20 %", credits: "Crédits", popular: "Populaire", processing: "Traitement...", subscribers_only: "Réservé aux abonnés", subscriber_pack_only: "Ce pack est réservé aux abonnés actifs.", checkout_not_configured: "Le paiement n’est pas configuré pour cette offre.", checkout_error: "Erreur de paiement", checkout_failed: "Impossible de créer la session de paiement." },
+    ToolPage: { lowCreditTitle: "Votre solde de crédits est faible", lowCreditDescription: "Il vous restera environ {credits} crédits après cette génération.", buyCredits: "Acheter des crédits", choosePlan: "Choisir une offre" },
+    PricingCards: { off_percent: "-20 %", onetime_description: "Achetez des crédits en une seule fois, sans abonnement.", one_time_payment: "Paiement unique", quarterly: "Trimestriel", quarterly_off: "-5 %", yearly_off: "-10 %", per_quarter: "/trimestre", quarterly_bill: "Trimestriel", quarterly_info: "tous les 3 mois", billed_quarterly: "Facturé {price} tous les 3 mois", billed_yearly: "Facturé {price} par an", credits: "Crédits", popular: "Populaire", processing: "Traitement...", subscribers_only: "Réservé aux abonnés", subscriber_pack_only: "Ce pack est réservé aux abonnés actifs.", checkout_not_configured: "Le paiement n’est pas configuré pour cette offre.", checkout_error: "Erreur de paiement", checkout_failed: "Impossible de créer la session de paiement." },
     VideoHistory: { promptCopied: "Prompt copié dans le presse-papiers", copyPrompt: "Copier le prompt", moreCreations: "Plus de créations" },
     GeneratorPanel: { noModels: "Aucun modèle vidéo n’est activé pour cet outil.", videoModels: "Modèles vidéo" },
     Legal: {
@@ -49,7 +50,8 @@ export const supplementalMessages: Record<string, SupplementalMessages> = {
     Mail: { welcome: { featuresList: { models: "Erstellen Sie Inhalte mit Seedance 2.0 Mini, Seedance 2.0 und Seedance 1.5 Pro" } } },
     Emails: { welcome: { featuresList: { models: "Erstellen Sie Inhalte mit Seedance 2.0 Mini, Seedance 2.0 und Seedance 1.5 Pro" } } },
     dashboard: { credits: { types: { new_user: "Systemguthaben" } } },
-    PricingCards: { off_percent: "20 % sparen", credits: "Credits", popular: "Beliebt", processing: "Wird verarbeitet...", subscribers_only: "Nur für Abonnenten", subscriber_pack_only: "Dieses Paket ist nur für aktive Abonnenten verfügbar.", checkout_not_configured: "Der Checkout ist für diesen Tarif noch nicht eingerichtet.", checkout_error: "Checkout-Fehler", checkout_failed: "Die Checkout-Sitzung konnte nicht erstellt werden." },
+    ToolPage: { lowCreditTitle: "Ihr Credit-Guthaben wird knapp", lowCreditDescription: "Nach dieser Generierung verbleiben voraussichtlich etwa {credits} Credits.", buyCredits: "Credits kaufen", choosePlan: "Tarif auswählen" },
+    PricingCards: { off_percent: "20 % sparen", onetime_description: "Credits einmalig und ohne Abonnement kaufen.", one_time_payment: "Einmalige Zahlung", quarterly: "Vierteljährlich", quarterly_off: "5 % sparen", yearly_off: "10 % sparen", per_quarter: "/Quartal", quarterly_bill: "Vierteljährlich", quarterly_info: "alle 3 Monate", billed_quarterly: "Alle 3 Monate {price}", billed_yearly: "Jährlich {price}", credits: "Credits", popular: "Beliebt", processing: "Wird verarbeitet...", subscribers_only: "Nur für Abonnenten", subscriber_pack_only: "Dieses Paket ist nur für aktive Abonnenten verfügbar.", checkout_not_configured: "Der Checkout ist für diesen Tarif noch nicht eingerichtet.", checkout_error: "Checkout-Fehler", checkout_failed: "Die Checkout-Sitzung konnte nicht erstellt werden." },
     VideoHistory: { promptCopied: "Prompt in die Zwischenablage kopiert", copyPrompt: "Prompt kopieren", moreCreations: "Weitere Kreationen" },
     GeneratorPanel: { noModels: "Für dieses Werkzeug ist kein Videomodell aktiviert.", videoModels: "Videomodelle" },
     Legal: {
@@ -66,7 +68,8 @@ export const supplementalMessages: Record<string, SupplementalMessages> = {
     Mail: { welcome: { featuresList: { models: "Crea con Seedance 2.0 Mini, Seedance 2.0 y Seedance 1.5 Pro" } } },
     Emails: { welcome: { featuresList: { models: "Crea con Seedance 2.0 Mini, Seedance 2.0 y Seedance 1.5 Pro" } } },
     dashboard: { credits: { types: { new_user: "Crédito del sistema" } } },
-    PricingCards: { off_percent: "20 % DTO.", credits: "Créditos", popular: "Popular", processing: "Procesando...", subscribers_only: "Solo para suscriptores", subscriber_pack_only: "Este paquete solo está disponible para suscriptores activos.", checkout_not_configured: "El pago no está configurado para este plan.", checkout_error: "Error de pago", checkout_failed: "No se pudo crear la sesión de pago." },
+    ToolPage: { lowCreditTitle: "Tu saldo de créditos se está agotando", lowCreditDescription: "Después de esta generación te quedarán aproximadamente {credits} créditos.", buyCredits: "Comprar créditos", choosePlan: "Elegir un plan" },
+    PricingCards: { off_percent: "20 % DTO.", onetime_description: "Compra créditos una sola vez, sin suscripción.", one_time_payment: "Pago único", quarterly: "Trimestral", quarterly_off: "5 % DTO.", yearly_off: "10 % DTO.", per_quarter: "/trimestre", quarterly_bill: "Trimestral", quarterly_info: "cada 3 meses", billed_quarterly: "Facturación de {price} cada 3 meses", billed_yearly: "Facturación anual de {price}", credits: "Créditos", popular: "Popular", processing: "Procesando...", subscribers_only: "Solo para suscriptores", subscriber_pack_only: "Este paquete solo está disponible para suscriptores activos.", checkout_not_configured: "El pago no está configurado para este plan.", checkout_error: "Error de pago", checkout_failed: "No se pudo crear la sesión de pago." },
     VideoHistory: { promptCopied: "Prompt copiado al portapapeles", copyPrompt: "Copiar prompt", moreCreations: "Más creaciones" },
     GeneratorPanel: { noModels: "No hay ningún modelo de vídeo activado para esta herramienta.", videoModels: "Modelos de vídeo" },
     Legal: {
@@ -83,7 +86,8 @@ export const supplementalMessages: Record<string, SupplementalMessages> = {
     Mail: { welcome: { featuresList: { models: "Seedance 2.0 Mini、Seedance 2.0、Seedance 1.5 Proで作成" } } },
     Emails: { welcome: { featuresList: { models: "Seedance 2.0 Mini、Seedance 2.0、Seedance 1.5 Proで作成" } } },
     dashboard: { credits: { types: { new_user: "システムクレジット" } } },
-    PricingCards: { off_percent: "20% OFF", credits: "クレジット", popular: "人気", processing: "処理中...", subscribers_only: "購読者限定", subscriber_pack_only: "このパックは有効な購読者のみ利用できます。", checkout_not_configured: "このプランの決済はまだ設定されていません。", checkout_error: "決済エラー", checkout_failed: "決済セッションを作成できませんでした。" },
+    ToolPage: { lowCreditTitle: "クレジット残高が少なくなっています", lowCreditDescription: "この生成後の残高は約{credits}クレジットです。", buyCredits: "クレジットを購入", choosePlan: "プランを選択" },
+    PricingCards: { off_percent: "20% OFF", onetime_description: "サブスクリプションなしでクレジットを一度だけ購入できます。", one_time_payment: "一括払い", quarterly: "3か月払い", quarterly_off: "5% OFF", yearly_off: "10% OFF", per_quarter: "/3か月", quarterly_bill: "3か月払い", quarterly_info: "3か月ごと", billed_quarterly: "3か月ごとに{price}を請求", billed_yearly: "年間{price}を請求", credits: "クレジット", popular: "人気", processing: "処理中...", subscribers_only: "購読者限定", subscriber_pack_only: "このパックは有効な購読者のみ利用できます。", checkout_not_configured: "このプランの決済はまだ設定されていません。", checkout_error: "決済エラー", checkout_failed: "決済セッションを作成できませんでした。" },
     VideoHistory: { promptCopied: "プロンプトをクリップボードにコピーしました", copyPrompt: "プロンプトをコピー", moreCreations: "その他の作品" },
     GeneratorPanel: { noModels: "このツールで有効な動画モデルがありません。", videoModels: "動画モデル" },
     Legal: {
@@ -100,7 +104,8 @@ export const supplementalMessages: Record<string, SupplementalMessages> = {
     Mail: { welcome: { featuresList: { models: "Seedance 2.0 Mini, Seedance 2.0, Seedance 1.5 Pro로 제작" } } },
     Emails: { welcome: { featuresList: { models: "Seedance 2.0 Mini, Seedance 2.0, Seedance 1.5 Pro로 제작" } } },
     dashboard: { credits: { types: { new_user: "시스템 크레딧" } } },
-    PricingCards: { off_percent: "20% 할인", credits: "크레딧", popular: "인기", processing: "처리 중...", subscribers_only: "구독자 전용", subscriber_pack_only: "이 패키지는 활성 구독자만 이용할 수 있습니다.", checkout_not_configured: "이 요금제의 결제가 아직 설정되지 않았습니다.", checkout_error: "결제 오류", checkout_failed: "결제 세션을 만들 수 없습니다." },
+    ToolPage: { lowCreditTitle: "크레딧 잔액이 부족해지고 있습니다", lowCreditDescription: "이번 생성 후 약 {credits} 크레딧이 남습니다.", buyCredits: "크레딧 구매", choosePlan: "요금제 선택" },
+    PricingCards: { off_percent: "20% 할인", onetime_description: "구독 없이 크레딧을 한 번만 구매하세요.", one_time_payment: "일회성 결제", quarterly: "분기별", quarterly_off: "5% 할인", yearly_off: "10% 할인", per_quarter: "/분기", quarterly_bill: "분기별", quarterly_info: "3개월마다", billed_quarterly: "3개월마다 {price} 청구", billed_yearly: "연간 {price} 청구", credits: "크레딧", popular: "인기", processing: "처리 중...", subscribers_only: "구독자 전용", subscriber_pack_only: "이 패키지는 활성 구독자만 이용할 수 있습니다.", checkout_not_configured: "이 요금제의 결제가 아직 설정되지 않았습니다.", checkout_error: "결제 오류", checkout_failed: "결제 세션을 만들 수 없습니다." },
     VideoHistory: { promptCopied: "프롬프트를 클립보드에 복사했습니다", copyPrompt: "프롬프트 복사", moreCreations: "더 많은 작품" },
     GeneratorPanel: { noModels: "이 도구에 활성화된 비디오 모델이 없습니다.", videoModels: "비디오 모델" },
     Legal: {

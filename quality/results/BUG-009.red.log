@@ -1,0 +1,71 @@
+RED
+Command: vitest run src/lib/upstash-config.regression.test.ts --reporter=verbose
+Exit: 1
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ × src/lib/upstash-config.regression.test.ts > BUG-009 / REQ-007: scheduler requires the receiver signing keys 7ms
+   → expected 'import { Client } from "@upstash/qsta…' to contain 'QSTASH_CURRENT_SIGNING_KEY'
+vitest.cmd : 
+At F:\saas411\quality\run_phase5_tdd.ps1:45 char:18
++ ...  $redOutput = & $vitest run $testPath --reporter=verbose 2>&1 | Out-S ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/upstash-config.regression.test.ts > BUG-009 / REQ-007: scheduler requires the receiver signing keys
+AssertionError: expected 'import { Client } from "@upstash/qsta…' to contain 'QSTASH_CURRENT_SIGNING_KEY'
+
+- Expected
++ Received
+
+- QSTASH_CURRENT_SIGNING_KEY
++ import { Client } from "@upstash/qstash";
++ 
++ function getQStashClient() {
++   const token = process.env.QSTASH_TOKEN;
++   if (!token) return null;
++   return new Client({ token, baseUrl: process.env.QSTASH_URL });
++ }
++ 
++ export function isWorkflowEnabled(): boolean {
++   return Boolean(process.env.QSTASH_TOKEN && process.env.NEXT_PUBLIC_APP_URL);
++ }
++ 
++ /** Queue a durable reconciliation pass after a provider accepts a task. */
++ export async function scheduleVideoReconciliation(input: {
++   videoUuid: string;
++   userId: string;
++ }) {
++   const client = getQStashClient();
++   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
++   if (!client || !appUrl) return null;
++ 
++   return client.publishJSON({
++     url: `${appUrl}/api/internal/workflows/video-reconcile`,
++     body: input,
++     retries: 3,
++     delay: "15s",
++     failureCallback: `${appUrl}/api/internal/workflows/video-reconcile-failed`,
++   });
++ }
++
+
+ ❯ src/lib/upstash-config.regression.test.ts:8:18
+      6|   expect(source).toContain("QSTASH_TOKEN");
+      7|   expect(source).toContain("NEXT_PUBLIC_APP_URL");
+      8|   expect(source).toContain("QSTASH_CURRENT_SIGNING_KEY");
+       |                  ^
+      9|   expect(source).toContain("QSTASH_NEXT_SIGNING_KEY");
+     10| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  01:43:15
+   Duration  178ms (transform 15ms, setup 0ms, import 25ms, tests 7ms, environment 0ms)
+

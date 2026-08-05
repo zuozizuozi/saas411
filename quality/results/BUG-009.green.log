@@ -1,0 +1,13 @@
+GREEN
+Command: vitest run src/lib/upstash-config.regression.test.ts --reporter=verbose
+Exit: 0
+
+ RUN  v4.1.10 F:/saas411/quality/workspace/phase5-worktree
+
+ ✓ src/lib/upstash-config.regression.test.ts > BUG-009 / REQ-007: scheduler requires the receiver signing keys 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:43:16
+   Duration  167ms (transform 16ms, setup 0ms, import 25ms, tests 2ms, environment 0ms)
+

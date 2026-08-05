@@ -36,6 +36,8 @@ export interface ListVideosParams {
   limit?: number;
   cursor?: string;
   status?: VideoStatus;
+  model?: string;
+  sortBy?: "newest" | "oldest";
 }
 
 // ============================================
@@ -66,11 +68,14 @@ export interface RetryVideoResponse {
 // ============================================
 
 export type CreditTransType =
+  | "new_user"
   | "order_pay"
   | "subscription"
-  | "admin_adjust"
-  | "video_generate"
-  | "video_refund";
+  | "video_consume"
+  | "refund"
+  | "expired"
+  | "system_adjust"
+  | "payment_reversal";
 
 export interface CreditTransaction {
   id: string;
