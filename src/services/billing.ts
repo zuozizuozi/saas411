@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { stripe } from "@/payment";
 import { pricingData } from "@/payment/subscriptions";
 import type { BillingPeriod } from "@/config/price/price-data";
-import { getOnetimeProducts } from "@/config/credits";
+import { getOnetimeProducts, getProductExpiryDays } from "@/config/credits";
 import {
   getSubscriptionPriceDetails,
   type SubscriptionPriceDetails,
@@ -16,7 +16,7 @@ import {
   type ProrationLine,
 } from "@/payment/subscription-proration";
 import { eq } from "drizzle-orm";
-import { ensureCustomer } from "./customer";
+import { ensureCustomer, ensureStripeCustomer } from "./customer";
 import {
   type PurchaseContext,
   recordPendingPaymentOrder,
@@ -255,6 +255,12 @@ function purchaseMetadata(userId: string, context: PurchaseContext) {
   };
 }
 
+function stripeTermsConsent() {
+  return process.env.STRIPE_REQUIRE_TERMS_CONSENT === "true"
+    ? ({ terms_of_service: "required" } as const)
+    : undefined;
+}
+
 export async function createStripeSession(
   userId: string,
   planId: string,
@@ -291,13 +297,16 @@ export async function createStripeSession(
   if (!user) {
     return { success: false as const, url: null };
   }
-  const email = user.email!;
+  const stripeCustomerId = await ensureStripeCustomer(userId);
 
   const session = await stripe.checkout.sessions.create(
     {
       mode: "subscription",
       payment_method_types: ["card"],
-      customer_email: email,
+      customer: stripeCustomerId,
+      customer_update: { address: "auto", name: "auto" },
+      billing_address_collection: "required",
+      consent_collection: stripeTermsConsent(),
       client_reference_id: userId,
       subscription_data: { metadata: purchaseMetadata(userId, context) },
       cancel_url: returnUrl,
@@ -333,11 +342,15 @@ export async function createStripeCreditSession(
     packageId: product.id,
     credits: String(product.credits),
   };
+  const stripeCustomerId = await ensureStripeCustomer(userId);
   const session = await stripe.checkout.sessions.create(
     {
       mode: "payment",
       payment_method_types: ["card"],
-      customer_email: user.email,
+      customer: stripeCustomerId,
+      customer_update: { address: "auto", name: "auto" },
+      billing_address_collection: "required",
+      consent_collection: stripeTermsConsent(),
       client_reference_id: userId,
       metadata,
       payment_intent_data: { metadata },
@@ -366,6 +379,8 @@ export async function createStripeCreditSession(
     amount: product.price.amount,
     currency: product.price.currency,
     credits: product.credits,
+    creditExpiryDays: getProductExpiryDays(product),
+    fulfillmentRemark: `Stripe credit purchase: ${product.name}`,
     context,
   });
   return { success: true as const, url: session.url };
