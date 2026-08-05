@@ -1,17 +1,20 @@
 "use client";
 
 import { cn } from "@/components/ui";
+import { getVideoProgress } from "@/lib/video-progress";
 
 interface VideoStatusCardProps {
   status: string;
   videoUrl?: string;
   error?: string;
+  progress?: number;
 }
 
 export function VideoStatusCard({
   status,
   videoUrl,
   error,
+  progress,
 }: VideoStatusCardProps) {
   const statusConfig = {
     PENDING: { label: "Pending", color: "text-yellow-500", bg: "bg-yellow-500/10" },
@@ -22,6 +25,7 @@ export function VideoStatusCard({
   };
 
   const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+  const displayProgress = getVideoProgress(status, progress);
 
   return (
     <div className="w-full max-w-3xl mx-auto p-6 bg-card rounded-xl border">
@@ -43,21 +47,35 @@ export function VideoStatusCard({
         {/* Progress Indicator */}
         {(status === "PENDING" || status === "GENERATING" || status === "UPLOADING") && (
           <div className="space-y-2">
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              role="progressbar"
+              aria-label={`${config.label} ${displayProgress}%`}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={displayProgress}
+              tabIndex={0}
+              className="h-2 bg-muted rounded-full overflow-hidden"
+            >
               <div
                 className={cn(
-                  "h-full rounded-full animate-pulse",
-                  status === "PENDING" && "w-1/4 bg-yellow-500",
-                  status === "GENERATING" && "w-1/2 bg-blue-500",
-                  status === "UPLOADING" && "w-3/4 bg-purple-500"
+                  "h-full rounded-full transition-[width] duration-500",
+                  status === "PENDING" && "bg-yellow-500",
+                  status === "GENERATING" && "bg-blue-500",
+                  status === "UPLOADING" && "bg-purple-500"
                 )}
+                style={{ width: `${displayProgress}%` }}
               />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {status === "PENDING" && "Waiting in queue..."}
-              {status === "GENERATING" && "AI is generating your video..."}
-              {status === "UPLOADING" && "Uploading to storage..."}
-            </p>
+            <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+              <p>
+                {status === "PENDING" && "Waiting in queue..."}
+                {status === "GENERATING" && "AI is generating your video..."}
+                {status === "UPLOADING" && "Uploading to storage..."}
+              </p>
+              <span className="font-semibold tabular-nums text-foreground">
+                {displayProgress}%
+              </span>
+            </div>
           </div>
         )}
 

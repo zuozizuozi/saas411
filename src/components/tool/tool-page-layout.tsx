@@ -135,6 +135,7 @@ export function ToolPageLayout({
         video.uuid,
         {
           status: "completed",
+          progress: 100,
           videoUrl: video.videoUrl || undefined,
           thumbnailUrl: video.thumbnailUrl || undefined,
           duration: video.duration || undefined,
@@ -255,9 +256,17 @@ export function ToolPageLayout({
     ({ videoId }: { videoId: string; error?: string }) => {
       videoHistoryStorage.updateHistory(
         videoId,
-        { status: "retrying" },
+        { status: "retrying", progress: 99 },
         user?.id
       );
+      setHistoryItems(videoHistoryStorage.getHistory(user?.id));
+    },
+    [user?.id]
+  );
+
+  const handleProgress = useCallback(
+    ({ videoId, progress }: { videoId: string; status: string; progress: number }) => {
+      videoHistoryStorage.updateHistory(videoId, { progress }, user?.id);
       setHistoryItems(videoHistoryStorage.getHistory(user?.id));
     },
     [user?.id]
@@ -269,6 +278,7 @@ export function ToolPageLayout({
     onCompleted: handleCompleted,
     onFailed: handleFailed,
     onRetrying: handleRetrying,
+    onProgress: handleProgress,
   });
 
   // 检查登录状态
@@ -390,6 +400,7 @@ export function ToolPageLayout({
         prompt: prefillData?.prompt || "",
         model: prefillData?.model || "",
         status: "generating",
+        progress: 0,
         creditsUsed: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -545,6 +556,7 @@ export function ToolPageLayout({
           prompt: data.prompt,
           model: data.model,
           status: "generating",
+          progress: 0,
           creditsUsed: output.creditsUsed ?? creditsPerOutput,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -651,6 +663,7 @@ export function ToolPageLayout({
         prompt: historyItems.find((item) => item.uuid === uuid)?.prompt ?? "",
         model: historyItems.find((item) => item.uuid === uuid)?.model ?? "",
         status: "generating",
+        progress: 0,
         creditsUsed: retried.creditsUsed ?? 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

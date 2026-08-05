@@ -9,6 +9,7 @@
  */
 
 import type { Video } from "@/db";
+import { getVideoProgress } from "@/lib/video-progress";
 
 // ============================================================================
 // Types
@@ -22,6 +23,7 @@ export interface VideoHistoryItem {
   prompt: string;
   model: string;
   status: VideoHistoryStatus;
+  progress?: number;
   videoUrl?: string;
   thumbnailUrl?: string;
   duration?: number;
@@ -137,6 +139,7 @@ class VideoHistoryStorage {
       prompt: v.prompt,
       model: v.model,
       status: this.normalizeStatus(v.status),
+      progress: getVideoProgress(v.status),
       videoUrl: v.videoUrl || undefined,
       thumbnailUrl: v.thumbnailUrl || undefined,
       duration: v.duration || undefined,

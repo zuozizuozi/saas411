@@ -15,6 +15,7 @@ import { generateSignedCallbackUrl } from "@/ai/utils/callback-signature";
 import { emitVideoEvent } from "@/lib/video-events";
 import { ApiError } from "@/lib/api/error";
 import { scheduleVideoReconciliation } from "@/lib/upstash";
+import { getVideoProgress } from "@/lib/video-progress";
 import { validateGenerationParams } from "./video-validation";
 import { generationPausedDetails } from "./generation-risk";
 
@@ -406,6 +407,7 @@ export class VideoService {
     userId: string
   ): Promise<{
     status: string;
+    progress: number;
     videoUrl?: string;
     error?: string;
   }> {
@@ -422,6 +424,7 @@ export class VideoService {
     if (video.status === VideoStatus.COMPLETED || video.status === VideoStatus.FAILED) {
       return {
         status: video.status,
+        progress: getVideoProgress(video.status),
         videoUrl: video.videoUrl || undefined,
         error: video.errorMessage || undefined,
       };
@@ -431,7 +434,10 @@ export class VideoService {
     // after claiming it, a later poll or recovery pass must be able to resume.
     if (video.status === VideoStatus.UPLOADING) {
       if (video.updatedAt.getTime() >= Date.now() - 5 * 60 * 1000) {
-        return { status: VideoStatus.UPLOADING };
+        return {
+          status: VideoStatus.UPLOADING,
+          progress: getVideoProgress(VideoStatus.UPLOADING),
+        };
       }
       const [releasedLease] = await db
         .update(videos)
@@ -444,7 +450,12 @@ export class VideoService {
           )
         )
         .returning({ uuid: videos.uuid });
-      if (!releasedLease) return { status: VideoStatus.UPLOADING };
+      if (!releasedLease) {
+        return {
+          status: VideoStatus.UPLOADING,
+          progress: getVideoProgress(VideoStatus.UPLOADING),
+        };
+      }
       video.status = VideoStatus.GENERATING;
     }
 
@@ -457,6 +468,7 @@ export class VideoService {
           const updated = await this.tryCompleteGeneration(video.uuid, result);
           return {
             status: updated.status,
+            progress: getVideoProgress(updated.status, result.progress),
             videoUrl: updated.videoUrl || undefined,
           };
         }
@@ -468,10 +480,14 @@ export class VideoService {
           );
           return {
             status: updated.status,
+            progress: getVideoProgress(updated.status, result.progress),
             error: updated.errorMessage || undefined,
           };
         }
-        if (result.status === "processing" && video.status === VideoStatus.PENDING) {
+        if (
+          result.status === "processing" &&
+          video.status === VideoStatus.PENDING
+        ) {
           await db
             .update(videos)
             .set({
@@ -479,8 +495,15 @@ export class VideoService {
               updatedAt: new Date(),
             })
             .where(eq(videos.uuid, video.uuid));
-          return { status: VideoStatus.GENERATING };
         }
+        const activeStatus =
+          result.status === "processing"
+            ? VideoStatus.GENERATING
+            : video.status;
+        return {
+          status: activeStatus,
+          progress: getVideoProgress(activeStatus, result.progress),
+        };
       } catch (error) {
         console.error("Failed to refresh status from provider:", error);
         const message = error instanceof Error ? error.message : String(error);
@@ -490,6 +513,7 @@ export class VideoService {
           message.includes("Failed to upload");
         return {
           status: "RETRYING",
+          progress: getVideoProgress("RETRYING"),
           error: isFinalizationRetry
             ? "Your video is ready and is being finalized. We will retry automatically."
             : "Video status is temporarily unavailable. We will retry automatically.",
@@ -497,7 +521,10 @@ export class VideoService {
       }
     }
 
-    return { status: video.status };
+    return {
+      status: video.status,
+      progress: getVideoProgress(video.status),
+    };
   }
 
   /**

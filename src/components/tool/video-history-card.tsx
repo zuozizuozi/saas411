@@ -9,10 +9,10 @@
 
 import { useTranslations } from "next-intl";
 import { Copy, AlertCircle, Clock } from "lucide-react";
-import { cn } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import type { VideoHistoryItem } from "@/lib/video-history-storage";
 import { getPublicModelName } from "@/lib/model-display";
+import { getVideoProgress } from "@/lib/video-progress";
 import { toast } from "sonner";
 
 interface VideoHistoryCardProps {
@@ -31,6 +31,7 @@ export function VideoHistoryCard({
   const isCompleted = video.status === "completed";
   const isFailed = video.status === "failed";
   const isRetrying = video.status === "retrying";
+  const progress = getVideoProgress(video.status, video.progress);
 
   // 格式化时间（显示日期和时间）
   const formatTime = (dateString: string) => {
@@ -97,13 +98,32 @@ export function VideoHistoryCard({
             {formatTime(video.createdAt)}
           </span>
         </div>
-        <div className="rounded-lg bg-zinc-800/50 p-5">
-          <div className="flex items-center justify-center gap-3 text-sm text-amber-200">
-            <Clock className="h-5 w-5 animate-pulse" />
-            <div>
-              <p className="font-medium">{t("retrying")}</p>
-              <p className="mt-0.5 text-xs text-zinc-400">{t("retryingHint")}</p>
+        <div className="space-y-3 rounded-lg bg-zinc-800/50 p-5">
+          <div className="flex items-center justify-between gap-3 text-sm text-amber-200">
+            <div className="flex min-w-0 items-center gap-3">
+              <Clock className="h-5 w-5 shrink-0 animate-pulse" />
+              <div>
+                <p className="font-medium">{t("retrying")}</p>
+                <p className="mt-0.5 text-xs text-zinc-400">
+                  {t("retryingHint")}
+                </p>
+              </div>
             </div>
+            <span className="shrink-0 font-semibold tabular-nums">{progress}%</span>
+          </div>
+          <div
+            role="progressbar"
+            aria-label={`${t("retrying")} ${progress}%`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+            tabIndex={0}
+            className="h-2 overflow-hidden rounded-full bg-zinc-700"
+          >
+            <div
+              className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
         {renderMetadata()}
@@ -125,10 +145,27 @@ export function VideoHistoryCard({
         </div>
 
         {/* 进度面板：矩形框 + 加载动画 */}
-        <div className="bg-zinc-800/50 rounded-lg p-6">
-          <div className="flex items-center justify-center gap-3 text-sm text-white">
-            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <span>{t("generating")}</span>
+        <div className="space-y-3 rounded-lg bg-zinc-800/50 p-6">
+          <div className="flex items-center justify-between gap-3 text-sm text-white">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+              <span>{t("generating")}</span>
+            </div>
+            <span className="shrink-0 font-semibold tabular-nums">{progress}%</span>
+          </div>
+          <div
+            role="progressbar"
+            aria-label={`${t("generating")} ${progress}%`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+            tabIndex={0}
+            className="h-2 overflow-hidden rounded-full bg-zinc-700"
+          >
+            <div
+              className="h-full rounded-full bg-blue-500 transition-[width] duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
 

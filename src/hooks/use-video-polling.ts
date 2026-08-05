@@ -8,6 +8,11 @@ interface UseVideoPollingOptions {
   onCompleted?: (video: Video) => void;
   onFailed?: (args: { videoId: string; error?: string }) => void;
   onRetrying?: (args: { videoId: string; error?: string }) => void;
+  onProgress?: (args: {
+    videoId: string;
+    status: string;
+    progress: number;
+  }) => void;
 }
 
 export function useVideoPolling(options: UseVideoPollingOptions = {}) {
@@ -18,6 +23,7 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
     onCompleted,
     onFailed,
     onRetrying,
+    onProgress,
   } = options;
 
   const pollingTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
@@ -69,6 +75,11 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
           const result = await response.json();
           const status = result?.data?.status;
           const error = result?.data?.error;
+          const progress = result?.data?.progress;
+
+          if (typeof status === "string" && Number.isFinite(progress)) {
+            onProgress?.({ videoId, status, progress });
+          }
 
           if (status === "COMPLETED") {
             try {
@@ -130,6 +141,7 @@ export function useVideoPolling(options: UseVideoPollingOptions = {}) {
       onCompleted,
       onFailed,
       onRetrying,
+      onProgress,
       fetchVideoDetail,
       stopPolling,
     ]
