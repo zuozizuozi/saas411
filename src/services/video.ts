@@ -483,6 +483,17 @@ export class VideoService {
         }
       } catch (error) {
         console.error("Failed to refresh status from provider:", error);
+        const message = error instanceof Error ? error.message : String(error);
+        const isFinalizationRetry =
+          Boolean(video.originalVideoUrl) ||
+          message.includes("Failed to download") ||
+          message.includes("Failed to upload");
+        return {
+          status: "RETRYING",
+          error: isFinalizationRetry
+            ? "Your video is ready and is being finalized. We will retry automatically."
+            : "Video status is temporarily unavailable. We will retry automatically.",
+        };
       }
     }
 

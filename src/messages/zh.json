@@ -585,6 +585,8 @@
     "title": "最近生成",
     "demoTitle": "示例视频",
     "generating": "正在生成视频...",
+    "retrying": "正在完成视频处理...",
+    "retryingHint": "交付过程暂时延迟，系统正在自动重试。",
     "download": "下载",
     "copyLink": "复制链接",
     "removeFromHistory": "从历史中移除",

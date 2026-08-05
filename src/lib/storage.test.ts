@@ -1,4 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const undiciMocks = vi.hoisted(() => ({
+  fetch: vi.fn(),
+  agentOptions: vi.fn(),
+}));
 
 vi.mock("node:dns/promises", () => ({
   lookup: vi.fn(async (hostname: string) =>
@@ -8,11 +13,29 @@ vi.mock("node:dns/promises", () => ({
   ),
 }));
 
+vi.mock("undici", () => ({
+  Agent: class MockAgent {
+    constructor(options: unknown) {
+      undiciMocks.agentOptions(options);
+    }
+
+    async close() {}
+  },
+  fetch: undiciMocks.fetch,
+}));
+
 import {
+  Storage,
   assertSafeRemoteMediaUrl,
   assertSafeRemoteMediaUrlResolved,
+  createPinnedLookup,
   detectSupportedImageType,
 } from "./storage";
+
+beforeEach(() => {
+  undiciMocks.fetch.mockReset();
+  undiciMocks.agentOptions.mockReset();
+});
 
 describe("assertSafeRemoteMediaUrl", () => {
   it("allows a public HTTPS URL", () => {
@@ -47,6 +70,64 @@ describe("assertSafeRemoteMediaUrlResolved", () => {
     await expect(
       assertSafeRemoteMediaUrlResolved("https://cdn.example.com/video.mp4")
     ).resolves.toMatchObject({ hostname: "cdn.example.com" });
+  });
+});
+
+describe("pinned provider downloads", () => {
+  it("returns only the previously validated address from DNS lookup", async () => {
+    const pinnedLookup = createPinnedLookup({
+      address: "93.184.216.34",
+      family: 4,
+    });
+
+    await expect(
+      new Promise<{ address: string; family?: number }>((resolve, reject) => {
+        pinnedLookup("changed.example.com", { all: false }, (error, address, family) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve({ address: String(address), family });
+        });
+      })
+    ).resolves.toEqual({ address: "93.184.216.34", family: 4 });
+  });
+
+  it("keeps the provider hostname in the HTTP request while pinning the socket", async () => {
+    undiciMocks.fetch.mockResolvedValueOnce(
+      new Response(Buffer.from("video"), {
+        status: 200,
+        headers: { "content-type": "video/mp4", "content-length": "5" },
+      })
+    );
+    const storage = new Storage({
+      endpoint: "https://storage.example.com",
+      region: "auto",
+      accessKeyId: "test-access-key",
+      secretAccessKey: "test-secret-key",
+      bucket: "test-bucket",
+      publicDomain: "https://media.example.com",
+    });
+    vi.spyOn(storage, "uploadFile").mockResolvedValue({
+      url: "https://media.example.com/videos/test.mp4",
+      key: "videos/test.mp4",
+    });
+
+    await storage.downloadAndUpload({
+      sourceUrl: "https://cdn.example.com/video.mp4",
+      key: "videos/test.mp4",
+    });
+
+    const requestUrl = undiciMocks.fetch.mock.calls[0]?.[0] as URL;
+    expect(requestUrl.hostname).toBe("cdn.example.com");
+    expect(undiciMocks.agentOptions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        connect: expect.objectContaining({
+          servername: "cdn.example.com",
+          lookup: expect.any(Function),
+        }),
+      })
+    );
   });
 });
 
