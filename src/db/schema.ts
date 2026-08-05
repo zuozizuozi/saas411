@@ -76,6 +76,14 @@ export const videoStatusEnum = pgEnum("VideoStatus", [
   "FAILED",
 ]);
 
+export const contentModerationStatusEnum = pgEnum("ContentModerationStatus", [
+  "PENDING",
+  "ALLOWED",
+  "PROVIDER_ONLY",
+  "BLOCKED",
+  "ERROR",
+]);
+
 export const customers = pgTable(
   "Customer",
   {
@@ -557,6 +565,11 @@ export const videos = pgTable(
     provider: text("provider"),
     externalTaskId: text("external_task_id"),
     errorMessage: text("error_message"),
+    moderationStatus: contentModerationStatusEnum("moderation_status")
+      .default("PENDING")
+      .notNull(),
+    moderationReason: text("moderation_reason"),
+    moderationCheckedAt: timestamp("moderation_checked_at"),
     startImageUrl: text("start_image_url"),
     originalVideoUrl: text("original_video_url"),
     videoUrl: text("video_url"),
@@ -579,6 +592,41 @@ export const videos = pgTable(
     createdAtIdx: index("videos_created_at_idx").on(table.createdAt),
   })
 );
+
+/** Privacy-minimized audit trail for content-safety decisions. */
+export const contentModerationEvents = pgTable(
+  "content_moderation_events",
+  {
+    id: serial("id").primaryKey(),
+    eventKey: text("event_key").notNull().unique(),
+    userId: text("user_id").notNull(),
+    videoUuid: text("video_uuid"),
+    stage: text("stage").notNull(),
+    provider: text("provider").notNull(),
+    decision: text("decision").notNull(),
+    model: text("model"),
+    promptHash: text("prompt_hash"),
+    assetHash: text("asset_hash"),
+    categories: jsonb("categories"),
+    reason: text("reason").notNull(),
+    externalRequestId: text("external_request_id"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userCreatedIdx: index("content_moderation_events_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+    videoCreatedIdx: index("content_moderation_events_video_created_idx").on(
+      table.videoUuid,
+      table.createdAt
+    ),
+    decisionCreatedIdx: index(
+      "content_moderation_events_decision_created_idx"
+    ).on(table.decision, table.createdAt),
+  })
+).enableRLS();
 
 /** Upload intents are reserved before a client receives an object-store URL. */
 export const uploadReservations = pgTable(
@@ -709,6 +757,7 @@ export type ProviderEvent = typeof providerEvents.$inferSelect;
 export type PaymentOrder = typeof paymentOrders.$inferSelect;
 export type PaymentDispute = typeof paymentDisputes.$inferSelect;
 export type PaymentRiskEvent = typeof paymentRiskEvents.$inferSelect;
+export type ContentModerationEvent = typeof contentModerationEvents.$inferSelect;
 
 export const SubscriptionPlan = {
   FREE: "FREE",

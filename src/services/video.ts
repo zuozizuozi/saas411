@@ -18,6 +18,10 @@ import { scheduleVideoReconciliation } from "@/lib/upstash";
 import { getVideoProgress } from "@/lib/video-progress";
 import { validateGenerationParams } from "./video-validation";
 import { generationPausedDetails } from "./generation-risk";
+import {
+  contentSafetyService,
+  type ContentSafetyResult,
+} from "./content-safety";
 
 export { validateGenerationParams } from "./video-validation";
 
@@ -38,6 +42,8 @@ export interface GenerateVideoParams {
   batchUuid?: string;
   /** Internal reservation created atomically by generateBatch. */
   reservedVideoUuid?: string;
+  /** Internal result reused by child tasks in a validated multi-output batch. */
+  contentSafetyResult?: ContentSafetyResult;
 }
 
 export interface VideoGenerationResult {
@@ -125,9 +131,20 @@ export class VideoService {
   async generate(params: GenerateVideoParams): Promise<VideoGenerationResult> {
     await this.assertGenerationAllowed(params.userId);
     const validated = validateGenerationParams(params);
+    const contentSafety =
+      params.contentSafetyResult ??
+      (await contentSafetyService.moderateGenerationInput({
+        userId: params.userId,
+        model: params.model,
+        prompt: params.prompt,
+        imageUrls: validated.imageUrls,
+      }));
     const requestedOutputs = validated.outputNumber;
     if (requestedOutputs > 1 && !params.batchUuid) {
-      return this.generateBatch(params, requestedOutputs);
+      return this.generateBatch(
+        { ...params, contentSafetyResult: contentSafety },
+        requestedOutputs
+      );
     }
 
     const modelConfig = validated.modelConfig;
@@ -193,6 +210,9 @@ export class VideoService {
           removeWatermark: params.removeWatermark,
         },
         status: VideoStatus.PENDING,
+        moderationStatus: contentSafety.status,
+        moderationReason: contentSafety.reason,
+        moderationCheckedAt: new Date(),
         startImageUrl: params.imageUrls?.[0] || params.imageUrl || null,
         creditsUsed: creditsRequired,
         duration: effectiveDuration,
@@ -570,6 +590,50 @@ export class VideoService {
       return { status: video.status, videoUrl: video.videoUrl };
     }
 
+    try {
+      const outputSafety = await contentSafetyService.moderateGenerationOutput({
+        userId: video.userId,
+        videoUuid: video.uuid,
+        model: video.model,
+        prompt: video.prompt,
+        thumbnailUrl: result.thumbnailUrl,
+      });
+      await db
+        .update(videos)
+        .set({
+          moderationStatus: outputSafety.status,
+          moderationReason: outputSafety.reason,
+          moderationCheckedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(videos.uuid, video.uuid));
+    } catch (error) {
+      const code =
+        error instanceof ApiError
+          ? (error.details as { code?: string } | undefined)?.code
+          : undefined;
+      const blocked = code === "CONTENT_MODERATION_BLOCKED";
+      await db
+        .update(videos)
+        .set({
+          moderationStatus: blocked ? "BLOCKED" : "ERROR",
+          moderationReason: error instanceof Error ? error.message : String(error),
+          moderationCheckedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(videos.uuid, video.uuid));
+      if (blocked) {
+        const failed = await this.failGeneration(
+          video.uuid,
+          "The generated result was blocked by the content policy."
+        );
+        return { status: failed.status, videoUrl: null };
+      }
+      // Temporary moderation outages remain retryable; credits stay frozen and
+      // the provider result is not published until a later completion attempt.
+      throw error;
+    }
+
     const [claimed] = await db
       .update(videos)
       .set({
@@ -692,6 +756,11 @@ export class VideoService {
           removeWatermark: params.removeWatermark,
         },
         status: VideoStatus.PENDING,
+        moderationStatus: params.contentSafetyResult?.status ?? "PROVIDER_ONLY",
+        moderationReason:
+          params.contentSafetyResult?.reason ??
+          "Local policy passed; provider-native safety checks remain enabled.",
+        moderationCheckedAt: new Date(),
         startImageUrl: validated.imageUrls[0] ?? null,
         creditsUsed: creditsPerOutput,
         duration: validated.duration,
@@ -733,6 +802,7 @@ export class VideoService {
           outputNumber: 1,
           batchUuid,
           reservedVideoUuid: reservation.uuid,
+          contentSafetyResult: params.contentSafetyResult,
         })
       )
     );

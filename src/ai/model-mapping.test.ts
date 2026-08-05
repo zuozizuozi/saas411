@@ -61,4 +61,18 @@ describe("EvoLink Seedance model mapping", () => {
     expect(result).not.toHaveProperty("content_filter");
     expect(result).not.toHaveProperty("remove_watermark");
   });
+
+  it("keeps KIE's documented Seedance NSFW checker enabled", () => {
+    const result = transformParamsForProvider("seedance-1.5-pro", "kie", {
+      prompt: "A fully clothed product presenter",
+      duration: 8,
+      quality: "720P",
+    });
+
+    expect(result).toMatchObject({
+      input: {
+        nsfw_checker: true,
+      },
+    });
+  });
 });
