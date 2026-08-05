@@ -10,6 +10,7 @@ import {
   Settings,
   ArrowLeft,
   Billing,
+  ShieldCheck,
 } from "@/components/ui/icons";
 
 interface AdminSidebarProps {
@@ -47,6 +48,11 @@ const navItems: NavItem[] = [
     title: "Payment risk",
     href: "/admin/payment-risk",
     icon: Billing,
+  },
+  {
+    title: "Content safety",
+    href: "/admin/content-safety",
+    icon: ShieldCheck,
   },
   {
     title: "Settings",

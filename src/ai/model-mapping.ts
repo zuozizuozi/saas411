@@ -273,6 +273,9 @@ function kieParamsTransformer(
       normalizeQuality(params.quality, "kie", internalModelId) || "720p";
     baseInput.fixed_lens = params.fixedLens ?? true;
     baseInput.generate_audio = params.generateAudio ?? false;
+    // KIE documents this model-level checker explicitly. Keep it on even when
+    // callers omit the field so a fallback route cannot silently weaken safety.
+    baseInput.nsfw_checker = true;
   }
 
   return {
