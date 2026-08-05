@@ -1,9 +1,9 @@
 import type Stripe from "stripe";
 import { eq } from "drizzle-orm";
 
-import { getOnetimeProducts } from "@/config/credits";
+import { getOnetimeProducts, getProductExpiryDays } from "@/config/credits";
 import { SubscriptionPlan, customers, db } from "@/db";
-import { CreditTransType, creditService } from "@/services/credit";
+import { CreditTransType } from "@/services/credit";
 import { ensureCustomer } from "@/services/customer";
 import { stripe } from ".";
 import {
@@ -13,26 +13,17 @@ import {
 } from "./plans";
 import { calculateProratedUpgradeCredits } from "./subscription-proration";
 import {
+  applyPaymentRiskAssessment,
   handleChargeRefunded,
   handleDispute,
+  handleEarlyFraudWarning,
+  handlePaymentIntentFailed,
+  handleRadarReview,
+  inspectStripePaymentRisk,
   processStripeEventOnce,
   recordPaidPaymentOrder,
   type StripeEventEnvelope,
 } from "@/services/payment-risk";
-
-async function resolvePaymentReferences(paymentIntentValue: unknown) {
-  const paymentIntentId =
-    typeof paymentIntentValue === "string"
-      ? paymentIntentValue
-      : (paymentIntentValue as { id?: string } | null)?.id ?? null;
-  if (!paymentIntentId) return { paymentIntentId: null, chargeId: null };
-  const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
-  const chargeId =
-    typeof intent.latest_charge === "string"
-      ? intent.latest_charge
-      : intent.latest_charge?.id ?? null;
-  return { paymentIntentId, chargeId };
-}
 
 async function syncSubscription(subscription: Stripe.Subscription) {
   const userId = subscription.metadata.userId;
@@ -73,26 +64,24 @@ async function fulfillCreditPurchase(session: Stripe.Checkout.Session) {
   const product = getOnetimeProducts().find((item) => item.id === packageId);
   if (!product) throw new Error(`Unknown credit package: ${packageId}`);
 
-  await creditService.recharge({
-    userId,
-    credits: product.credits,
-    orderNo: `stripe_${session.id}`,
-    transType: CreditTransType.ORDER_PAY,
-    expiryDays: product.expireDays,
-    remark: `Stripe credit purchase: ${product.name}`,
-  });
-  const references = await resolvePaymentReferences(session.payment_intent);
-  await recordPaidPaymentOrder({
+  const risk = await inspectStripePaymentRisk(session.payment_intent);
+  const order = await recordPaidPaymentOrder({
     userId,
     orderNo: `stripe_${session.id}`,
     checkoutSessionId: session.id,
-    ...references,
+    paymentIntentId: risk.paymentIntentId,
+    chargeId: risk.chargeId,
     productId: product.id,
     amount: session.amount_total ?? product.price.amount,
     currency: session.currency ?? product.price.currency,
     credits: product.credits,
+    creditTransType: CreditTransType.ORDER_PAY,
+    creditExpiryDays: getProductExpiryDays(product),
+    fulfillmentRemark: `Stripe credit purchase: ${product.name}`,
+    risk,
     metadata: session.metadata,
   });
+  await applyPaymentRiskAssessment(order, risk);
   return true;
 }
 
@@ -109,6 +98,14 @@ async function fulfillSubscriptionInvoice(
 
   const userId = subscription.metadata.userId;
   if (!userId) throw new Error("Missing user id in Stripe subscription metadata");
+  const invoiceData = invoice as Stripe.Invoice & {
+    payment_intent?: string | Stripe.PaymentIntent | null;
+    charge?: string | Stripe.Charge | null;
+  };
+  const risk = await inspectStripePaymentRisk(
+    invoiceData.payment_intent,
+    invoiceData.charge
+  );
 
   if (invoice.billing_reason === "subscription_update") {
     const lines = await stripe.invoices.listLineItems(invoice.id, { limit: 100 });
@@ -123,33 +120,23 @@ async function fulfillSubscriptionInvoice(
       throw new Error(`Unknown Stripe upgrade price: ${targetLine?.price?.id}`);
     }
 
-    await creditService.recharge({
-      userId,
-      credits,
-      orderNo: `stripe_upgrade_invoice_${invoice.id}`,
-      transType: CreditTransType.SUBSCRIPTION,
-      expiryDays: targetGrant.expiryDays,
-      remark: `Stripe prorated subscription upgrade: ${targetGrant.name}`,
-    });
-    const invoiceData = invoice as Stripe.Invoice & {
-      payment_intent?: string | Stripe.PaymentIntent | null;
-      charge?: string | Stripe.Charge | null;
-    };
-    const references = await resolvePaymentReferences(invoiceData.payment_intent);
-    await recordPaidPaymentOrder({
+    const order = await recordPaidPaymentOrder({
       userId,
       orderNo: `stripe_upgrade_invoice_${invoice.id}`,
-      paymentIntentId: references.paymentIntentId,
-      chargeId:
-        references.chargeId ??
-        (typeof invoiceData.charge === "string" ? invoiceData.charge : invoiceData.charge?.id),
+      paymentIntentId: risk.paymentIntentId,
+      chargeId: risk.chargeId,
       invoiceId: invoice.id,
       productId: targetLine?.price?.id,
       amount: invoice.amount_paid,
       currency: invoice.currency,
       credits,
+      creditTransType: CreditTransType.SUBSCRIPTION,
+      creditExpiryDays: targetGrant.expiryDays,
+      fulfillmentRemark: `Stripe prorated subscription upgrade: ${targetGrant.name}`,
+      risk,
       metadata: subscription.metadata,
     });
+    await applyPaymentRiskAssessment(order, risk);
     return true;
   }
 
@@ -157,37 +144,54 @@ async function fulfillSubscriptionInvoice(
   const grant = getSubscriptionCreditGrant(priceId);
   if (!grant) throw new Error(`Unknown Stripe subscription price: ${priceId}`);
 
-  await creditService.recharge({
-    userId,
-    credits: grant.credits,
-    orderNo: `stripe_invoice_${invoice.id}`,
-    transType: CreditTransType.SUBSCRIPTION,
-    expiryDays: grant.expiryDays,
-    remark: `Stripe subscription credits: ${grant.name}`,
-  });
-  const invoiceData = invoice as Stripe.Invoice & {
-    payment_intent?: string | Stripe.PaymentIntent | null;
-    charge?: string | Stripe.Charge | null;
-  };
-  const references = await resolvePaymentReferences(invoiceData.payment_intent);
-  await recordPaidPaymentOrder({
+  const order = await recordPaidPaymentOrder({
     userId,
     orderNo: `stripe_invoice_${invoice.id}`,
-    paymentIntentId: references.paymentIntentId,
-    chargeId:
-      references.chargeId ??
-      (typeof invoiceData.charge === "string" ? invoiceData.charge : invoiceData.charge?.id),
+    paymentIntentId: risk.paymentIntentId,
+    chargeId: risk.chargeId,
     invoiceId: invoice.id,
     productId: priceId,
     amount: invoice.amount_paid,
     currency: invoice.currency,
     credits: grant.credits,
+    creditTransType: CreditTransType.SUBSCRIPTION,
+    creditExpiryDays: grant.expiryDays,
+    fulfillmentRemark: `Stripe subscription credits: ${grant.name}`,
+    risk,
     metadata: subscription.metadata,
   });
+  await applyPaymentRiskAssessment(order, risk);
   return true;
 }
 
 async function handleEventPayload(event: Stripe.DiscriminatedEvent) {
+  if (event.type === "review.opened" || event.type === "review.closed") {
+    await handleRadarReview(
+      event as unknown as StripeEventEnvelope,
+      event.data.object as Stripe.Review
+    );
+    return;
+  }
+
+  if (
+    event.type === "radar.early_fraud_warning.created" ||
+    event.type === "radar.early_fraud_warning.updated"
+  ) {
+    await handleEarlyFraudWarning(
+      event as unknown as StripeEventEnvelope,
+      event.data.object as Stripe.Radar.EarlyFraudWarning
+    );
+    return;
+  }
+
+  if (event.type === "payment_intent.payment_failed") {
+    await handlePaymentIntentFailed(
+      event as unknown as StripeEventEnvelope,
+      event.data.object as Stripe.PaymentIntent
+    );
+    return;
+  }
+
   if (event.type === "charge.refunded") {
     await handleChargeRefunded(event.data.object as Stripe.Charge);
     return;

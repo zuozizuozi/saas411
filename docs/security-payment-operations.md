@@ -22,6 +22,27 @@ Only unused credits from that order are removed. Already-used credits become
 `user.credit_debt`; unrelated packages are not confiscated. Accounts with debt
 cannot start new generations until an operator resolves the balance.
 
+## Payment risk and fulfillment holds
+
+Stripe payment success is recorded before any credits are issued. The server
+retrieves the PaymentIntent and Charge, records Radar risk level/score, review
+ID, and 3DS outcome, and then applies the configured policy:
+
+- `normal` risk is fulfilled immediately and idempotently.
+- An open Radar Review, a risk level in `PAYMENT_RISK_HOLD_LEVELS`, or a score at
+  or above `PAYMENT_RISK_HOLD_SCORE` holds fulfillment and changes the account
+  to `PAYMENT_REVIEW`.
+- Radar approval or an administrator approval releases the held credits once.
+- Early fraud warnings keep the payment blocked for an operator decision. The
+  application never creates a Stripe refund automatically.
+- Refunds and disputes received before fulfillment close or reduce the held
+  grant instead of assuming that a credit package already exists.
+
+Operators use `/{locale}/admin/payment-risk` for the internal audit trail and
+open the linked payment/review in Stripe for the source-of-truth decision.
+Every manual approve/block action requires a note. Approval can issue held
+credits; blocking does not refund the payment.
+
 ## Bank disputes / chargebacks
 
 A cardholder can bypass the merchant and file a dispute with their bank. The
@@ -62,6 +83,11 @@ The production webhook endpoint must include at least:
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
 - `charge.refunded`
+- `payment_intent.payment_failed`
+- `review.opened`
+- `review.closed`
+- `radar.early_fraud_warning.created`
+- `radar.early_fraud_warning.updated`
 - `charge.dispute.created`
 - `charge.dispute.updated`
 - `charge.dispute.closed`
@@ -75,18 +101,22 @@ retryable; processed events are ignored on replay.
 
 1. Back up the database.
 2. Set and verify `ADMIN_EMAIL`, `RESEND_FROM`, `RESEND_API_KEY`,
-   `STRIPE_API_KEY`, and `STRIPE_WEBHOOK_SECRET`.
-3. Apply database migrations `0002_sparkling_doorman.sql` and
-   `0003_flat_jamie_braddock.sql`. They create payment and dispute ledgers,
-   enable RLS on them, normalize legacy invalid credit counters, and install
-   accounting constraints.
-4. Add the webhook events listed above in Stripe and send test-mode refund and
-   dispute events.
+   `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`, `PAYMENT_RISK_HOLD_LEVELS`, and
+   `PAYMENT_RISK_HOLD_SCORE`.
+3. Back up, then apply every pending migration in `src/db/migrations` in order.
+   The payment-risk migration must be live before deploying the matching code.
+4. In Stripe test mode, enable Radar's standard protection and 3DS rules, add
+   every webhook event listed above, and send test review, early-warning,
+   failure, refund, and dispute events.
 5. Verify unauthenticated access to `/api/v1/admin/user-videos` returns 401 and
    a non-admin session returns 403.
-6. Verify the bootstrap admin can open `/admin/disputes` and that Stripe links
-   point to the intended mode/account.
-7. Upload URLs expire after 15 minutes and sign the declared content length;
+6. Verify the bootstrap admin can open `/admin/disputes` and
+   `/admin/payment-risk`, and that Stripe links point to the intended
+   mode/account.
+7. Configure a public Terms of Service URL in Stripe before setting
+   `STRIPE_REQUIRE_TERMS_CONSENT=true`; run a test Checkout and confirm Stripe
+   records consent and the billing address.
+8. Upload URLs expire after 15 minutes and sign the declared content length;
    completed files are also checked by image magic bytes. Do not add a blanket
    lifecycle deletion rule to `uploads/`, because completed reference images
    use the same prefix.

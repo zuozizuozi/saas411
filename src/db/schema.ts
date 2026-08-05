@@ -44,11 +44,22 @@ export const creditTransTypeEnum = pgEnum("CreditTransType", [
 export const paymentOrderStatusEnum = pgEnum("PaymentOrderStatus", [
   "PENDING",
   "PAID",
+  "FAILED",
   "PARTIALLY_REFUNDED",
   "REFUNDED",
   "DISPUTED",
   "DISPUTE_WON",
   "DISPUTE_LOST",
+]);
+
+export const paymentRiskStatusEnum = pgEnum("PaymentRiskStatus", [
+  "PENDING",
+  "CLEAR",
+  "REVIEW",
+  "BLOCKED",
+  "EFW",
+  "FAILED",
+  "RESOLVED",
 ]);
 
 export const creditPackageStatusEnum = pgEnum("CreditPackageStatus", [
@@ -339,6 +350,19 @@ export const paymentOrders = pgTable(
     creditsRevoked: integer("credits_revoked").default(0).notNull(),
     amountRefunded: integer("amount_refunded").default(0).notNull(),
     status: paymentOrderStatusEnum("status").default("PENDING").notNull(),
+    riskStatus: paymentRiskStatusEnum("risk_status").default("PENDING").notNull(),
+    riskLevel: text("risk_level"),
+    riskScore: integer("risk_score"),
+    riskReason: text("risk_reason"),
+    reviewId: text("review_id"),
+    earlyFraudWarningId: text("early_fraud_warning_id"),
+    threeDSecureResult: text("three_d_secure_result"),
+    liabilityShift: boolean("liability_shift"),
+    riskEvaluatedAt: timestamp("risk_evaluated_at"),
+    fulfilledAt: timestamp("fulfilled_at"),
+    creditTransType: text("credit_trans_type"),
+    creditExpiryDays: integer("credit_expiry_days"),
+    fulfillmentRemark: text("fulfillment_remark"),
     purchaseIp: text("purchase_ip"),
     userAgent: text("user_agent"),
     termsVersion: text("terms_version"),
@@ -356,6 +380,10 @@ export const paymentOrders = pgTable(
     ),
     chargeIdx: index("payment_orders_charge_idx").on(table.chargeId),
     invoiceIdx: index("payment_orders_invoice_idx").on(table.invoiceId),
+    riskUpdatedIdx: index("payment_orders_risk_updated_idx").on(
+      table.riskStatus,
+      table.updatedAt
+    ),
     nonnegativeAmounts: check(
       "payment_orders_nonnegative_amounts",
       sql`${table.amount} >= 0 and ${table.amountRefunded} >= 0 and ${table.creditsGranted} >= 0 and ${table.creditsRevoked} >= 0`
@@ -363,6 +391,54 @@ export const paymentOrders = pgTable(
     boundedReversals: check(
       "payment_orders_bounded_reversals",
       sql`${table.amountRefunded} <= ${table.amount} and ${table.creditsRevoked} <= ${table.creditsGranted}`
+    ),
+    validRiskScore: check(
+      "payment_orders_valid_risk_score",
+      sql`${table.riskScore} is null or (${table.riskScore} >= 0 and ${table.riskScore} <= 99)`
+    ),
+    validCreditExpiry: check(
+      "payment_orders_valid_credit_expiry",
+      sql`${table.creditExpiryDays} is null or ${table.creditExpiryDays} > 0`
+    ),
+  })
+);
+
+/** Immutable payment-risk decisions and Radar lifecycle history. */
+export const paymentRiskEvents = pgTable(
+  "payment_risk_events",
+  {
+    id: serial("id").primaryKey(),
+    eventKey: text("event_key").notNull().unique(),
+    paymentOrderId: integer("payment_order_id"),
+    userId: text("user_id"),
+    source: text("source").notNull(),
+    action: text("action").notNull(),
+    status: text("status").notNull(),
+    riskLevel: text("risk_level"),
+    riskScore: integer("risk_score"),
+    stripeObjectId: text("stripe_object_id"),
+    reason: text("reason").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+    resolvedBy: text("resolved_by"),
+    resolutionRemark: text("resolution_remark"),
+  },
+  (table) => ({
+    statusCreatedIdx: index("payment_risk_events_status_created_idx").on(
+      table.status,
+      table.createdAt
+    ),
+    userCreatedIdx: index("payment_risk_events_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+    paymentOrderIdx: index("payment_risk_events_payment_order_idx").on(
+      table.paymentOrderId
+    ),
+    validRiskScore: check(
+      "payment_risk_events_valid_risk_score",
+      sql`${table.riskScore} is null or (${table.riskScore} >= 0 and ${table.riskScore} <= 99)`
     ),
   })
 );
@@ -632,6 +708,7 @@ export type UploadReservation = typeof uploadReservations.$inferSelect;
 export type ProviderEvent = typeof providerEvents.$inferSelect;
 export type PaymentOrder = typeof paymentOrders.$inferSelect;
 export type PaymentDispute = typeof paymentDisputes.$inferSelect;
+export type PaymentRiskEvent = typeof paymentRiskEvents.$inferSelect;
 
 export const SubscriptionPlan = {
   FREE: "FREE",

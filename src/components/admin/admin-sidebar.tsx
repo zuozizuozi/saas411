@@ -44,6 +44,11 @@ const navItems: NavItem[] = [
     icon: Billing,
   },
   {
+    title: "Payment risk",
+    href: "/admin/payment-risk",
+    icon: Billing,
+  },
+  {
     title: "Settings",
     href: "/admin/settings",
     icon: Settings,
